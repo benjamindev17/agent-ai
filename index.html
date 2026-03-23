@@ -311,6 +311,8 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .ctx-paste-input::placeholder{color:var(--od-faint);font-family:system-ui,sans-serif}
 .ctx-paste-btn{width:100%;margin-top:8px;background:linear-gradient(135deg,var(--od-teal),#016468);border:none;border-radius:10px;padding:8px;color:#fff;font-size:11.5px;font-family:system-ui,sans-serif;cursor:pointer;font-weight:600;transition:all .2s}
 .ctx-paste-btn:hover{box-shadow:0 4px 16px rgba(1,126,132,.3)}
+.ctx-img-drop:hover{border-color:var(--od-teal);background:rgba(1,126,132,.05)}
+.ctx-img-drop.dragover{border-color:var(--od-teal);background:rgba(1,126,132,.1);box-shadow:0 0 0 3px rgba(1,126,132,.15)}
 .ctx-field{display:flex;flex-direction:column;gap:4px}
 .ctx-field-label{font-size:9px;font-family:system-ui,sans-serif;color:var(--od-grey);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:0}
 .ctx-field-label.full-q{font-size:10px;text-transform:none;letter-spacing:0;font-weight:600;color:var(--od-text)}
@@ -1342,7 +1344,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 
     <!-- Step 2: Secondary controls — discreet -->
     <div class="ag-secondary-bar">
-<button class="ag-launch" id="ag-launch" onclick="launchMulti()" style="display:none">Lancer <span class="ag-launch-count" id="ag-launch-count">0</span></button>
+      <button class="ag-launch" id="ag-launch" onclick="launchMulti()" style="display:none" data-i18n="btn_launch">Lancer <span class="ag-launch-count" id="ag-launch-count">0</span></button>
       <button class="ag-reset-btn" onclick="resetAll()" title="Nouveau client"><span class="ag-reset-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg></span></button>
     </div>
 
@@ -1440,7 +1442,23 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
         <span class="ctx-paste-arrow" id="ctx-paste-arrow">▼</span>
       </div>
       <div class="ctx-paste-expanded" id="ctx-paste-expanded" style="display:none">
-        <textarea class="ctx-paste-input" id="ctx-paste-input" rows="4" placeholder="Collez ici le contenu copié depuis la page subscription Odoo…"></textarea>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:10px;font-weight:600;font-family:system-ui,sans-serif;color:var(--od-muted);text-transform:uppercase;letter-spacing:.5px" data-i18n="ctx_paste_text_label">Texte copié</div>
+            <textarea class="ctx-paste-input" id="ctx-paste-input" rows="4" placeholder="Collez ici le contenu copié depuis la page subscription Odoo…"></textarea>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:10px;font-weight:600;font-family:system-ui,sans-serif;color:var(--od-muted);text-transform:uppercase;letter-spacing:.5px" data-i18n="ctx_paste_img_label">ou capture d'écran</div>
+            <div class="ctx-img-drop" id="ctx-img-drop" onclick="document.getElementById('ctx-img-file').click()" style="flex:1;min-height:80px;border:1.5px dashed var(--od-grey-border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;background:var(--od-grey-light);overflow:hidden;position:relative">
+              <div id="ctx-img-placeholder" style="text-align:center;padding:10px">
+                <div style="font-size:20px;margin-bottom:4px">📋</div>
+                <div style="font-size:10px;color:var(--od-faint);font-family:system-ui,sans-serif" data-i18n="ctx_paste_img_hint">Ctrl+V ou cliquez</div>
+              </div>
+              <img id="ctx-img-preview" style="display:none;max-width:100%;max-height:120px;border-radius:8px"/>
+            </div>
+            <input type="file" id="ctx-img-file" accept="image/*" style="display:none" onchange="handleCtxImgFile(event)"/>
+          </div>
+        </div>
         <button class="ctx-paste-btn" onclick="parseCtxPaste()">✦ Auto-compléter</button>
       </div>
     </div>
@@ -1481,10 +1499,13 @@ STYLE & TONE (NON-NEGOTIABLE):
   * NEVER use asterisks (*) for any reason. Not for bold (**text**), not for italic (*text*), not for lists (* item). ZERO asterisks in the output.
   * NEVER use markdown bold, italic, or any markdown formatting.
   * NEVER wrap words in asterisks, underscores, or any special characters for emphasis.
-  * If you want to emphasize something, use sentence structure and word choice — NOT formatting characters.
+  * If you want to emphasize something, use sentence structure and word choice, NOT formatting characters.
   * Write like a real human email: plain text, no formatting marks whatsoever.
-  * For bullet points, use ONLY the dash character: - (tiret). Never * or •.
-- Max 3-4 bullet points (with dashes -) when strictly necessary. Prefer flowing paragraphs.
+  * NEVER use bullet points, dashes (-), em-dashes (—), en-dashes (–), or any list-style formatting. Write ONLY in flowing paragraphs and complete sentences.
+  * NEVER use — (em-dash) in sentences for parenthetical remarks. Use commas or parentheses instead. Example: WRONG "c'est un beau projet — félicitations !" → RIGHT "c'est un beau projet, félicitations !"
+  * ZERO dashes of any kind in the output. Not for lists, not for emphasis, not for parenthetical remarks. The only acceptable dash is inside a URL.
+- Write EXCLUSIVELY in flowing paragraphs. No bullet points, no numbered lists, no dashes. Every piece of information must be woven into natural sentences and paragraphs.
+- CLOSING LINE BAN: NEVER end an email with "N'hésitez pas à revenir vers moi" or "Don't hesitate to reach out" or any variation. This is overused and robotic. Instead, end naturally with a simple "Bonne journée" or "À bientôt" or a contextual closing line. Be creative, vary the closings.
 
 LANGUAGE PROTOCOL:
 - The response language is controlled by the AM's interface setting, injected at the end of this prompt.
@@ -1497,7 +1518,7 @@ FUNCTIONAL SUPPORT LEVEL 0
 
 TRIGGER: Use Resource List ONLY for "How-to" or technical configuration questions.
 Admin Exception: billing/user count questions -> NO resource list, NO Tango link.
-Safety Clause: Tango duplicate link ONLY if technical manipulation explained: https://app.tango.us/app/workflow/How-to-duplicate-your-database-31d11ff635cd4f76b3f9ae49b07f8a7d
+Safety Clause: When recommending to duplicate a database before any manipulation, ALWAYS include the link as a clickable markdown link: [dupliquer votre base de données](https://app.tango.us/app/workflow/How-to-duplicate-your-database-31d11ff635cd4f76b3f9ae49b07f8a7d). NEVER just mention duplicating without the link.
 Version Lock: ALWAYS use v19.0 links.
 Service Packs: FORBIDDEN to suggest unless client explicitly says "pack", "consultant", "coaching", "service".
 
@@ -2005,14 +2026,16 @@ let multiCurrentIdx=0;
 let isInMultiQueue=false;
 
 const SIT_NAMES={accountant:"Comptable",hosting:"Hébergement",tech:"Technique",db:"Réouverture DB",upsell:"Upsell",commercial:"Commercial",upgrade:"Upgrade",oneappfree:"Gratuit",codelines:"Code",successpack:"Packs"};
+const SIT_NAMES_EN={accountant:"Accountant",hosting:"Hosting",tech:"Technical",db:"DB Recovery",upsell:"Upsell",commercial:"Commercial",upgrade:"Upgrade",oneappfree:"Free",codelines:"Code",successpack:"Packs"};
 
 function showMultiProgress(){
   if(multiAllSteps.length<2){document.getElementById("multi-progress").classList.remove("visible");return;}
   const el=document.getElementById("mp-steps");
+  const names=uiLang==="en"?SIT_NAMES_EN:SIT_NAMES;
   let h="";
   multiAllSteps.forEach((s,i)=>{
     const state=i<multiCurrentIdx?"done":i===multiCurrentIdx?"active":"";
-    h+='<div class="mp-step '+state+'"><div class="mp-step-dot">'+(i<multiCurrentIdx?"✓":(i+1))+'</div><div class="mp-step-name">'+(SIT_NAMES[s]||s)+'</div></div>';
+    h+='<div class="mp-step '+state+'"><div class="mp-step-dot">'+(i<multiCurrentIdx?"✓":(i+1))+'</div><div class="mp-step-name">'+(names[s]||s)+'</div></div>';
     if(i<multiAllSteps.length-1)h+='<div class="mp-step-line'+(i<multiCurrentIdx?" done":"")+'"></div>';
   });
   el.innerHTML=h;
@@ -2042,30 +2065,16 @@ function updateMultiUI(){
   const count=multiSelected.length;
   const btn=document.getElementById("ag-launch");
   btn.style.display=count>0?"inline-flex":"none";
-  document.getElementById("ag-launch-count").textContent=count;
+  var E=uiLang==="en";
+  btn.innerHTML=(E?"Launch ":"Lancer ")+'<span class="ag-launch-count" id="ag-launch-count">'+count+'</span>';
 }
 
 let autoDetected=false;
 
 function launchMulti(){
   if(multiSelected.length===0)return;
-  if(autoDetected){
-    // Path 2: auto-detected, skip CR popup, use detect input directly
-    pendingEmailText="";
-    autoDetected=false;
-    multiQueue=[...multiSelected];
-    multiAllSteps=[...multiQueue];
-    multiCurrentIdx=0;
-    multiBlocks=[];
-    multiUseWebSearch=false;
-    isInMultiQueue=true;
-    showMultiProgress();
-    openNextInQueue();
-  }else{
-    // Path 1: manual, show CR popup
-    document.getElementById("cr-textarea").value="";
-    document.getElementById("cr-overlay").classList.remove("hidden");
-  }
+  document.getElementById("cr-textarea").value="";
+  document.getElementById("cr-overlay").classList.remove("hidden");
 }
 
 function closeCrPopup(){document.getElementById("cr-overlay").classList.add("hidden");}
@@ -2078,10 +2087,11 @@ function skipCrPopup(){
 function launchAfterCr(){
   closeCrPopup();
   pendingEmailText=document.getElementById("cr-textarea").value.trim();
-  if(pendingSingleSituation){
-    // Single situation path
-    const type=pendingSingleSituation;
-    pendingSingleSituation=null;
+  if(multiSelected.length===1){
+    // Single situation — open directly (style inline in wizard)
+    const type=multiSelected[0];
+    multiSelected=[];
+    updateMultiUI();
     openSituation(type);
   }else{
     // Multi situation path
@@ -2091,6 +2101,8 @@ function launchAfterCr(){
     multiBlocks=[];
     multiUseWebSearch=false;
     isInMultiQueue=true;
+    multiSelected=[];
+    updateMultiUI();
     showMultiProgress();
     openNextInQueue();
   }
@@ -2223,7 +2235,7 @@ function onDateChange(val){ctxDateChange();}
 
 function syncSummary(){const u=document.getElementById("users-input").value;if(u)ctx.users=u;else ctx.users=null;const parts=[];if(ctx.plan)parts.push(ctx.plan);if(ctx.billing)parts.push(ctx.billing);if(ctx.users)parts.push(ctx.users+" user(s)");if(ctx.vat)parts.push(ctx.vat==="Oui — TVA applicable"?"TVA: Oui":"TVA: Non");if(ctx.country)parts.push(ctx.country);if(ctx.nextInvoice){const d=new Date(ctx.nextInvoice);parts.push("Facture: "+d.toLocaleDateString("fr-BE",{day:"2-digit",month:"2-digit",year:"numeric"}));}const fab=document.getElementById("fab-summary"),dot=document.getElementById("fab-dot"),isLive=parts.length>0;if(fab)fab.textContent=isLive?"— "+parts.join(" · "):"";if(dot)dot.classList.toggle("live",isLive);const agDot=document.getElementById("ag-ctx-dot");if(agDot)agDot.classList.toggle("live",isLive);const agBtn=document.getElementById("ag-ctx-btn");if(agBtn){const txt=agBtn.querySelector(".ag-ctx-text");const isComplete=!!(ctx.plan&&ctx.billing&&ctx.country);agBtn.classList.toggle("complete",isComplete);if(txt)txt.textContent=isComplete?"✓ "+parts.slice(0,2).join(" · "):UI_TEXTS["ctx_incomplete"][uiLang];}}
 
-function resetCtx(){ctx.plan=ctx.billing=ctx.pricelist=ctx.users=ctx.vat=ctx.country=ctx.nextInvoice=null;document.getElementById("users-input").value="";document.getElementById("country-input").value="";document.getElementById("country-input").classList.remove("has-value");document.getElementById("pl-badge").style.display="none";var cd=document.getElementById("ctx-day");if(cd)cd.innerHTML='<option value="" data-i18n="ctx_day">Jour</option>';var cm=document.getElementById("ctx-month");if(cm)cm.value="";var cy=document.getElementById("ctx-year");if(cy)cy.value="";document.getElementById("prorata-info").textContent="";document.getElementById("field-date").style.display="none";document.querySelectorAll(".cb[data-field]").forEach(b=>b.classList.remove("on"));syncSummary();}
+function resetCtx(){ctx.plan=ctx.billing=ctx.pricelist=ctx.users=ctx.vat=ctx.country=ctx.nextInvoice=null;document.getElementById("users-input").value="";document.getElementById("country-input").value="";document.getElementById("country-input").classList.remove("has-value");document.getElementById("pl-badge").style.display="none";var cd=document.getElementById("ctx-day");if(cd)cd.innerHTML='<option value="" data-i18n="ctx_day">Jour</option>';var cm=document.getElementById("ctx-month");if(cm)cm.value="";var cy=document.getElementById("ctx-year");if(cy)cy.value="";document.getElementById("prorata-info").textContent="";document.getElementById("field-date").style.display="none";document.querySelectorAll(".cb[data-field]").forEach(b=>b.classList.remove("on"));if(typeof clearCtxImg==="function")clearCtxImg();document.getElementById("ctx-paste-input").value="";syncSummary();}
 
 function toggleCtxPaste(){
   var exp=document.getElementById("ctx-paste-expanded");
@@ -2234,6 +2246,8 @@ function toggleCtxPaste(){
 }
 
 function parseCtxPaste(){
+  // If image is loaded, use vision API
+  if(ctxImgBase64){parseCtxImgVision();return;}
   var raw=document.getElementById("ctx-paste-input").value;
   if(!raw.trim())return;
   var t=raw.toLowerCase();
@@ -2339,6 +2353,142 @@ function clickCtxBtn(field,value){
     b.classList.remove("on");
     if(b.getAttribute("data-value")===value)b.classList.add("on");
   });
+}
+
+// ═══ IMAGE PASTE/DROP FOR CONTEXT ═══
+var ctxImgBase64=null;
+
+function handleCtxImgFile(e){
+  var file=e.target.files&&e.target.files[0];
+  if(file)loadCtxImg(file);
+}
+
+function loadCtxImg(file){
+  if(!file||!file.type.startsWith("image/"))return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    ctxImgBase64=e.target.result.split(",")[1];
+    var preview=document.getElementById("ctx-img-preview");
+    preview.src=e.target.result;
+    preview.style.display="block";
+    document.getElementById("ctx-img-placeholder").style.display="none";
+    document.getElementById("ctx-img-drop").style.borderStyle="solid";
+    document.getElementById("ctx-img-drop").style.borderColor="var(--od-teal)";
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearCtxImg(){
+  ctxImgBase64=null;
+  document.getElementById("ctx-img-preview").style.display="none";
+  document.getElementById("ctx-img-preview").src="";
+  document.getElementById("ctx-img-placeholder").style.display="block";
+  document.getElementById("ctx-img-drop").style.borderStyle="dashed";
+  document.getElementById("ctx-img-drop").style.borderColor="";
+}
+
+// Listen for paste events on the ctx drawer
+document.addEventListener("paste",function(e){
+  var ctxZone=document.getElementById("ctx-paste-expanded");
+  if(!ctxZone||ctxZone.style.display==="none")return;
+  var items=e.clipboardData&&e.clipboardData.items;
+  if(!items)return;
+  for(var i=0;i<items.length;i++){
+    if(items[i].type.indexOf("image")!==-1){
+      e.preventDefault();
+      loadCtxImg(items[i].getAsFile());
+      return;
+    }
+  }
+});
+
+// Drag and drop
+(function(){
+  var drop=document.getElementById("ctx-img-drop");
+  if(!drop)return;
+  drop.addEventListener("dragover",function(e){e.preventDefault();drop.classList.add("dragover");});
+  drop.addEventListener("dragleave",function(){drop.classList.remove("dragover");});
+  drop.addEventListener("drop",function(e){e.preventDefault();drop.classList.remove("dragover");var f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)loadCtxImg(f);});
+})();
+
+async function parseCtxImgVision(){
+  var apiKey=localStorage.getItem("anthropic_api_key");
+  if(!apiKey){document.getElementById("api-modal").classList.remove("hidden");return;}
+  var btn=document.querySelector(".ctx-paste-btn");
+  btn.textContent="⏳ Analyse en cours…";btn.style.background="var(--od-purple)";btn.disabled=true;
+  try{
+    var resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",max_tokens:500,
+      messages:[{role:"user",content:[
+        {type:"image",source:{type:"base64",media_type:"image/png",data:ctxImgBase64}},
+        {type:"text",text:"Extract subscription info from this Odoo screenshot. Return ONLY a JSON object (no markdown, no backticks) with these fields (use null if not found):\n{\"plan\":\"Standard\" or \"Custom\",\"billing\":\"Monthly\" or \"Annual\",\"users\":number,\"next_invoice\":\"DD Mon\" format,\"vat_rate\":number or null,\"country_code\":\"XX\" 2-letter code or null,\"pricelist\":\"Europe High\" or \"Europe Low\" or null,\"hosting\":\"Online\" or \"Odoo.sh\" or \"On-Premise\" or null}"}
+      ]}]
+    })});
+    var data=await resp.json();
+    if(data.error)throw new Error(data.error.message);
+    var txt=(data.content||[]).map(function(b){return b.text||"";}).join("");
+    txt=txt.replace(/```json|```/g,"").trim();
+    var parsed=JSON.parse(txt);
+    applyVisionResult(parsed);
+    btn.textContent=t("toast_imported");btn.style.background="var(--od-green)";
+    setTimeout(function(){btn.textContent="✦ Auto-compléter";btn.style.background="";btn.disabled=false;},2000);
+  }catch(err){
+    btn.textContent="✕ Erreur";btn.style.background="var(--od-red)";
+    setTimeout(function(){btn.textContent="✦ Auto-compléter";btn.style.background="";btn.disabled=false;},2500);
+    console.error("Vision parse error:",err);
+  }
+}
+
+function applyVisionResult(r){
+  if(r.plan){
+    var p=r.plan.toLowerCase().includes("custom")?"Custom":"Standard";
+    ctx.plan=p;clickCtxBtn("plan",p);
+  }
+  if(r.billing){
+    var b=r.billing.toLowerCase().includes("month")?"Mensuel":"Annuel";
+    ctx.billing=b;clickCtxBtn("billing",b);
+    document.getElementById("field-date").style.display=b==="Annuel"?"block":"none";
+    if(b==="Annuel")ctxUpdateDays();
+  }
+  if(r.users){
+    var u=parseInt(r.users);
+    if(u>0){document.getElementById("users-input").value=u;ctx.users=String(u);}
+  }
+  if(r.next_invoice&&ctx.billing==="Annuel"){
+    var m=r.next_invoice.match(/(\d{1,2})\s*(\w+)/);
+    if(m){
+      var day=parseInt(m[1]);
+      var monStr=m[2].toLowerCase().substring(0,3);
+      var months={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
+      var mon=months[monStr]||0;
+      if(mon){
+        var yr=new Date().getFullYear();
+        var testDate=new Date(yr,mon-1,day);
+        if(testDate<new Date())yr++;
+        document.getElementById("ctx-month").value=mon;
+        document.getElementById("ctx-year").value=yr;
+        ctxUpdateDays();
+        document.getElementById("ctx-day").value=day;
+        ctxDateChange();
+      }
+    }
+  }
+  if(r.vat_rate&&r.vat_rate>0){
+    ctx.vat="Oui — TVA applicable";clickCtxBtn("vat","Oui — TVA applicable");
+  }else if(r.vat_rate===0||r.vat_rate===null){
+    // Don't set if null, only if explicitly 0
+    if(r.vat_rate===0){ctx.vat="Non — exonéré de TVA";clickCtxBtn("vat","Non — exonéré de TVA");}
+  }
+  var code=r.country_code;
+  if(!code&&r.vat_rate){
+    var vatCountries={"21":"BE","20":"FR","19":"DE","23":"PL","23":"IE"};
+    code=vatCountries[String(r.vat_rate)];
+  }
+  if(code){
+    var entry=COUNTRIES.find(function(c){return c[0]===code;});
+    if(entry)selectCountry(entry[0],entry[1]);
+  }
+  syncSummary();
 }
 
 function buildContextBlock(){const u=document.getElementById("users-input").value;if(u)ctx.users=u;const lines=[];if(ctx.plan)lines.push("Plan : "+ctx.plan);if(ctx.billing)lines.push("Facturation : "+ctx.billing);if(ctx.pricelist)lines.push("Pricelist : "+ctx.pricelist);if(ctx.users)lines.push("Nombre d'utilisateurs : "+ctx.users);if(ctx.vat)lines.push("Assujetti TVA : "+ctx.vat);if(ctx.country)lines.push("Pays du client : "+ctx.country);if(ctx.nextInvoice){const today=new Date();today.setHours(0,0,0,0);const next=new Date(ctx.nextInvoice);next.setHours(0,0,0,0);const days=Math.round((next-today)/(1000*60*60*24));const fmt=next.toLocaleDateString("fr-BE",{day:"2-digit",month:"2-digit",year:"numeric"});lines.push("Prochaine date de facturation annuelle : "+fmt+" (dans "+days+" jours)");}if(!lines.length)return"";return"\n\n---\n[CONTEXTE CLIENT — UTILISER POUR CALCULS]\n"+lines.join("\n")+"\n---";}
@@ -2619,6 +2769,7 @@ const QW_CONFIGS={
         {id:"billing",label:"Facturation actuelle",required:true,type:"radio",options:[
           {val:"monthly",label:"Mensuel"},{val:"annual",label:"Annuel"}
         ]},
+        {id:"quote_url",label:"Lien du devis",required:false,type:"text",placeholder:"Ex: https://www.odoo.com/my/quotes/123",showIf:function(){return qwState.billing==="annual";}},
         {id:"info",type:"alert",style:"info",text:"Mensuel : changements à la prochaine facture. Annuel : ajouts = prorata immédiat, suppressions = au prochain renouvellement."}
       ]});
       return pages;
@@ -2642,32 +2793,50 @@ const QW_CONFIGS={
         const count=qwState.cl_count||"non précisé";
         const origins=qwState.cl_origin||[];
         const dburl=(qwState.cl_dburl||"").replace(/\/+$/,"");
-        l.push("== LIGNES DE CODE CUSTOM ==","- DÉTECTION: 'Il semblerait que le système ait détecté "+count+" lignes de code personnalisé sur votre base de données.'");
-        l.push("- COÛTS: La maintenance du code personnalisé est facturée par tranche de 100 lignes. Europe High: €16/mois par tranche. Europe Low: €12/mois par tranche.");
-        l.push("  RÈGLE ABSOLUE TARIF MAINTENANCE: Le tarif est TOUJOURS par tranche complète de 100 lignes. Ne JAMAIS calculer de prix au prorata. Que le client ait 1 ligne ou 100 lignes = 1 tranche = 1x le tarif. 101 à 200 lignes = 2 tranches = 2x le tarif. Donner UNIQUEMENT le prix par tranche selon la pricelist du client, pas de calcul.");
+        l.push("== LIGNES DE CODE CUSTOM ==");
+        l.push("- DÉTECTION: 'Il semblerait que le système ait détecté "+count+" lignes de code personnalisé sur votre base de données.'");
+        l.push("- POURQUOI ÇA COÛTE (OBLIGATOIRE — toujours expliquer) : Expliquer que le code personnalisé nécessite une maintenance spécifique de la part d'Odoo. À chaque nouvelle version, Odoo doit s'assurer que le code custom reste compatible et fonctionnel. C'est cette maintenance qui est facturée.");
+        l.push("- COÛTS — EXPLICATION SIMPLE:");
+        l.push("  Formuler de manière simple et directe, par exemple: 'La maintenance du code personnalisé est facturée par tranche de 100 lignes, ce qui représente €16/mois dans votre cas.' (ou €12 selon la pricelist).");
+        l.push("  NE PAS faire de calcul complexe, NE PAS dire 'X lignes = Y tranches = Z euros'. Juste donner le prix par tranche et laisser le devis parler.");
         l.push("  Le code custom nécessite toujours un plan Custom.");
+        l.push("- ALTERNATIVE ODOO.SH / ON-PREMISE (OBLIGATOIRE — toujours mentionner) :");
+        l.push("  Mentionner que si le client souhaite conserver ses lignes de code sans frais de maintenance, il a la possibilité de migrer vers Odoo.sh ou On-Premise, où le code custom est hébergé directement par le client.");
+        l.push("  Formuler de manière positive et informative, pas comme une menace. Ex: 'Si vous souhaitez conserver vos personnalisations sans frais de maintenance supplémentaires, sachez qu'Odoo.sh et On-Premise sont des options qui vous le permettent.'");
         if(dburl&&origins.length>0){
           const links=[];
           if(origins.includes("server_actions"))links.push(dburl+"/odoo/server-actions");
           if(origins.includes("computed_fields"))links.push(dburl+"/odoo/actions");
-          l.push("- COMMENT VÉRIFIER ET RETIRER: Expliquer que ces lignes proviennent "+((links.length>1)?"des liens":"du lien")+" suivant"+(links.length>1?"s":"")+" :");
+          l.push("- COMMENT VÉRIFIER ET RETIRER: Présenter les liens vers les pages de code en les mettant chacun sur sa propre ligne dans le texte, SANS tiret, SANS bullet point. Juste l'URL seule sur sa ligne.");
+          l.push("  Format OBLIGATOIRE dans l'email (chaque URL seule sur sa ligne, PAS de tiret devant, PAS de markdown) :");
           links.forEach(lk=>l.push("  "+lk));
-          l.push("- IMPORTANT FORMAT LIENS: URLs en clair (PAS de markdown [texte](url)).");
+          l.push("- IMPORTANT FORMAT LIENS: URLs en clair, chacune sur sa propre ligne. PAS de markdown [texte](url). PAS de tiret devant.");
           l.push("- STRUCTURE DU PARAGRAPHE (ordre EXACT):");
-          l.push("  1. Phrase 'il semblerait' + nombre de lignes + "+(links.length>1?"les liens":"le lien")+" en clair");
-          l.push("  2. Explication des coûts de maintenance");
-          l.push("  3. 'Pour identifier qui a créé chaque élément, vous devez :' suivi de bullet points (tirets -) :");
-          l.push("     - Cliquer sur "+(links.length>1?"les liens":"le lien"));
-          l.push("     - Utiliser la fonction \"Regrouper par\" > \"Créé par\"");
-          l.push("     - Chaque action ou champ sera classé sous le nom de l'utilisateur qui l'a créé");
-          l.push("     - Si certaines lignes ne vous sont plus utiles, vous pouvez les supprimer directement depuis "+(links.length>1?"ces mêmes pages":"cette même page"));
+          l.push("  1. Phrase 'il semblerait' + nombre de lignes");
+          l.push("  2. Explication de POURQUOI ça coûte (maintenance à chaque version)");
+          l.push("  3. Explication simple du prix par tranche");
+          l.push("  4. Mention de l'alternative Odoo.sh / On-Premise");
+          l.push("  5. Présentation des liens, chacun sur sa propre ligne (SANS tiret) :");
+          links.forEach(lk=>l.push("     "+lk));
+          l.push("  6. Expliquer comment identifier qui a créé chaque élément dans un paragraphe fluide : mentionner qu'il faut cliquer sur "+(links.length>1?"les liens ci-dessus":"le lien ci-dessus")+", utiliser la fonction 'Regrouper par' puis 'Créé par', et que si certaines lignes ne sont plus utiles, elles peuvent être supprimées directement depuis "+(links.length>1?"ces mêmes pages":"cette même page")+".");
         }else if(origins.length>0){
           l.push("- Provenance: "+(origins.includes("server_actions")?"actions serveur":"")+(origins.length>1?" + ":"")+(origins.includes("computed_fields")?"champs calculés":""));
         }
         l.push("- Pour toute manipulation complexe: TOUJOURS rediriger vers le [support technique](https://www.odoo.com/help-form).","");
       }
       if(reasons.includes("archive_branch"))l.push("== ARCHIVAGE BRANCHE ODOO.SH ==","- DÉTECTION: 'Il semblerait que vous souhaitiez archiver une branche sur votre projet Odoo.sh.'","- COÛTS: Si annuel → pas de remboursement avant le renouvellement.","- COMMENT RETIRER: Lien Tango : https://app.tango.us/app/workflow/How-to-Archive-a-Branch-514dde5383dc4291a746a82c670737f7","");
-      l.push("RÈGLES FINALES:","- Traite CHAQUE élément dans un paragraphe séparé en suivant la structure 3 étapes (détection → coûts → comment retirer).","- Transitions naturelles entre les paragraphes.","- Intégrer les liens en format [texte](URL) dans le texte (sauf lignes de code: URLs en clair).","- UN SEUL email fluide, pas de sections visibles.");
+      l.push("RÈGLES FINALES:","- Traite CHAQUE élément dans un paragraphe séparé en suivant la structure 3 étapes (détection, coûts, comment retirer).","- Transitions naturelles entre les paragraphes.","- Intégrer les liens en format [texte](URL) dans le texte (sauf lignes de code: URLs en clair sur leur propre ligne).","- UN SEUL email fluide, pas de sections visibles.","- ZÉRO tiret (-), ZÉRO em-dash (—), ZÉRO bullet point. Paragraphes fluides uniquement.");
+      const quoteUrl=qwState.quote_url;
+      if(quoteUrl){
+        l.push("","DEVIS À INTÉGRER:");
+        l.push("- Lien du devis : "+quoteUrl);
+        l.push("- Insérer le lien du devis UNE SEULE fois dans l'email, après les explications de coûts.");
+        if(reasons.includes("codelines")){
+          l.push("- Pour les lignes de code: formuler de manière friendly, ex: 'Si vous souhaitez conserver vos lignes de code, je vous invite à régulariser via le devis suivant : [lien]'.");
+        }else{
+          l.push("- Formulation: intégrer le lien de manière fluide, ex: 'Voici un devis reprenant la mise à jour de votre contrat : [lien]'.");
+        }
+      }
       return l.join("\n");
     }
   },
@@ -2874,6 +3043,7 @@ function qwRenderBody(){
     const sections=isPaged?(page.sections||[]):cfg.sections;
     if(isPaged)h+='<div class="qw-page active">';
     sections.forEach(s=>{
+      if(s.showIf&&!s.showIf())return;
       if(s.type==="alert"){h+='<div class="qw-alert '+s.style+' visible"><span class="qw-alert-icon">💡</span><span>'+tl(s.text)+'</span></div>';return;}
       if(s.type==="cards"){
         h+='<div class="qw-section"><div class="qw-section-label"><span></span> '+tl(s.label)+(s.required?' <span class="qw-required">*</span>':'')+'</div>';
@@ -3010,8 +3180,11 @@ function closeQwWizard(){document.getElementById("qw-overlay").classList.add("hi
 
 function qwSelect(field,val,el){
   qwState[field]=val;
-  document.querySelectorAll('[data-qw="'+field+'"]').forEach(b=>{b.classList.remove("on");});
-  el.classList.add("on");
+  // Clear quote_url if billing switches away from annual
+  if(field==="billing"&&val!=="annual")qwState.quote_url="";
+  // Re-render body to evaluate showIf conditions
+  qwRenderBody();
+  lockQwPrefilledFields();
   qwUpdateNav();
 }
 
@@ -3053,13 +3226,13 @@ function qwGenerate(){
 }
 
 function buildStyleInstr(s){
-  var noAsterisks=" RAPPEL ABSOLU: ZÉRO astérisque (*) dans la réponse. Pas de bold, pas de markdown. Écrire en texte brut humain uniquement.";
+  var noFormat=" RAPPEL ABSOLU: ZÉRO astérisque (*), ZÉRO tiret (-), ZÉRO em-dash (—) dans la réponse. Pas de bold, pas de markdown, pas de bullet points. Écrire UNIQUEMENT en paragraphes fluides, comme un vrai email humain.";
   return "\n\n---\n[STYLE DE RÉPONSE: "+s.toUpperCase()+"]\n"
     +(s==="direct"?"Ton direct et factuel. Phrases courtes. Pas de fioritures. Aller droit au but."
     :s==="rassurante"?"Ton rassurant et empathique. Montrer de la compréhension. Accompagner le client. Rassurer sur les étapes. Écrire comme un vrai email humain chaleureux."
     :s==="familiere"?"Ton familier et décontracté. Comme si on parlait à un collègue. Tutoyement si le client tutoie. Rester pro mais chaleureux."
     :"Ton commercial et persuasif. Valoriser les bénéfices. Montrer de l'enthousiasme. Transformer chaque point en opportunité."
-    )+noAsterisks+"\n---";
+    )+noFormat+"\n---";
 }
 
 function buildStyleBlock(){
@@ -3078,12 +3251,16 @@ const twCtx={options:{explanation:true,doc:'module',el:'module',support:false,du
 
 function openTwWizard(){
   twCtx.options={explanation:true,doc:'module',el:'module',support:false,duplicate:false,redirectsupport:false};
+  twStyle=null;
   // Reset toggles
   document.querySelectorAll(".tw-opt[data-tw='explanation']").forEach(o=>{o.classList.add("on");o.querySelector(".tw-opt-check").textContent="✓";});
   document.querySelectorAll(".tw-opt[data-tw='support'],.tw-opt[data-tw='duplicate'],.tw-opt[data-tw='redirectsupport']").forEach(o=>{o.classList.remove("on");o.querySelector(".tw-opt-check").textContent="";});
   // Reset radio groups
   twResetRadioUI('doc','doc_module');
   twResetRadioUI('el','el_module');
+  // Reset style buttons
+  document.querySelectorAll("#tw-style-section .ag-style-btn").forEach(function(b){b.classList.remove("on");});
+  document.getElementById("tw-gen-btn").disabled=true;
   twUpdatePreview();
   document.getElementById("tw-overlay").classList.remove("hidden");
 }
@@ -3311,19 +3488,29 @@ function hideTyping(){document.getElementById("typing")?.remove();}
 function showError(msg){const c=document.getElementById("messages"),d=document.createElement("div");d.className="error-bar";d.textContent=msg;c.appendChild(d);c.scrollTop=c.scrollHeight;}
 function copyText(btn){
   const idx=parseInt(btn.getAttribute("data-idx")),text=msgStore.get(idx)||"";
-  // Convert markdown links to HTML for rich paste
-  let html=escHtml(text);
-  html=html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" style="color:#714B67;text-decoration:underline;">$1</a>');
-  html=html.replace(/(^|[^"=])(https?:\/\/[^\s<]+)/g,'$1<a href="$2" style="color:#714B67;text-decoration:underline;">$2</a>');
-  html='<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#1a0e18;">'+html.replace(/\n/g,'<br>')+'</div>';
-  // Also prepare plain text version (strip markdown link syntax)
-  const plain=text.replace(/\[([^\]]+)\]\(https?:\/\/[^\s)]+\)/g,'$1');
+  // Convert to HTML paragraphs that survive Gmail's send formatting
+  // Split by double newlines (paragraphs) and single newlines (line breaks within paragraphs)
+  let paragraphs=text.split(/\n\n+/);
+  let htmlParts=paragraphs.map(function(para){
+    let h=escHtml(para);
+    // Convert markdown links to HTML
+    h=h.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" style="color:#714B67;text-decoration:underline;">$1</a>');
+    // Convert bare URLs to links
+    h=h.replace(/(^|[^"=])(https?:\/\/[^\s<]+)/g,'$1<a href="$2" style="color:#714B67;text-decoration:underline;">$2</a>');
+    // Convert single newlines within paragraph to <br>
+    h=h.replace(/\n/g,'<br>');
+    return '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#1a0e18;">'+h+'</div>';
+  });
+  // Join with empty div for paragraph spacing (Gmail-safe)
+  let html=htmlParts.join('<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#1a0e18;"><br></div>');
+  // Plain text version (strip markdown link syntax, keep URLs)
+  const plain=text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'$1 ($2)');
   // Try rich copy first
   try{
     const htmlBlob=new Blob([html],{type:'text/html'});
     const textBlob=new Blob([plain],{type:'text/plain'});
     navigator.clipboard.write([new ClipboardItem({'text/html':htmlBlob,'text/plain':textBlob})]).then(()=>{
-      btn.textContent="✓ Copié !";btn.classList.add("copied");
+      btn.textContent="✓";btn.classList.add("copied");
       setTimeout(()=>{btn.textContent=t("btn_copy");btn.classList.remove("copied");},2500);
     }).catch(()=>fallbackCopy(plain,btn));
   }catch(e){fallbackCopy(plain,btn);}
@@ -3427,18 +3614,32 @@ function copyTranslated(btn){
   var text="";
   if(bubble&&bubble._translatedText){text=bubble._translatedText;}
   else if(bubble){var b=bubble.querySelector(".bubble");if(b)text=b.innerText||b.textContent||"";}
-  if(!text)return;
-  try{
-    navigator.clipboard.writeText(text).then(function(){
-      btn.textContent="✓ Copié !";btn.classList.add("copied");
-      setTimeout(function(){btn.textContent=t("btn_copy_translation");btn.classList.remove("copied");},2000);
-    });
-  }catch(e){
-    var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
-    document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
-    btn.textContent="✓ Copié !";btn.classList.add("copied");
-    setTimeout(function(){btn.textContent=t("btn_copy_translation");btn.classList.remove("copied");},2000);
+  if(!text){return;}
+  // Build rich HTML (same logic as copyText)
+  var paragraphs=text.split(/\n\n+/);
+  var htmlParts=paragraphs.map(function(para){
+    var h=escHtml(para);
+    h=h.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" style="color:#714B67;text-decoration:underline;">$1</a>');
+    h=h.replace(/(^|[^"=])(https?:\/\/[^\s<]+)/g,'$1<a href="$2" style="color:#714B67;text-decoration:underline;">$2</a>');
+    h=h.replace(/\n/g,'<br>');
+    return '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#1a0e18;">'+h+'</div>';
+  });
+  var html=htmlParts.join('<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#1a0e18;"><br></div>');
+  var plain=text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'$1 ($2)');
+  function onSuccess(){btn.textContent="✓";btn.classList.add("copied");setTimeout(function(){btn.textContent=t("btn_copy_translation");btn.classList.remove("copied");},2000);}
+  function fallback(){
+    var ta=document.createElement("textarea");ta.value=plain;ta.style.position="fixed";ta.style.left="-9999px";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand("copy");onSuccess();}catch(e){}
+    document.body.removeChild(ta);
   }
+  if(navigator.clipboard&&navigator.clipboard.write){
+    try{
+      var htmlBlob=new Blob([html],{type:'text/html'});
+      var textBlob=new Blob([plain],{type:'text/plain'});
+      navigator.clipboard.write([new ClipboardItem({'text/html':htmlBlob,'text/plain':textBlob})]).then(onSuccess).catch(fallback);
+    }catch(e){fallback();}
+  }else{fallback();}
 }
 function toggleBend(){launchRocket();}
 
@@ -3555,6 +3756,9 @@ var UI_TEXTS={
   "ctx_paste_label":{fr:"Coller depuis la subscription Odoo",en:"Paste from Odoo subscription"},
   "ctx_paste_placeholder":{fr:"Collez ici le contenu copié depuis la page subscription Odoo…",en:"Paste the content copied from the Odoo subscription page here…"},
   "ctx_autocomplete":{fr:"✦ Auto-compléter",en:"✦ Auto-fill"},
+  "ctx_paste_text_label":{fr:"Texte copié",en:"Copied text"},
+  "ctx_paste_img_label":{fr:"ou capture d'écran",en:"or screenshot"},
+  "ctx_paste_img_hint":{fr:"Ctrl+V ou cliquez",en:"Ctrl+V or click"},
   "ctx_plan":{fr:"Plan",en:"Plan"},
   "ctx_billing":{fr:"Facturation",en:"Billing"},
   "ctx_billing_monthly":{fr:"Mensuel",en:"Monthly"},
@@ -3582,6 +3786,7 @@ var UI_TEXTS={
   // Buttons
   "btn_chatter":{fr:"Chatter",en:"Chatter"},
   "btn_generate":{fr:"Générer la réponse ✦",en:"Generate response ✦"},
+  "btn_launch":{fr:"Lancer",en:"Launch"},
   "btn_next":{fr:"Suivant →",en:"Next →"},
   "btn_cancel":{fr:"← Retour",en:"← Back"},
   "btn_copy":{fr:"⎘ Copier la réponse",en:"⎘ Copy response"},
@@ -3753,6 +3958,8 @@ var QW_TR={
   "URL de la base de données du client":"Client database URL","Ex: https://mycompany.odoo.com":"E.g.: https://mycompany.odoo.com",
   "Le système ajoutera automatiquement /odoo/server-actions ou /odoo/actions à l'URL selon la provenance sélectionnée.":"The system will automatically add /odoo/server-actions or /odoo/actions to the URL based on selected origin.",
   "Facturation":"Billing",
+  "Lien du devis":"Quote link",
+  "Ex: https://www.odoo.com/my/quotes/123":"E.g.: https://www.odoo.com/my/quotes/123",
   "Mensuel : changements à la prochaine facture. Annuel : ajouts = prorata immédiat, suppressions = au prochain renouvellement.":"Monthly: changes at next invoice. Annual: additions = immediate prorate, removals = at next renewal.",
   // Commercial
   "Sujet":"Subject","Question de prix":"Pricing question","Standard → Custom":"Standard → Custom",
