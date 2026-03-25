@@ -1494,7 +1494,7 @@ STYLE & TONE (NON-NEGOTIABLE):
 - LANGUE DE RÉPONSE: La langue de l'email est déterminée dynamiquement (voir instruction en fin de prompt).
 - Salutation: if first name known, use it. If not, simple greeting. NEVER use [Name] or placeholders.
 - Ultra-Short Intro: go directly to body. FORBIDDEN: "I understand your question", "Thanks for your message".
-- Mirror Effect: client uses "tu" -> use "tu". Client uses "vous" -> use "vous". Default: "vous".
+- VOUVOIEMENT PAR DÉFAUT (RÈGLE STRICTE): Tu DOIS utiliser le vouvoiement ("vous") par défaut dans TOUS les emails. Le tutoiement ("tu") est UNIQUEMENT autorisé si l'email du client utilise explicitement le "tu". C'est un effet miroir : si le client tutoie, tu tutoies. Si le client vouvoie ou si tu n'as pas d'email client, tu vouvoies TOUJOURS. En cas de doute, vouvoie.
 - ABSOLUTE FORMATTING BAN (ZERO EXCEPTION): 
   * NEVER use asterisks (*) for any reason. Not for bold (**text**), not for italic (*text*), not for lists (* item). ZERO asterisks in the output.
   * NEVER use markdown bold, italic, or any markdown formatting.
@@ -1767,6 +1767,16 @@ function awSetField(field,val){
     document.getElementById("aw-reg-no").classList.toggle("on",val==="no");
     document.getElementById("aw-alert-reg").classList.toggle("visible",val==="no");
     document.getElementById("aw-alert-reg-ok").classList.toggle("visible",val==="yes");
+    // If not registered, hide added/connected questions (skip to contract)
+    var addedSection=document.getElementById("aw-add-yes").closest(".aw-section");
+    var connSection=document.getElementById("aw-connected-section");
+    if(val==="no"){
+      if(addedSection)addedSection.style.display="none";
+      if(connSection)connSection.style.display="none";
+      awCtx.added=null;awCtx.connected=null;
+    }else{
+      if(addedSection)addedSection.style.display="";
+    }
   }else if(field==="connected"){
     document.getElementById("aw-con-yes").classList.toggle("on",val==="yes");
     document.getElementById("aw-con-no").classList.toggle("on",val==="no");
@@ -1844,9 +1854,14 @@ function updateAwNav(){
     nextBtn.style.display="inline-flex";genBtn.style.display="none";
     if(awPage===1)nextBtn.disabled=!awCtx.hosting;
     else if(awGetActualPage()===2){
-      var addedOk=!!awCtx.added;
-      var connOk=awCtx.added==="no"||!!awCtx.connected;
-      nextBtn.disabled=!(awCtx.registered&&addedOk&&connOk);
+      if(awCtx.registered==="no"){
+        // Not registered → skip added/connected, go straight to contract
+        nextBtn.disabled=false;
+      }else{
+        var addedOk=!!awCtx.added;
+        var connOk=awCtx.added==="no"||!!awCtx.connected;
+        nextBtn.disabled=!(awCtx.registered&&addedOk&&connOk);
+      }
     }
     else if(awGetActualPage()===3)nextBtn.disabled=!awCtx.internal;
     else if(awGetActualPage()===4){
@@ -1861,8 +1876,14 @@ function updateAwNav(){
   }
 }
 
-function awNext(){const maxPage=awCtx.hosting==="online"?5:2;if(awPage<maxPage){awPage++;renderAwPage();updateAwNav();}}
-function awBack(){if(awPage>1){awPage--;renderAwPage();updateAwNav();}}
+function awNext(){const maxPage=awCtx.hosting==="online"?5:2;if(awPage<maxPage){awPage++;
+  // If registered=no, skip page 3 (checklist) → jump to page 4 (contract)
+  if(awCtx.hosting==="online"&&awCtx.registered==="no"&&awPage===3){awPage=4;}
+  renderAwPage();updateAwNav();}}
+function awBack(){if(awPage>1){awPage--;
+  // If registered=no, skip page 3 back too
+  if(awCtx.hosting==="online"&&awCtx.registered==="no"&&awPage===3){awPage=2;}
+  renderAwPage();updateAwNav();}}
 
 function buildAwSummary(){
   const rows=document.getElementById("aw-summary-rows");
@@ -1873,10 +1894,12 @@ function buildAwSummary(){
   h+=awSRow(tl("Hébergement"),hostLabel,isOnline?"free":"warn",isOnline?"🌐":awCtx.hosting==="sh"?"☁":"🖥");
   if(isOnline){
     h+=awSRow(tl("Fiduciaire agréée"),awCtx.registered==="yes"?tl("Oui"):tl("Non"),awCtx.registered==="yes"?"ok":"block",awCtx.registered==="yes"?"✓":"✕");
-    h+=awSRow(tl("Comptable connecté"),awCtx.connected==="yes"?tl("Oui"):tl("Non"),awCtx.connected==="yes"?"ok":"warn",awCtx.connected==="yes"?"✓":"⚠");
-    h+=awSRow(tl("Vérifications internes"),awCtx.internal==="yes"?"OK":E?"To verify":"À vérifier",awCtx.internal==="yes"?"ok":"warn",awCtx.internal==="yes"?"✓":"⚠");
+    if(awCtx.registered==="yes"){
+      h+=awSRow(tl("Comptable connecté"),awCtx.connected==="yes"?tl("Oui"):tl("Non"),awCtx.connected==="yes"?"ok":"warn",awCtx.connected==="yes"?"✓":"⚠");
+      h+=awSRow(tl("Vérifications internes"),awCtx.internal==="yes"?"OK":E?"To verify":"À vérifier",awCtx.internal==="yes"?"ok":"warn",awCtx.internal==="yes"?"✓":"⚠");
+    }
     const isFree=awCtx.registered==="yes";
-    h+=awSRow(tl("Coût comptable"),isFree?(E?"FREE":"GRATUIT"):(E?"Paid user required":"User payant requis"),isFree?"free":"block",isFree?"🎉":"💰");
+    h+=awSRow(tl("Coût comptable"),isFree?(E?"FREE":"GRATUIT"):(E?"Registration needed":"Inscription requise"),isFree?"free":"block",isFree?"🎉":"📋");
   }else{
     h+=awSRow(tl("Coût comptable"),E?"Paid user required":"User payant requis","warn","💰");
   }
@@ -1885,13 +1908,16 @@ function buildAwSummary(){
   if(!isOnline){
     actions.push(E?hostLabel+" hosting: the accountant requires a paid user license. The upsell is legitimate.":"Hébergement "+hostLabel+" : le comptable nécessite une licence utilisateur payante. L'upsell est légitime.");
   }else{
-    if(awCtx.registered==="no")actions.push(E?"The accountant must register as a certified firm at https://www.odoo.com/fr_FR/accounting-firms":"Le comptable doit s'enregistrer comme fiduciaire agréée sur https://www.odoo.com/fr_FR/accounting-firms");
-    else oks.push(E?"Certified firm — eligible for free access.":"Fiduciaire agréée — éligible à l'accès gratuit.");
-    if(awCtx.connected==="no")actions.push(E?"The accountant must log into the client's database for the upsell to be removed.":"Le comptable doit se connecter à la base du client pour que l'upsell se retire.");
-    else oks.push(E?"Accountant connected to the database.":"Comptable connecté à la base.");
-    if(awCtx.internal==="no")actions.push(E?"Check internally: accountant under firm company + Odoo account linked to user.":"Vérifier en interne : comptable sous société fidu + compte Odoo lié au user.");
-    else oks.push(E?"Internal checks OK.":"Vérifications internes OK.");
-    if(awCtx.registered==="yes"&&awCtx.connected==="yes")oks.push(E?"Tell the client NOT to sign the Upsell Order.":"Dire au client de NE PAS signer l'Upsell Order.");
+    if(awCtx.registered==="no"){
+      actions.push(E?"Accountant not yet registered as certified firm. Verify with client.":"Comptable pas encore inscrit comme fiduciaire. Vérifier avec le client.");
+    }else{
+      oks.push(E?"Certified firm — eligible for free access.":"Fiduciaire agréée — éligible à l'accès gratuit.");
+      if(awCtx.connected==="no")actions.push(E?"The accountant must log into the client's database for the upsell to be removed.":"Le comptable doit se connecter à la base du client pour que l'upsell se retire.");
+      else if(awCtx.connected==="yes")oks.push(E?"Accountant connected to the database.":"Comptable connecté à la base.");
+      if(awCtx.internal==="support")actions.push(E?"Redirect to support.":"Redirection support.");
+      else if(awCtx.internal==="yes")oks.push(E?"Internal checks OK.":"Vérifications internes OK.");
+      if(awCtx.registered==="yes"&&awCtx.connected==="yes")oks.push(E?"Tell the client NOT to sign the Upsell Order.":"Dire au client de NE PAS signer l'Upsell Order.");
+    }
   }
   if(isOnline&&awCtx.aw_billing==="annual"){
     h+=awSRow(tl("Contrat"),E?"Annual — DO NOT sign":"Annuel — NE PAS signer","warn","📅");
@@ -1937,14 +1963,21 @@ function buildAwBlock(){
   const l=["[CONTEXTE UPSELL COMPTABLE — SITUATION DU CLIENT]","Hébergement : "+hostLabel];
   if(isOnline){
     l.push("Fiduciaire agréée : "+(awCtx.registered==="yes"?"OUI":"NON"));
-    l.push("Comptable ajouté dans la base : "+(awCtx.added==="yes"?"OUI":"NON"));
-    l.push("Comptable connecté à la base : "+(awCtx.added==="yes"?(awCtx.connected==="yes"?"OUI":"NON"):"N/A (pas encore ajouté)"));
-    l.push("Vérifications internes AM : "+(awCtx.internal==="yes"?"OK":awCtx.internal==="support"?"REDIRECTION SUPPORT":"NON VÉRIFIÉES"));
+    if(awCtx.registered==="yes"){
+      l.push("Comptable ajouté dans la base : "+(awCtx.added==="yes"?"OUI":"NON"));
+      l.push("Comptable connecté à la base : "+(awCtx.added==="yes"?(awCtx.connected==="yes"?"OUI":"NON"):"N/A (pas encore ajouté)"));
+      l.push("Vérifications internes AM : "+(awCtx.internal==="yes"?"OK":awCtx.internal==="support"?"REDIRECTION SUPPORT":"NON VÉRIFIÉES"));
+    }
     l.push("");
     l.push("INSTRUCTIONS POUR LA RÉPONSE:");
     if(awCtx.registered==="no"){
-      l.push("- Le comptable N'EST PAS enregistré comme fiduciaire. Envoyer le lien d'inscription : https://www.odoo.com/fr_FR/accounting-firms");
-      l.push("- Expliquer que le comptable doit s'y inscrire PUIS être ajouté dans la base PUIS se connecter pour que l'upsell se retire.");
+      l.push("- TON OBLIGATOIRE: Très friendly et délicat. Tu viens de te renseigner et tu constates que le comptable ne semble pas encore enregistré.");
+      l.push("- FORMULATION OBLIGATOIRE (adapter mais garder l'esprit): Commencer par quelque chose comme 'Je viens de me renseigner sur la situation de votre comptable, et il semblerait qu'il ne soit pas encore enregistré comme fiduciaire agréée sur notre plateforme.'");
+      l.push("- Demander POLIMENT une confirmation: 'Pourriez-vous me confirmer si votre comptable a déjà entamé le processus d'inscription sur [la plateforme dédiée](https://www.odoo.com/fr_FR/accounting-firms), ou s'il s'agit d'une étape qu'il n'a pas encore eu l'occasion de finaliser ?'");
+      l.push("- Expliquer brièvement et simplement pourquoi c'est important: une fois inscrit comme fiduciaire agréée, l'accès comptable devient gratuit sur Odoo Online et l'upsell se retire automatiquement.");
+      l.push("- NE PAS être accusateur ou donner l'impression que le client a fait une erreur. C'est une simple vérification bienveillante.");
+      l.push("- NE PAS mentionner les étapes d'ajout dans la base ou de connexion. Se concentrer UNIQUEMENT sur l'inscription fiduciaire.");
+      l.push("- Intégrer le lien [la plateforme fiduciaire](https://www.odoo.com/fr_FR/accounting-firms) naturellement dans le texte.");
     }
     if(awCtx.registered==="yes"&&awCtx.added==="no"){
       l.push("- Le comptable EST enregistré comme fiduciaire agréée. NE PAS envoyer le lien d'inscription.");
@@ -2073,6 +2106,14 @@ let autoDetected=false;
 
 function launchMulti(){
   if(multiSelected.length===0)return;
+  if(multiSelected.length===1&&multiSelected[0]==="upgrade"){
+    pendingEmailText="";
+    var type=multiSelected[0];
+    multiSelected=[];
+    updateMultiUI();
+    openSituation(type);
+    return;
+  }
   document.getElementById("cr-textarea").value="";
   document.getElementById("cr-overlay").classList.remove("hidden");
 }
@@ -2435,7 +2476,6 @@ async function parseCtxImgVision(){
   }catch(err){
     btn.textContent="✕ Erreur";btn.style.background="var(--od-red)";
     setTimeout(function(){btn.textContent="✦ Auto-compléter";btn.style.background="";btn.disabled=false;},2500);
-    console.error("Vision parse error:",err);
   }
 }
 
@@ -2899,15 +2939,12 @@ const QW_CONFIGS={
       const isMinor=c==="minor";
       const l=["[CONTEXTE UPGRADE DE VERSION]","Version actuelle : "+c,"Hébergement : "+h,""];
       l.push("INSTRUCTIONS:");
-      if(isMinor&&h==="online")l.push("- Version mineure sur SaaS: la mise à jour est OBLIGATOIRE et automatique. Le client ne peut pas la bloquer.","- Rassurer le client et recommander de tester.");
-      else l.push("- Recommander la migration vers 19.0.");
-      l.push("- Argument V22: 'Une fois sur V19, vous êtes tranquille pour 3 ans jusqu'à la Version 22.'");
-      l.push("- Procédure de test OBLIGATOIRE (inclure les 3 étapes):");
-      l.push("  1. Aller sur [upgrade.odoo.com](https://upgrade.odoo.com/)");
-      l.push("  2. Suivre les instructions pour votre base.");
-      l.push("  3. Sélectionner 'Test Database' d'abord avant Production.");
-      l.push("- Ressources: [notes de version 19.0](https://www.odoo.com/odoo-19-release-notes) | [support](https://www.odoo.com/help-form)");
-      l.push("- Intégrer les liens en format [texte](URL) dans le texte.");
+      if(isMinor&&h==="online")l.push("Version mineure sur SaaS: la mise à jour est OBLIGATOIRE et automatique. Le client ne peut pas la bloquer. Rassurer le client et recommander de tester.");
+      else l.push("Recommander la migration vers 19.0.");
+      l.push("Argument V22: 'Une fois sur V19, vous êtes tranquille pour 3 ans jusqu'à la Version 22.'");
+      l.push("Procédure de test OBLIGATOIRE: 1. Aller sur [upgrade.odoo.com](https://upgrade.odoo.com/) 2. Suivre les instructions 3. Sélectionner 'Test Database' d'abord.");
+      l.push("Ressources: [notes de version 19.0](https://www.odoo.com/odoo-19-release-notes) | [support](https://www.odoo.com/help-form)");
+      l.push("Intégrer les liens dans le texte.");
       return l.join("\n");
     }
   },
@@ -3038,7 +3075,7 @@ function qwRenderBody(){
     // Inject style selector on summary page too
     h+=buildStyleSectionHTML();
     h+='</div>';
-    }catch(e){console.error("Summary error:",e);h='<div class="qw-page active"><div class="qw-alert warning visible"><span class="qw-alert-icon">⚠</span><span>'+tl("Erreur de résumé. Vérifiez les champs remplis.")+'</span></div>'+buildStyleSectionHTML()+'</div>';}
+    }catch(e){h='<div class="qw-page active"><div class="qw-alert warning visible"><span class="qw-alert-icon">⚠</span><span>'+tl("Erreur de résumé. Vérifiez les champs remplis.")+'</span></div>'+buildStyleSectionHTML()+'</div>';}
   }else{
     const sections=isPaged?(page.sections||[]):cfg.sections;
     if(isPaged)h+='<div class="qw-page active">';
@@ -3226,11 +3263,11 @@ function qwGenerate(){
 }
 
 function buildStyleInstr(s){
-  var noFormat=" RAPPEL ABSOLU: ZÉRO astérisque (*), ZÉRO tiret (-), ZÉRO em-dash (—) dans la réponse. Pas de bold, pas de markdown, pas de bullet points. Écrire UNIQUEMENT en paragraphes fluides, comme un vrai email humain.";
+  var noFormat=" RAPPEL ABSOLU: ZÉRO astérisque (*), ZÉRO tiret (-), ZÉRO em-dash (—) dans la réponse. Pas de bold, pas de markdown, pas de bullet points. Écrire UNIQUEMENT en paragraphes fluides, comme un vrai email humain. VOUVOIEMENT par défaut, sauf si l'email du client utilise le tutoiement.";
   return "\n\n---\n[STYLE DE RÉPONSE: "+s.toUpperCase()+"]\n"
     +(s==="direct"?"Ton direct et factuel. Phrases courtes. Pas de fioritures. Aller droit au but."
     :s==="rassurante"?"Ton rassurant et empathique. Montrer de la compréhension. Accompagner le client. Rassurer sur les étapes. Écrire comme un vrai email humain chaleureux."
-    :s==="familiere"?"Ton familier et décontracté. Comme si on parlait à un collègue. Tutoyement si le client tutoie. Rester pro mais chaleureux."
+    :s==="familiere"?"Ton familier et décontracté. Comme si on parlait à un collègue. Vouvoiement par défaut sauf si le client tutoie explicitement. Rester pro mais chaleureux."
     :"Ton commercial et persuasif. Valoriser les bénéfices. Montrer de l'enthousiasme. Transformer chaque point en opportunité."
     )+noFormat+"\n---";
 }
@@ -3240,7 +3277,7 @@ function buildStyleBlock(){
   return "\n\n---\n[STYLE DE RÉPONSE: "+style.toUpperCase()+"]\n"
     +(style==="direct"?"Ton direct et factuel. Phrases courtes. Pas de fioritures. Aller droit au but."
     :style==="rassurante"?"Ton rassurant et empathique. Montrer de la compréhension. Accompagner le client. Rassurer sur les étapes."
-    :style==="familiere"?"Ton familier et décontracté. Comme si on parlait à un collègue. Tutoyement si le client tutoie. Rester pro mais chaleureux."
+    :style==="familiere"?"Ton familier et décontracté. Comme si on parlait à un collègue. Vouvoiement par défaut sauf si le client tutoie explicitement. Rester pro mais chaleureux."
     :"Ton commercial et persuasif. Valoriser les bénéfices. Montrer de l'enthousiasme. Transformer chaque point en opportunité."
     )+"\n---";
 }
@@ -3391,7 +3428,7 @@ function buildTwBlock(){
 }
 
 // ══════ CHAT ══════
-function newChat(){messages=[];msgStore.clear();msgIdx=0;resetCtx();document.getElementById("messages").innerHTML='<div id="welcome"><div class="welcome-icon">✦</div><div><div class="welcome-title">Chatter</div><div class="welcome-sub">Les réponses générées apparaîtront ici.</div></div></div>';document.getElementById("app-grid-view").style.display="flex";var cv=document.getElementById("chatter-view");cv.style.display="none";cv.style.position="";cv.style.inset="";cv.style.zIndex="";cv.style.background="";multiSelected=[];multiMode=false;document.getElementById("ag-multi-toggle").classList.remove("active");updateMultiUI();}
+function newChat(){messages=[];msgStore.clear();msgIdx=0;resetCtx();document.getElementById("messages").innerHTML='<div id="welcome"><div class="welcome-icon">✦</div><div><div class="welcome-title">Chatter</div><div class="welcome-sub">Les réponses générées apparaîtront ici.</div></div></div>';document.getElementById("app-grid-view").style.display="flex";var cv=document.getElementById("chatter-view");cv.style.display="none";cv.style.position="";cv.style.inset="";cv.style.zIndex="";cv.style.background="";multiSelected=[];updateMultiUI();}
 
 function resetAll(){
   // Sparkle burst effect
@@ -3476,7 +3513,12 @@ if(useWebSearch)parts.push("🔧 Recherche doc auto");
 const twOpts=[];if(twCtx.options.explanation)twOpts.push("Expl");if(twCtx.options.doc)twOpts.push("Doc:"+twCtx.options.doc);if(twCtx.options.el)twOpts.push("EL:"+twCtx.options.el);if(twCtx.options.support)twOpts.push("Support");if(twCtx.options.duplicate)twOpts.push("Dupli");if(twOpts.length>0&&useWebSearch)parts.push("["+twOpts.join("+")+"]");
 const displayText=text+(parts.length?"\n\n[ Contexte : "+parts.join(" · ")+" ]":"");addMessage("user",displayText);
 isLoading=true;showTyping();
-try{const apiMessages=[...messages.slice(0,-1).map(m=>({role:m.role,content:m.content})),{role:"user",content:fullText}];
+try{
+// Build API messages from history, but limit total size to prevent overflow
+var rawMsgs=[...messages.slice(0,-1).map(m=>({role:m.role,content:m.content})),{role:"user",content:fullText}];
+// Keep only last 4 messages if total content is too large
+var totalLen=rawMsgs.reduce(function(s,m){return s+(m.content?m.content.length:0);},0);
+var apiMessages=totalLen>15000?rawMsgs.slice(-2):rawMsgs;
 const langInstr=uiLang==="en"?"\n\nCRITICAL LANGUAGE RULE: You MUST write the entire email draft in ENGLISH. The AM's interface is set to English. Do NOT write in French. Write everything in English.":"\n\nRÈGLE DE LANGUE: Tu DOIS rédiger l'email brouillon en FRANÇAIS. C'est la langue par défaut.";
 const body={model:"claude-sonnet-4-20250514",max_tokens:1500,system:SYSTEM_PROMPT+langInstr,messages:apiMessages};
 if(useWebSearch){body.tools=[{type:"web_search_20250305",name:"web_search",max_uses:5}];}
@@ -3590,7 +3632,7 @@ async function translateMsg(idx,code,name,flag,input){
   if(!apiKey){document.getElementById("api-modal").classList.remove("hidden");return;}
   input.disabled=true;input.value="⏳";
   try{
-    const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2500,messages:[{role:"user",content:"Translate the following email draft into "+name+" ("+code+"). Keep the EXACT same tone, structure, links, and formatting. Do NOT add any explanation or commentary. Just provide the translated email:\n\n"+original}]})});
+    const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,messages:[{role:"user",content:"Translate the following email draft into "+name+" ("+code+"). Keep the EXACT same tone, structure, links, and formatting. Do NOT add any explanation or commentary. Just provide the translated email:\n\n"+original}]})});
     const data=await resp.json();
     if(data.error)throw new Error(data.error.message);
     const translated=data.content?.map(b=>b.text||"").filter(Boolean).join("\n")||"";
