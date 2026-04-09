@@ -1355,12 +1355,6 @@ function renderPricingResult(){
       <div class="pricing-formula-row">${isFR?'Annuel HTVA':'Annual excl. VAT'} = <code>prix × nb users × 12</code></div>
       <div class="pricing-formula-row">${isFR?'Total TTC':'Total incl. VAT'} = <code>HTVA × (1 + taux TVA)</code></div>
     </div>`;
-    // TVA
-    html += `<div class="iot-section-title">${isFR?'TAUX TVA PAR PAYS':'VAT RATES BY COUNTRY'}</div>`;
-    const tva = [{c:'🇧🇪',n:'Belgique',r:'21%'},{c:'🇫🇷',n:'France',r:'20%'},{c:'🇩🇪',n:'Allemagne',r:'19%'},{c:'🇳🇱',n:'Pays-Bas',r:'21%'},{c:'🇵🇱',n:'Pologne',r:'23%'}];
-    html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">`;
-    tva.forEach(t=>{ html+=`<div class="iot-contact-chip" style="flex-direction:row;gap:8px;padding:8px 10px;"><span style="font-size:18px;">${t.c}</span><div><div class="iot-contact-name" style="font-size:12px;">${t.n}</div><div class="iot-contact-role" style="font-size:13px;color:#FFD166;font-weight:700;">${t.r}</div></div></div>`; });
-    html += `</div>`;
     // Warnings
  
     html += `<a class="iot-link-btn" href="https://www.odoo.com/pricing" target="_blank" rel="noopener"><span class="iot-link-icon">🔗</span><span class="iot-link-label">Odoo Pricing</span><span class="iot-link-arrow">↗</span></a>`;
