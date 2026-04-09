@@ -1588,18 +1588,32 @@ Have a great day,`;
 
 Je reviens vers vous concernant votre base de données Odoo.
 
-Votre abonnement a expiré le ${renewalStr}, ce qui signifie que votre base est inactive depuis environ ${diffMonths} mois.
+Votre abonnement a expiré le ${renewalStr}, ce qui signifie que votre base est actuellement inactive depuis environ ${diffMonths} mois. De manière générale, Odoo conserve les bases de données pendant une période de 3 mois après l'expiration du contrat. Au-delà de cette période, la récupération n'est malheureusement pas toujours garantie.
 
-Malheureusement, après vérification, il n'est plus possible de récupérer votre base de données. Je vous invite à contacter notre équipe support technique via https://www.odoo.com/help afin qu'elle puisse vous confirmer la situation et vous proposer les alternatives disponibles.
+Dans votre cas, je vous invite à contacter notre équipe support technique via https://www.odoo.com/help afin qu'elle puisse vérifier si votre base de données est toujours récupérable. Eux seuls ont la visibilité technique nécessaire pour vous confirmer l'état de vos données.
+
+Si le support confirme que la récupération est possible, voici ce qu'il faudra prévoir pour la réactivation. Odoo ayant assuré la préservation de vos données, la sécurité de votre environnement et la maintenance de l'infrastructure serveur pendant toute la durée d'inactivité, l'ensemble des périodes écoulées depuis l'expiration devront être régularisées.
+Concrètement, cela représente ${periods.length} période${periods.length > 1 ? 's' : ''} :
+
+${periodsText}
+
+Dès que vous aurez la confirmation du support, revenez vers moi et je vous ferai parvenir le devis pour procéder à la régularisation et à la réactivation de votre base.
 
 Bonne journée,`
 : `Hello,
 
 I am following up regarding your Odoo database.
 
-Your subscription expired on ${renewalStr}, meaning your database has been inactive for approximately ${diffMonths} month${diffMonths > 1 ? 's' : ''}.
+Your subscription expired on ${renewalStr}, meaning your database has been inactive for approximately ${diffMonths} month${diffMonths > 1 ? 's' : ''}. As a general rule, Odoo retains databases for a period of 3 months after contract expiration. Beyond this period, recovery is unfortunately not always guaranteed.
 
-Unfortunately, after verification, it is no longer possible to recover your database. I invite you to contact our technical support team via https://www.odoo.com/help so they can confirm the situation and propose available alternatives.
+In your case, I invite you to contact our technical support team via https://www.odoo.com/help so they can verify whether your database is still recoverable. They are the only ones with the technical visibility to confirm the status of your data.
+
+If support confirms that recovery is possible, here is what will need to be arranged for reactivation. As Odoo has ensured the preservation of your data, the security of your environment and the maintenance of the server infrastructure throughout the entire inactive period, all elapsed periods since expiration will need to be regularized.
+Concretely, this represents ${periods.length} period${periods.length > 1 ? 's' : ''} :
+
+${periodsText}
+
+Once you have confirmation from support, please come back to me and I will send you a quote to proceed with the regularization and reactivation of your database.
 
 Have a great day,`;
   }
