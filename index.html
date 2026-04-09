@@ -450,7 +450,6 @@ html { overflow-x: hidden; }
       <div class="card">
         <div class="card-header"><span style="font-size:18px;">🔌</span><span id="iot-card-header">Type d'IoT</span></div>
         <div class="card-body">
-          <div class="section-label" id="iot-label-type">Quel type d'IoT ?</div>
           <div class="type-grid">
             <button class="type-btn" data-iot="physical" onclick="iotSelectType('physical')"><span class="t-icon">📦</span><span class="t-label" id="iot-physical-label">Physical IoT</span><span class="t-sub" id="iot-physical-sub">Boîtier physique</span></button>
             <button class="type-btn" data-iot="virtual" onclick="iotSelectType('virtual')"><span class="t-icon">💻</span><span class="t-label" id="iot-virtual-label">Virtual IoT</span><span class="t-sub" id="iot-virtual-sub">Windows (logiciel)</span></button>
@@ -955,7 +954,7 @@ function openTool(tool){
   el('btn-back').classList.add('visible');
   view=tool;
   if(tool==='vat'){el('view-vat').style.display='block';el('header-icon-el').textContent='📋';el('header-title').textContent=t('vatHeaderTitle');}
-  else if(tool==='iot'){el('view-iot').style.display='block';el('header-icon-el').textContent='🔌';el('header-title').textContent=t('iotHeaderTitle');}
+  else if(tool==='iot'){el('view-iot').style.display='block';el('header-icon-el').textContent='🔌';el('header-title').textContent=t('iotHeaderTitle');if(iotState.need)iotShowResult(iotState.need);else iotClearResult();}
   else if(tool==='hosting'){el('view-hosting').style.display='block';el('header-icon-el').textContent='🖥️';el('header-title').textContent=t('hostingHeaderTitle');}
   else if(tool==='pricing'){el('view-pricing').style.display='block';el('header-icon-el').textContent='💶';el('header-title').textContent=t('pricingHeaderTitle');}
   else if(tool==='recovery'){el('view-recovery').style.display='block';el('header-icon-el').textContent='🔓';el('header-title').textContent=t('recoveryHeaderTitle');}
@@ -1060,7 +1059,7 @@ function setLang(l){
   el('vat-verify-text').innerHTML=t('vatVerifyText'); el('vies-link').textContent=t('viesLink');
   el('label-vat-check').textContent=t('labelVatCheck'); el('btn-vat-valid').textContent=t('btnVatValid'); el('btn-vat-invalid').textContent=t('btnVatInvalid');
   el('vat-result-title').textContent=t('vatResultTitle'); el('vat-placeholder-text').innerHTML=t('vatPlaceholder');
-  el('iot-card-header').textContent=t('iotCardHeader'); el('iot-label-type').textContent=t('iotLabelType');
+  el('iot-card-header').textContent=t('iotCardHeader');
   el('iot-physical-label').textContent=t('iotPhysicalLabel'); el('iot-physical-sub').textContent=t('iotPhysicalSub');
   el('iot-virtual-label').textContent=t('iotVirtualLabel'); el('iot-virtual-sub').textContent=t('iotVirtualSub');
   el('iot-sub-title').textContent=t('iotSubTitle'); el('iot-sub-text').innerHTML=t('iotSubText');
@@ -1091,7 +1090,7 @@ function setLang(l){
   el('elig-version-ph').textContent=t('eligVersionPh');
   if(eligState.plan||eligState.billing||eligState.version) runEligibility();
   if(vatLast)showVatResult(vatLast);
-  if(iotState.need)iotShowResult(iotState.need);
+  if(iotState.need)iotShowResult(iotState.need); else iotClearResult();
   if(hostingState.type)hostingShowResult(hostingState.type);
   // upsell labels
   if(el('upsell-card-header'))el('upsell-card-header').textContent=t('upsellCardHeader');
@@ -1214,7 +1213,8 @@ function iotSelectNeed(need){
 }
 function iotClearResult(){
   el('iot-result-card').classList.remove('has-result');el('iot-result-icon').textContent='ℹ️';
-  el('iot-result-title').textContent=t('iotResultTitle');el('iot-placeholder').style.display='block';el('iot-result-content').style.display='none';
+  el('iot-result-title').textContent=t('iotResultTitle');el('iot-placeholder').style.display='none';
+  const c=el('iot-result-content');c.style.display='block';c.innerHTML=IOT_EXPLAIN[lang];
 }
 function iotShowResult(need){
   const data=IOT[lang][need]; if(!data)return iotClearResult();
