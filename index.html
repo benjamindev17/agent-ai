@@ -1052,7 +1052,8 @@ function setLang(l){
   el('loc-uk-label').textContent=t('locUk'); el('loc-ch-label').textContent=t('locCh'); el('loc-row-label').textContent=t('locRow');
   el('label-eu-country').textContent=t('labelEuCountry');
   const _csi2=el('country-search-input');
-  if(_csi2&&!el('eu-country').value) _csi2.placeholder=lang==='fr'?'Rechercher un pays...':'Search a country...'; el('select-placeholder').textContent=t('selectPH');
+  if(_csi2) _csi2.placeholder=lang==='fr'?'Rechercher un pays...':'Search a country...';
+  const _sp=el('select-placeholder'); if(_sp) _sp.textContent=t('selectPH');
   el('label-vat-status').textContent=t('labelVatStatus');
   el('b2b-label').textContent=t('b2bLabel'); el('b2b-sub').textContent=t('b2bSub');
   el('b2c-label').textContent=t('b2cLabel'); el('b2c-sub').textContent=t('b2cSub');
