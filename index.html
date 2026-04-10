@@ -11,6 +11,7 @@
   --primary: #714B67; --teal: #00A09D; --teal-dark: #008784;
   --radius: 10px; --radius-lg: 14px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --header-h: 62px;
 }
 body { font-family: 'Noto Sans', sans-serif; background: #0d0a1a; color: #fff; min-height: 100vh; overflow-x: hidden; max-width: 100vw; }
 html { overflow-x: hidden; }
@@ -23,12 +24,16 @@ html { overflow-x: hidden; }
 .content-layer { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; }
  
 /* HEADER */
-.header { background:rgba(113,75,103,0.95); backdrop-filter:blur(10px); color:white; padding:14px 28px; display:flex; align-items:center; gap:12px; font-size:17px; font-weight:600; box-shadow:0 2px 8px rgba(113,75,103,0.3); flex-shrink:0; position:sticky; top:0; z-index:100; }
+.header { background:rgba(113,75,103,0.95); backdrop-filter:blur(10px); color:white; padding:14px 28px; display:flex; align-items:center; gap:12px; font-size:17px; font-weight:600; box-shadow:0 2px 8px rgba(113,75,103,0.3); position:fixed; top:0; left:0; width:100%; z-index:1000; box-sizing:border-box; }
+.header-spacer { height:var(--header-h); flex-shrink:0; }
 .header-icon { width:34px; height:34px; background:rgba(255,255,255,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
 .header-title { flex:1; }
 .header-back { display:none; align-items:center; gap:8px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); border-radius:8px; padding:6px 14px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-right:4px; font-family:inherit; }
 .header-back:hover { background:rgba(255,255,255,0.22); }
 .header-back.visible { display:flex; }
+.header-reset { display:none; align-items:center; justify-content:center; background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.18); border-radius:8px; padding:6px 9px; color:rgba(255,255,255,0.55); font-size:15px; cursor:pointer; transition:all 0.2s; font-family:inherit; line-height:1; }
+.header-reset:hover { background:rgba(255,100,80,0.2); border-color:rgba(255,100,80,0.4); color:#ff9080; }
+.header-reset.visible { display:flex; }
 .lang-switcher { display:flex; align-items:center; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); border-radius:999px; padding:4px 6px; gap:2px; }
 .lang-btn { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:999px; border:none; background:transparent; color:rgba(255,255,255,0.7); font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; }
 .lang-btn:hover { color:white; background:rgba(255,255,255,0.12); }
@@ -50,6 +55,8 @@ html { overflow-x: hidden; }
   .lang-btn { padding:4px 8px; font-size:12px; }
   .lang-flag { font-size:14px; }
   .header-back { padding:5px 10px; font-size:12px; }
+  .header-reset { padding:5px 7px; font-size:13px; }
+  .header-spacer { height:54px; }
   .tool-main { padding:0 12px; margin:16px auto; gap:16px; }
   .hosting-layout { padding:0 12px; margin:16px auto 0; gap:16px; }
   .card-body { padding:14px; }
@@ -318,6 +325,7 @@ html { overflow-x: hidden; }
   <!-- HEADER -->
   <div class="header">
     <button class="header-back" id="btn-back" onclick="goHome()">← <span id="back-label">Retour</span></button>
+    <button class="header-reset" id="btn-reset" onclick="resetTool()" title="Réinitialiser">↺</button>
     <div class="header-icon" id="header-icon-el">🧰</div>
     <span class="header-title" id="header-title">CCM Toolbox</span>
     <div class="lang-switcher">
@@ -325,6 +333,7 @@ html { overflow-x: hidden; }
       <button class="lang-btn" id="lang-en" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span> EN</button>
     </div>
   </div>
+  <div class="header-spacer"></div>
  
   <!-- HOME -->
   <div id="view-home" style="flex:1;display:flex;flex-direction:column;">
@@ -988,6 +997,7 @@ function openTool(tool){
   el('view-upsell').style.display='none';
   el('view-pitch').style.display='none';
   el('btn-back').classList.add('visible');
+  el('btn-reset').classList.add('visible');
   view=tool;
   if(tool==='vat'){el('view-vat').style.display='block';el('header-icon-el').textContent='📋';el('header-title').textContent=t('vatHeaderTitle');}
   else if(tool==='iot'){el('view-iot').style.display='block';el('header-icon-el').textContent='🔌';el('header-title').textContent=t('iotHeaderTitle');}
@@ -1000,7 +1010,31 @@ function openTool(tool){
 }
 function goHome(){
   el('view-home').style.display='flex';el('view-vat').style.display='none';el('view-iot').style.display='none';el('view-hosting').style.display='none';el('view-pricing').style.display='none';el('view-recovery').style.display='none';el('view-accountant').style.display='none';el('view-upsell').style.display='none';el('view-pitch').style.display='none';
-  el('btn-back').classList.remove('visible');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
+  el('btn-back').classList.remove('visible');el('btn-reset').classList.remove('visible');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
+}
+var VIEW_ORIGINALS={};
+window.addEventListener('DOMContentLoaded',function(){
+  ['vat','iot','hosting','pricing','recovery','accountant','upsell','pitch'].forEach(function(t){
+    var v=el('view-'+t); if(v) VIEW_ORIGINALS[t]=v.innerHTML;
+  });
+});
+function resetTool(){
+  var tool=view;
+  var viewEl=el('view-'+tool);
+  if(!viewEl||!VIEW_ORIGINALS[tool]) return;
+  // Restore pristine DOM
+  viewEl.innerHTML=VIEW_ORIGINALS[tool];
+  // Reset JS state
+  if(tool==='vat'){vatState={location:null,euCountry:'',status:null,vatResult:null};vatLast=null;}
+  else if(tool==='iot'){iotState={type:null,need:null};}
+  else if(tool==='hosting'){hostingState={type:null};}
+  else if(tool==='pricing'){pricingState={topic:null,pricelist:'high',billing:'monthly'};}
+  else if(tool==='recovery'){recoveryState={type:null,plan:null,pricelist:'high',users:1,recoverable:null};}
+  else if(tool==='accountant'){accState={scenario:null,added:null,connected:null,contract:null};}
+  else if(tool==='upsell'){upsellState={reason:null,contract:null,multiType:null,discuss:null};upsellEmailOpen=false;}
+  else if(tool==='pitch'){pitchCAOpen={};renderPitchView();}
+  // Re-apply current language
+  setLang(lang);
 }
 function renderPitchView(){
   var isFR=lang==='fr';
