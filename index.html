@@ -27,7 +27,7 @@ html { overflow-x: hidden; }
 .header { background:rgba(113,75,103,0.95); backdrop-filter:blur(10px); color:white; padding:14px 28px; display:flex; align-items:center; gap:12px; font-size:17px; font-weight:600; box-shadow:0 2px 8px rgba(113,75,103,0.3); position:fixed; top:0; left:0; width:100%; z-index:1000; box-sizing:border-box; }
 .header-spacer { height:var(--header-h); flex-shrink:0; }
 .header-icon { width:34px; height:34px; background:rgba(255,255,255,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-.header-title { flex:1; }
+.header-title { min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .header-back { display:none; align-items:center; gap:8px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); border-radius:8px; padding:6px 14px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-right:4px; font-family:inherit; }
 .header-back:hover { background:rgba(255,255,255,0.22); }
 .header-back.visible { display:flex; }
@@ -327,9 +327,11 @@ html { overflow-x: hidden; }
   <!-- HEADER -->
   <div class="header">
     <button class="header-back" id="btn-back" onclick="goHome()">← <span id="back-label">Retour</span></button>
-    <button class="header-reset visible" id="btn-reset" onclick="resetTool()" title="Réinitialiser">↺</button>
     <div class="header-icon" id="header-icon-el">🧰</div>
-    <span class="header-title" id="header-title">CCM Toolbox</span>
+    <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0;">
+      <span class="header-title" id="header-title">CCM Toolbox</span>
+      <button class="header-reset visible" id="btn-reset" onclick="resetTool()" title="Réinitialiser">↺</button>
+    </div>
     <div class="lang-switcher">
       <button class="lang-btn active" id="lang-fr" onclick="setLang('fr')"><span class="lang-flag">🇫🇷</span> FR</button>
       <button class="lang-btn" id="lang-en" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span> EN</button>
@@ -1016,26 +1018,26 @@ function goHome(){
   el('btn-back').classList.remove('visible');document.querySelector('.header').classList.remove('in-tool');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
 }
 var VIEW_ORIGINALS={};
-window.addEventListener('DOMContentLoaded',function(){
-  ['vat','iot','hosting','pricing','recovery','accountant','upsell','pitch'].forEach(function(t){
-    var v=el('view-'+t); if(v) VIEW_ORIGINALS[t]=v.innerHTML;
-  });
+// Save pristine HTML immediately — script is at end of body so DOM is ready
+['vat','iot','hosting','pricing','recovery','accountant','upsell','pitch'].forEach(function(tid){
+  var v=el('view-'+tid); if(v) VIEW_ORIGINALS[tid]=v.innerHTML;
 });
 function resetTool(){
-  var tool=view;
-  var viewEl=el('view-'+tool);
-  if(!viewEl||!VIEW_ORIGINALS[tool]) return;
-  // Restore pristine DOM
-  viewEl.innerHTML=VIEW_ORIGINALS[tool];
-  // Reset JS state
-  if(tool==='vat'){vatState={location:null,euCountry:'',status:null,vatResult:null};vatLast=null;}
-  else if(tool==='iot'){iotState={type:null,need:null};}
-  else if(tool==='hosting'){hostingState={type:null};}
-  else if(tool==='pricing'){pricingState={topic:null,pricelist:'high',billing:'monthly'};}
-  else if(tool==='recovery'){recoveryState={type:null,plan:null,pricelist:'high',users:1,recoverable:null};}
-  else if(tool==='accountant'){accState={scenario:null,added:null,connected:null,contract:null};}
-  else if(tool==='upsell'){upsellState={reason:null,contract:null,multiType:null,discuss:null};upsellEmailOpen=false;}
-  else if(tool==='pitch'){pitchCAOpen={};renderPitchView();}
+  // Reset ALL JS states regardless of current view
+  vatState={location:null,euCountry:'',status:null,vatResult:null}; vatLast=null;
+  iotState={type:null,need:null};
+  hostingState={type:null};
+  pricingState={topic:null,pricelist:'high',billing:'monthly'};
+  recoveryState={type:null,plan:null,pricelist:'high',users:1,recoverable:null};
+  accState={scenario:null,added:null,connected:null,contract:null};
+  upsellState={reason:null,contract:null,multiType:null,discuss:null}; upsellEmailOpen=false;
+  pitchCAOpen={};
+  // If inside a tool, restore the pristine DOM for that tool
+  if(view!=='home'){
+    var viewEl=el('view-'+view);
+    if(viewEl&&VIEW_ORIGINALS[view]) viewEl.innerHTML=VIEW_ORIGINALS[view];
+    if(view==='pitch') renderPitchView();
+  }
   // Re-apply current language
   setLang(lang);
 }
