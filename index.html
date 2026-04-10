@@ -1006,16 +1006,17 @@ function renderPitchView(){
   var isFR=lang==='fr';
   var YLW="background:rgba(255,209,102,0.25);color:#FFD166;font-weight:700;padding:1px 5px;border-radius:3px;";
   var GRN="background:rgba(0,200,150,0.2);color:#00E8B0;font-weight:700;padding:1px 5px;border-radius:3px;";
+  function bubble(n,color){return "<span style='display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;min-width:28px;background:"+color+";color:#fff;border-radius:50%;font-size:13px;font-weight:800;box-shadow:0 2px 10px rgba(0,0,0,0.35);margin-right:10px;'>"+n+"</span>";}
   var html='';
   // ── SECTION 1: CAB ──
-  html+="<div class='iot-section-title' style='margin-bottom:16px;'>🎯 "+(isFR?"MÉMO PITCH — PLAN MULTI-ANNUEL":"PITCH MEMO — MULTI-YEAR PLAN")+"</div>";
+  html+="<div class='iot-section-title' style='margin-bottom:16px;display:flex;align-items:center;'>"+bubble(1,'#6366f1')+"🎯 "+(isFR?"MÉMO PITCH — PLAN MULTI-ANNUEL":"PITCH MEMO — MULTI-YEAR PLAN")+"</div>";
   html+="<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;'>";
   html+="<div class='card' style='border-top:3px solid #6366f1;padding:18px 20px;'><div style='font-size:11px;font-weight:700;color:#6366f1;letter-spacing:1.5px;margin-bottom:10px;'>"+(isFR?"CARACTÉRISTIQUES":"CHARACTERISTICS")+"</div><div style='font-size:22px;margin-bottom:8px;'>📋</div><div style='font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;'>"+(isFR?"Contrat Longue Durée":"Long-Term Contract")+"</div><ul style='margin:0;padding-left:18px;color:rgba(255,255,255,0.75);font-size:12.5px;line-height:1.7;'>"+(isFR?"<li>Plan pluriannuel (2–5 ans)</li><li>Prix fixé à la signature</li><li>Engagement client = stabilité</li>":"<li>Multi-year plan (2–5 years)</li><li>Price locked at signing</li><li>Client commitment = stability</li>")+"</ul></div>";
   html+="<div class='card' style='border-top:3px solid #00C896;padding:18px 20px;'><div style='font-size:11px;font-weight:700;color:#00C896;letter-spacing:1.5px;margin-bottom:10px;'>"+(isFR?"AVANTAGES":"BENEFITS")+"</div><div style='font-size:22px;margin-bottom:8px;'>🔒</div><div style='font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;'>"+(isFR?"Simplification":"Simplification")+"</div><ul style='margin:0;padding-left:18px;color:rgba(255,255,255,0.75);font-size:12.5px;line-height:1.7;'>"+(isFR?"<li>Prix verrouillé, 0 surprise</li><li>Remise selon la durée</li><li>Renouvellement simplifié</li>":"<li>Price locked, 0 surprises</li><li>Discount based on duration</li><li>Simplified renewal</li>")+"</ul></div>";
   html+="<div class='card' style='border-top:3px solid #FFD166;padding:18px 20px;'><div style='font-size:11px;font-weight:700;color:#FFD166;letter-spacing:1.5px;margin-bottom:10px;'>"+(isFR?"BÉNÉFICES":"OUTCOMES")+"</div><div style='font-size:22px;margin-bottom:8px;'>🏆</div><div style='font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;'>"+(isFR?"Stabilité ERP":"ERP Stability")+"</div><ul style='margin:0;padding-left:18px;color:rgba(255,255,255,0.75);font-size:12.5px;line-height:1.7;'>"+(isFR?"<li>Stabilité budgétaire garantie</li><li>Focus sur votre business</li><li>Sérénité à long terme</li>":"<li>Guaranteed budget stability</li><li>Focus on your business</li><li>Long-term peace of mind</li>")+"</ul></div>";
   html+="</div>";
   // ── SECTION 2: OPENING ──
-  html+="<div class='iot-section-title' style='margin-bottom:16px;'>🎙️ "+(isFR?"OUVERTURE — PEUR &amp; RÉASSURANCE":"OPENING — FEAR &amp; REASSURANCE")+"</div>";
+  html+="<div class='iot-section-title' style='margin-bottom:16px;display:flex;align-items:center;'>"+bubble(2,'#8b5cf6')+"🎙️ "+(isFR?"OUVERTURE — PEUR &amp; RÉASSURANCE":"OPENING — FEAR &amp; REASSURANCE")+"</div>";
   html+="<div class='card' style='padding:20px 24px;margin-bottom:28px;border-left:4px solid #6366f1;'>";
   html+="<div style='font-size:12px;font-weight:700;color:#6366f1;letter-spacing:1px;margin-bottom:12px;'>"+(isFR?"SCRIPT D'ACCROCHE":"HOOK SCRIPT")+"</div>";
   if(isFR){
@@ -1030,7 +1031,7 @@ function renderPitchView(){
   html+="<div style='font-size:11.5px;color:rgba(255,255,255,0.5);'><span style='"+GRN+"'>"+(isFR?"Vert":"Green")+"</span> = "+(isFR?"rassurer avec la solution":"reassure with the solution")+"</div>";
   html+="</div></div>";
   // ── SECTION 3: TOULMIN ──
-  html+="<div class='iot-section-title' style='margin-bottom:16px;'>🧠 "+(isFR?"ARGUMENTAIRE — MODÈLE TOULMIN":"ARGUMENTATION — TOULMIN MODEL")+"</div>";
+  html+="<div class='iot-section-title' style='margin-bottom:16px;display:flex;align-items:center;'>"+bubble(3,'#3b82f6')+"🧠 "+(isFR?"ARGUMENTAIRE — MODÈLE TOULMIN":"ARGUMENTATION — TOULMIN MODEL")+"</div>";
   html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;'>";
   html+="<div class='card' style='border-top:3px solid #00C896;padding:18px 20px;'><div style='font-size:11px;font-weight:700;color:#00C896;letter-spacing:1.5px;margin-bottom:10px;'>① "+(isFR?"THÈSE":"CLAIM")+"</div><div style='font-size:13px;font-weight:600;color:#fff;line-height:1.6;'>\""+(isFR?"Je vous recommande de passer à un plan pluriannuel.":"I recommend moving to a multi-year plan.")+"\"</div></div>";
   html+="<div class='card' style='border-top:3px solid #8b5cf6;padding:18px 20px;'><div style='font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:1.5px;margin-bottom:10px;'>② "+(isFR?"DONNÉES (PREUVES)":"DATA (EVIDENCE)")+"</div><ul style='margin:0;padding-left:18px;color:rgba(255,255,255,0.80);font-size:12.5px;line-height:1.7;'>"+(isFR?"<li>Les prix Odoo augmentent chaque année</li><li>Votre contrat actuel n'est pas protégé contre les hausses</li><li>Des remises significatives existent sur 2–5 ans</li>":"<li>Odoo prices increase every year</li><li>Your current contract is not protected against increases</li><li>Significant discounts exist for 2–5 years</li>")+"</ul></div>";
@@ -1038,16 +1039,57 @@ function renderPitchView(){
   html+="<div class='card' style='border-top:3px solid #00C896;padding:18px 20px;'><div style='font-size:11px;font-weight:700;color:#00C896;letter-spacing:1.5px;margin-bottom:10px;'>④ "+(isFR?"RÉASSURANCE":"REASSURANCE")+"</div><ul style='margin:0;padding-left:18px;color:rgba(255,255,255,0.80);font-size:12.5px;line-height:1.7;'>"+(isFR?"<li>Votre tarif est verrouillé dès la signature</li><li>Vous pouvez modifier votre plan si vos besoins changent</li><li>Pas de mauvaise surprise à la prochaine échéance</li>":"<li>Your rate is locked from the moment of signing</li><li>You can modify your plan if your needs change</li><li>No unpleasant surprises at the next renewal</li>")+"</ul></div>";
   html+="</div>";
   // ── SECTION 4: CLOSING ──
-  html+="<div class='iot-section-title' style='margin-bottom:16px;'>🏁 "+(isFR?"CLÔTURE — CHOIX DU PLAN":"CLOSING — PLAN CHOICE")+"</div>";
+  html+="<div class='iot-section-title' style='margin-bottom:16px;display:flex;align-items:center;'>"+bubble(4,'#00C896')+"🏁 "+(isFR?"CLÔTURE — CHOIX DU PLAN":"CLOSING — PLAN CHOICE")+"</div>";
   html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;'>";
   html+="<div class='card' style='padding:20px 22px;border:1.5px solid rgba(255,255,255,0.15);'><div style='font-size:13px;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:10px;'>"+(isFR?"2–3 ANS":"2–3 YEARS")+"</div><div style='font-size:20px;margin-bottom:10px;'>📅</div><div style='font-size:13px;font-weight:600;color:#fff;margin-bottom:8px;'>"+(isFR?"Protection intermédiaire":"Intermediate protection")+"</div><ul style='margin:0;padding-left:18px;color:rgba(255,255,255,0.65);font-size:12px;line-height:1.7;'>"+(isFR?"<li>Prix verrouillé 2 ou 3 ans</li><li>Remise modérée</li><li>Idéal si le client hésite</li>":"<li>Price locked for 2 or 3 years</li><li>Moderate discount</li><li>Ideal if the client is hesitant</li>")+"</ul></div>";
   html+="<div class='card' style='padding:20px 22px;border:2px solid #00C896;background:rgba(0,200,150,0.07);'><div style='font-size:13px;font-weight:700;color:#00E8B0;margin-bottom:10px;'>"+(isFR?"5 ANS":"5 YEARS")+" &nbsp;<span style='background:#00C896;color:#001a14;padding:2px 8px;border-radius:4px;font-size:11px;letter-spacing:0.5px;'>⭐ "+(isFR?"RECOMMANDÉ":"RECOMMENDED")+"</span></div><div style='font-size:20px;margin-bottom:10px;'>🏆</div><div style='font-size:13px;font-weight:600;color:#fff;margin-bottom:8px;'>"+(isFR?"Sécurité maximale":"Maximum security")+"</div><ul style='margin:0;padding-left:18px;color:rgba(255,255,255,0.80);font-size:12px;line-height:1.7;'>"+(isFR?"<li>Meilleure remise disponible</li><li>Tarif gelé 5 ans — 0 surprise</li><li>Priorité support incluse</li>":"<li>Best discount available</li><li>Rate frozen 5 years — 0 surprises</li><li>Priority support included</li>")+"</ul></div>";
   html+="</div>";
-  html+="<div style='background:rgba(255,209,102,0.12);border:1.5px solid rgba(255,209,102,0.4);border-radius:10px;padding:16px 20px;'>";
+  html+="<div style='background:rgba(255,209,102,0.12);border:1.5px solid rgba(255,209,102,0.4);border-radius:10px;padding:16px 20px;margin-bottom:32px;'>";
   html+="<div style='font-size:11px;font-weight:700;color:#FFD166;letter-spacing:1.2px;margin-bottom:8px;'>"+(isFR?"QUESTION DE CLÔTURE":"CLOSING QUESTION")+"</div>";
   html+="<div style='font-size:14px;color:rgba(255,255,255,0.9);line-height:1.7;font-style:italic;'>\""+(isFR?"Est-ce que vous souhaitez plutôt commencer avec <strong style='color:#fff;'>2–3 ans</strong>, ou vous sentez-vous à l'aise de partir directement sur <strong style='color:#00E8B0;'>5 ans</strong> ?":"Would you prefer to start with <strong style='color:#fff;'>2–3 years</strong>, or do you feel comfortable going straight to <strong style='color:#00E8B0;'>5 years</strong>?")+"\"</div>";
   html+="</div>";
+  // ── SECTION 5: COUNTER-ARGUMENTS (AIR) ──
+  html+="<div class='iot-section-title' style='margin-bottom:16px;display:flex;align-items:center;'>"+bubble(5,'#ef4444')+"🛡️ "+(isFR?"OBJECTIONS — TECHNIQUE AIR":"OBJECTIONS — AIR TECHNIQUE")+"</div>";
+  html+="<div style='font-size:11.5px;color:rgba(255,255,255,0.45);margin-bottom:16px;letter-spacing:0.5px;'>"+(isFR?"Accepter · Isoler · Résoudre — Cliquer sur une objection pour voir la défense":"Accept · Isolate · Resolve — Click an objection to reveal the defence")+"</div>";
+  var ca=isFR?[
+    {obj:"L'engagement est trop long, je perds ma flexibilité.",a:"C'est vrai, un engagement sur 5 ans semble une longue période et la flexibilité est essentielle.",i:"Mais la vraie flexibilité est de se concentrer sur le stratégique, non l'administratif.",r:"Ce plan vous offre la seule véritable flexibilité : supprimer la complexité administrative de votre calendrier et vous concentrer sur vos projets stratégiques, en garantissant que votre service est simplement là."},
+    {obj:"C'est trop cher.",a:"Je comprends que l'investissement sur 5 ans représente un montant conséquent.",i:"Mais qu'est-ce qui est réellement cher aujourd'hui ? C'est l'instabilité et la surprise des prix.",r:"Vous n'achetez pas une dépense, vous achetez une valeur d'ancrage. Le plan multi-annuel vous protège contre la forte augmentation des prix futurs. C'est une assurance budgétaire pour sécuriser votre futur."},
+    {obj:"Et si votre technologie (ERP) devient obsolète d'ici 5 ans ?",a:"C'est une excellente question, l'innovation est rapide.",i:"Mais le plus grand risque pour vous est de devoir tout reconfigurer ou changer d'ERP.",r:"Notre engagement sur 5 ans garantit la stabilité du système et l'alignement technologique. Les mises à jour continues sont intégrées pour que vous n'ayez jamais de rupture de service ni de frais de reconfiguration coûteux."},
+    {obj:"Je n'ai pas le budget disponible maintenant.",a:"Je comprends tout à fait que la gestion de trésorerie soit complexe et prioritaire.",i:"Mais si je vous montre que ce n'est pas une dépense, mais le seul moyen de générer ce budget dans le futur ?",r:"L'efficacité générée va libérer un temps précieux pour vos équipes. Cette économie de coûts sur les tâches administratives crée un nouveau budget et vous fait passer de gestionnaire administratif à conseiller stratégique."},
+    {obj:"Si la qualité de service baisse, je suis coincé pendant 5 ans.",a:"Vous avez raison, la qualité doit rester irréprochable sur la durée.",i:"Mais notre stratégie de plan multi-annuel est conçue pour nous rendre plus performants, pas pour nous décharger.",r:"Le plan libère nos équipes de la gestion répétitive des contrats grâce à l'automatisation. Vous bénéficiez d'une plus grande attention stratégique et d'une meilleure qualité de service."}
+  ]:[
+    {obj:"The commitment is too long, I lose my flexibility.",a:"That's true, a 5-year commitment seems like a long time and flexibility is essential.",i:"But true flexibility means focusing on strategy, not administration.",r:"This plan offers the only real flexibility: eliminating administrative complexity from your calendar so you can focus on strategic projects and ensure your service is simply there."},
+    {obj:"It's too expensive.",a:"I understand that a 5-year investment represents a significant amount.",i:"But what's really expensive today? Instability and pricing surprises.",r:"You're not buying an expense, you're buying an anchor value. The multi-year plan protects you against future price increases. It's budget insurance to secure your future."},
+    {obj:"What if your ERP technology becomes obsolete in 5 years?",a:"That's an excellent question, innovation moves fast.",i:"But the biggest risk for you is having to reconfigure everything or switch ERPs.",r:"Our 5-year commitment guarantees system stability and technological alignment. Continuous updates are built in so you never face service disruption or costly reconfiguration fees."},
+    {obj:"I don't have the budget available right now.",a:"I completely understand that cash flow management is complex and a priority.",i:"But what if I show you this isn't an expense, but the only way to generate that budget in the future?",r:"The efficiency gains will free up precious time for your teams. These cost savings create a new budget and shift you from administrative manager to strategic advisor."},
+    {obj:"If service quality drops, I'm stuck for 5 years.",a:"You're right, quality must remain impeccable over time.",i:"But our multi-year plan strategy is designed to make us more efficient, not less accountable.",r:"The plan frees our teams from repetitive contract management through automation. You benefit from greater strategic attention and better service quality."}
+  ];
+  var airA=isFR?"A — Accepter":"A — Accept"; var airI=isFR?"I — Isoler":"I — Isolate"; var airR=isFR?"R — Résoudre":"R — Resolve";
+  html+="<div style='display:flex;flex-direction:column;gap:10px;'>";
+  for(var ci=0;ci<ca.length;ci++){
+    var c=ca[ci];
+    html+="<div class='card' style='padding:0;overflow:hidden;'>";
+    html+="<div onclick='toggleCA("+ci+")' style='display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none;'>";
+    html+=bubble(ci+1,'#ef4444');
+    html+="<div style='font-size:13px;font-weight:600;color:rgba(255,255,255,0.9);flex:1;font-style:italic;'>\""+c.obj+"\"</div>";
+    html+="<span id='pitch-ca-icon-"+ci+"' style='font-size:12px;color:rgba(255,255,255,0.35);transition:transform 0.2s;'>▼</span>";
+    html+="</div>";
+    html+="<div id='pitch-ca-body-"+ci+"' style='display:none;padding:0 18px 16px 18px;border-top:1px solid rgba(255,255,255,0.08);'>";
+    html+="<div style='display:flex;flex-direction:column;gap:8px;padding-top:12px;'>";
+    html+="<div style='display:flex;gap:10px;align-items:flex-start;'><span style='background:rgba(255,209,102,0.2);color:#FFD166;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:1px;white-space:nowrap;margin-top:1px;'>"+airA+"</span><span style='font-size:12.5px;color:rgba(255,255,255,0.75);line-height:1.6;'>"+c.a+"</span></div>";
+    html+="<div style='display:flex;gap:10px;align-items:flex-start;'><span style='background:rgba(99,102,241,0.25);color:#a78bfa;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:1px;white-space:nowrap;margin-top:1px;'>"+airI+"</span><span style='font-size:12.5px;color:rgba(255,255,255,0.75);line-height:1.6;'>"+c.i+"</span></div>";
+    html+="<div style='display:flex;gap:10px;align-items:flex-start;'><span style='background:rgba(0,200,150,0.2);color:#00E8B0;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:1px;white-space:nowrap;margin-top:1px;'>"+airR+"</span><span style='font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.6;font-weight:500;'>"+c.r+"</span></div>";
+    html+="</div></div></div>";
+  }
+  html+="</div>";
   el('pitch-content').innerHTML=html;
+}
+var pitchCAOpen={};
+function toggleCA(n){
+  pitchCAOpen[n]=!pitchCAOpen[n];
+  var body=el('pitch-ca-body-'+n), icon=el('pitch-ca-icon-'+n);
+  if(body) body.style.display=pitchCAOpen[n]?'block':'none';
+  if(icon) icon.textContent=pitchCAOpen[n]?'▲':'▼';
 }
 
 // ── LANG ──
