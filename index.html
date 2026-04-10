@@ -325,7 +325,7 @@ html { overflow-x: hidden; }
   <!-- HEADER -->
   <div class="header">
     <button class="header-back" id="btn-back" onclick="goHome()">← <span id="back-label">Retour</span></button>
-    <button class="header-reset" id="btn-reset" onclick="resetTool()" title="Réinitialiser">↺</button>
+    <button class="header-reset visible" id="btn-reset" onclick="resetTool()" title="Réinitialiser">↺</button>
     <div class="header-icon" id="header-icon-el">🧰</div>
     <span class="header-title" id="header-title">CCM Toolbox</span>
     <div class="lang-switcher">
@@ -1010,7 +1010,7 @@ function openTool(tool){
 }
 function goHome(){
   el('view-home').style.display='flex';el('view-vat').style.display='none';el('view-iot').style.display='none';el('view-hosting').style.display='none';el('view-pricing').style.display='none';el('view-recovery').style.display='none';el('view-accountant').style.display='none';el('view-upsell').style.display='none';el('view-pitch').style.display='none';
-  el('btn-back').classList.remove('visible');el('btn-reset').classList.remove('visible');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
+  el('btn-back').classList.remove('visible');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
 }
 var VIEW_ORIGINALS={};
 window.addEventListener('DOMContentLoaded',function(){
