@@ -57,6 +57,8 @@ html { overflow-x: hidden; }
   .header-back { padding:5px 10px; font-size:12px; }
   .header-reset { padding:5px 7px; font-size:13px; }
   .header-spacer { height:54px; }
+  .header.in-tool #header-title { display:none; }
+  .header.in-tool #header-icon-el { display:none; }
   .tool-main { padding:0 12px; margin:16px auto; gap:16px; }
   .hosting-layout { padding:0 12px; margin:16px auto 0; gap:16px; }
   .card-body { padding:14px; }
@@ -998,6 +1000,7 @@ function openTool(tool){
   el('view-pitch').style.display='none';
   el('btn-back').classList.add('visible');
   el('btn-reset').classList.add('visible');
+  document.querySelector('.header').classList.add('in-tool');
   view=tool;
   if(tool==='vat'){el('view-vat').style.display='block';el('header-icon-el').textContent='📋';el('header-title').textContent=t('vatHeaderTitle');}
   else if(tool==='iot'){el('view-iot').style.display='block';el('header-icon-el').textContent='🔌';el('header-title').textContent=t('iotHeaderTitle');}
@@ -1010,7 +1013,7 @@ function openTool(tool){
 }
 function goHome(){
   el('view-home').style.display='flex';el('view-vat').style.display='none';el('view-iot').style.display='none';el('view-hosting').style.display='none';el('view-pricing').style.display='none';el('view-recovery').style.display='none';el('view-accountant').style.display='none';el('view-upsell').style.display='none';el('view-pitch').style.display='none';
-  el('btn-back').classList.remove('visible');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
+  el('btn-back').classList.remove('visible');document.querySelector('.header').classList.remove('in-tool');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
 }
 var VIEW_ORIGINALS={};
 window.addEventListener('DOMContentLoaded',function(){
