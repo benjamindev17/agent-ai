@@ -483,9 +483,11 @@ html { overflow-x: hidden; }
           <span id="iot-explain-toggle-label">💡 Qu'est-ce qu'une IoT Box ? — Cliquer pour déplier</span>
           <span id="iot-explain-icon" style="font-size:15px;transition:transform 0.3s;color:rgba(255,255,255,0.5);">▼</span>
         </button>
-        <div id="iot-explain-body" style="display:none;padding:0 22px 18px;border-top:1px solid rgba(255,255,255,0.15);">
+        <div id="iot-explain-body" style="display:none;padding:14px 22px 18px;border-top:1px solid rgba(255,255,255,0.15);">
           <div id="iot-explain-content"></div>
-          <a href="https://www.youtube.com/watch?v=xOEIh02oxzM" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:8px 14px;color:#fff;font-size:12px;font-weight:600;text-decoration:none;" id="iot-explain-video-link">▶️ Vidéo — Comprendre l'IoT Box</a>
+          <div style="position:relative;width:100%;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;margin-top:14px;">
+            <iframe src="https://www.youtube.com/embed/xOEIh02oxzM" title="IoT Box" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>
+          </div>
         </div>
       </div>
     </div>
@@ -1185,7 +1187,6 @@ function setLang(l){
   el('badge-domain').textContent=t('badgeActive'); el('tool-domain-label').textContent=t('toolDomainLabel'); el('tool-domain-sub').textContent=t('toolDomainSub');
   if(el('iot-explain-toggle-label')) el('iot-explain-toggle-label').textContent=_iotExplainOpen?t('iotExplainToggleClose'):t('iotExplainToggle');
   if(_iotExplainOpen && el('iot-explain-content')) el('iot-explain-content').innerHTML=IOT_EXPLAIN[lang];
-  if(_iotExplainOpen && el('iot-explain-video-link')) el('iot-explain-video-link').textContent=t('iotExplainVideoLabel');
   if(view==='pitch') renderPitchView();
   if(view==='hunting') renderHuntingView();
   if(view==='domain') renderDomainView();
@@ -1461,9 +1462,8 @@ function toggleIotExplain(){
   icon.style.transform=_iotExplainOpen?'rotate(180deg)':'rotate(0deg)';
   if(lbl) lbl.textContent=_iotExplainOpen?t('iotExplainToggleClose'):t('iotExplainToggle');
   if(_iotExplainOpen && el('iot-explain-content')) el('iot-explain-content').innerHTML=IOT_EXPLAIN[lang];
-  if(_iotExplainOpen && el('iot-explain-video-link')) el('iot-explain-video-link').textContent=t('iotExplainVideoLabel');
 }
- 
+
 // ── PRICING LOGIC ──
 let pricingState={topic:null, pricelist:'high', billing:'monthly'};
  
