@@ -65,7 +65,7 @@ html { overflow-x: hidden; }
   .card-header { padding:12px 14px; font-size:14px; }
   .result-body { padding:14px; }
   .result-header { padding:12px 14px; font-size:14px; }
-  .tool-btn { padding:18px 8px 14px; gap:8px; border-radius:12px; }
+  .tool-btn { padding:18px 8px 14px; gap:8px; border-radius:12px; height:138px; }
   .tool-icon { font-size:26px; }
   .tool-label { font-size:12px; }
   .tool-sub { font-size:10px; }
@@ -78,12 +78,13 @@ html { overflow-x: hidden; }
   padding: 28px 16px 22px;
   cursor: pointer;
   text-align: center;
-  display: flex; flex-direction:column; align-items:center; gap:12px;
+  display: flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
   transition: all 0.25s;
   backdrop-filter: blur(12px);
   position: relative;
   font-family: inherit;
   min-width: 0; overflow: hidden;
+  height: 158px;
   box-shadow: 0 0 18px rgba(113,75,103,0.35), 0 0 6px rgba(143,107,130,0.2);
   animation: tool-glow 3s ease-in-out infinite;
 }
@@ -105,8 +106,8 @@ html { overflow-x: hidden; }
 .tool-btn.empty { cursor:default; opacity:0.45; animation:none; box-shadow:none; }
 .tool-btn.empty:hover { transform:none; border-color:rgba(255,255,255,0.22); background:rgba(255,255,255,0.13); box-shadow:none; }
 .tool-icon { font-size:32px; line-height:1; }
-.tool-label { font-size:13.5px; font-weight:600; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.5); line-height:1.3; }
-.tool-sub { font-size:11px; color:rgba(255,255,255,0.5); }
+.tool-label { font-size:13.5px; font-weight:600; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.5); line-height:1.3; min-height:2.6em; display:flex; align-items:center; justify-content:center; }
+.tool-sub { font-size:11px; color:rgba(255,255,255,0.5); min-height:2.4em; display:flex; align-items:center; justify-content:center; }
 .tool-badge { position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:2px 7px; font-size:9.5px; font-weight:700; color:rgba(255,255,255,0.5); letter-spacing:0.8px; text-transform:uppercase; }
  
 /* TOOL PANELS — identical layout for ALL tools */
