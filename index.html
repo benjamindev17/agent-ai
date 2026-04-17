@@ -1264,7 +1264,6 @@ function setLang(l){
   el('badge-hosting').textContent=t('badgeActive'); el('tool-hosting-label').textContent=t('toolHostingLabel'); el('tool-hosting-sub').textContent=t('toolHostingSub');
   el('badge-pricing').textContent=t('badgeActive'); el('tool-pricing-label').textContent=t('toolPricingLabel'); el('tool-pricing-sub').textContent=t('toolPricingSub');
   for(let i=5;i<=6;i++){el(`bs${i}`).textContent=t('badgeSoon');el(`tl${i}`).textContent=t('toolEmpty');}
-  el('bs7').textContent=t('badgeSoon');el('tl7').textContent=t('toolEmpty');
   el('card-header-loc').textContent=t('cardHeaderLoc'); el('label-where').textContent=t('labelWhere');
   el('loc-be-label').textContent=t('locBe'); el('loc-eu-label').textContent=t('locEu'); el('loc-eu-sub').textContent=t('locEuSub');
   el('loc-uk-label').textContent=t('locUk'); el('loc-ch-label').textContent=t('locCh'); el('loc-row-label').textContent=t('locRow');
@@ -1330,6 +1329,9 @@ function setLang(l){
   if(el('upsell-discuss-yes-label'))el('upsell-discuss-yes-label').textContent=t('upsellDiscussYes');
   if(el('upsell-discuss-no-label'))el('upsell-discuss-no-label').textContent=t('upsellDiscussNo');
   if(el('upsell-placeholder-text'))el('upsell-placeholder-text').innerHTML=t('upsellPlaceholder');
+  if(el('upsell-result-title')&&!upsellState.reason)el('upsell-result-title').textContent=t('upsellResultTitle');
+  if(el('upsell-email-toggle-label')&&!upsellEmailOpen)el('upsell-email-toggle-label').textContent=t('upsellEmailToggle');
+  if(el('upsell-copy-email-label'))el('upsell-copy-email-label').textContent=t('upsellCopyEmail');
   if(typeof upsellState!=='undefined'&&upsellState.reason)renderUpsellResult();
 }
  
