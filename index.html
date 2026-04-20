@@ -1031,7 +1031,7 @@ en:{order:{title:'Order a box',sections:[{label:'INTERNAL RESOURCES',links:[{ico
 let lang='fr', view='home';
 let vatState={location:null,euCountry:'',status:null,vatResult:null}, vatLast=null;
 let iotState={type:null,need:null};
-let callState={phase:null,plan:null,objOpen:{}};
+let callState={phase:null,plan:null,planType:null,sentiment:null,objOpen:{}};
 const CALL_DATA={
   scripts:{
     test_mensuel:{
@@ -1061,6 +1061,16 @@ const CALL_DATA={
     {id:'autonomie',label:'🛠️ Autonomie',text:"Serait-ce ridicule de suggérer qu'un regard externe vous ferait gagner les heures que vous allez passer à chercher seul ?"}
   ]
 };
+const CALL_THERMO={
+  test:  {emoji:'❄️',label:'Température Froide', color:'#3b82f6',bg:'rgba(59,130,246,0.12)', border:'rgba(59,130,246,0.45)', text:"Objectif : Rassurer et verrouiller l'intérêt."},
+  implem:{emoji:'🔥',label:'Température Chaude', color:'#f97316',bg:'rgba(249,115,22,0.12)',border:'rgba(249,115,22,0.45)',text:'Objectif : Sauver du temps (Vendre le Pack).'},
+  prod:  {emoji:'✅',label:'Température Stable', color:'#22c55e',bg:'rgba(34,197,94,0.12)', border:'rgba(34,197,94,0.45)', text:"Objectif : Optimiser les coûts (Vendre l'Annuel)."}
+};
+const CALL_SENTIMENTS=[
+  {key:'stresse',  label:'😓 Stressé',  color:'#f87171',bg:'rgba(248,113,113,0.14)',border:'rgba(248,113,113,0.5)', text:"On dirait que la mise en place technique vous pèse un peu..."},
+  {key:'hesitant', label:'🤔 Hésitant', color:'#fb923c',bg:'rgba(251,146,60,0.14)', border:'rgba(251,146,60,0.5)',  text:"On dirait que vous avez peur de prendre une décision trop rapide..."},
+  {key:'satisfait',label:'😊 Satisfait',color:'#34d399',bg:'rgba(52,211,153,0.14)', border:'rgba(52,211,153,0.5)',  text:"On dirait que vous voyez déjà tout le potentiel d'Odoo pour votre business..."}
+];
 function t(k){return TR[lang][k]||TR.fr[k]||k;}
 function el(id){return document.getElementById(id);}
  
@@ -1113,7 +1123,7 @@ function resetTool(){
   upsellState={reason:null,contract:null,multiType:null,discuss:null}; upsellEmailOpen=false;
   pitchCAOpen={};
   huntingDate=new Date();
-  callState={phase:null,plan:null,objOpen:{}};
+  callState={phase:null,plan:null,planType:null,sentiment:null,objOpen:{}};
   // If inside a tool, restore the pristine DOM for that tool
   if(view!=='home'){
     var viewEl=el('view-'+view);
@@ -2847,52 +2857,117 @@ function renderDomainView(){
   el('domain-content').innerHTML=h;
 }
 function renderCallFuView(){
-  var phase=callState.phase,plan=callState.plan;
+  var phase=callState.phase,plan=callState.plan,planType=callState.planType,sentiment=callState.sentiment;
   var phases=[
-    {key:'test',label:'TEST',color:'#3b82f6',bg:'rgba(59,130,246,0.18)',border:'rgba(59,130,246,0.6)'},
-    {key:'implem',label:'IMPLÉMENTATION',color:'#f97316',bg:'rgba(249,115,22,0.18)',border:'rgba(249,115,22,0.6)'},
-    {key:'prod',label:'PRODUCTION',color:'#22c55e',bg:'rgba(34,197,94,0.18)',border:'rgba(34,197,94,0.6)'}
+    {key:'test',  label:'TEST',           color:'#3b82f6',bg:'rgba(59,130,246,0.18)', border:'rgba(59,130,246,0.6)'},
+    {key:'implem',label:'IMPLÉMENTATION', color:'#f97316',bg:'rgba(249,115,22,0.18)',border:'rgba(249,115,22,0.6)'},
+    {key:'prod',  label:'PRODUCTION',     color:'#22c55e',bg:'rgba(34,197,94,0.18)', border:'rgba(34,197,94,0.6)'}
   ];
+  var scriptsReady=phase&&plan&&(plan==='annuel'||planType);
   var h='';
   h+="<style>@keyframes cfSlidein{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}.cf-step{animation:cfSlidein 0.35s ease both}</style>";
-  // Header banner
-  h+="<div style='background:linear-gradient(135deg,rgba(113,75,103,0.25),rgba(0,160,157,0.15));border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px 20px;margin-bottom:22px;font-size:13.5px;line-height:1.75;color:rgba(255,255,255,0.82);'>"
-   +"<strong style='color:#00E8B0;'>🎯 Objectif : Obtenir un 'NON'.</strong> En demandant si le client est <em>'opposé'</em> ou <em>'contre'</em>, on élimine son sentiment de pression. Le 'Non' ici est un signe de sécurité qui ouvre la discussion."
+  // ── AIDE-MÉMOIRE header
+  h+="<div class='cf-step card' style='padding:0;margin-bottom:14px;overflow:hidden;animation-delay:0s;'>"
+   +"<div style='background:linear-gradient(90deg,rgba(113,75,103,0.35),rgba(0,160,157,0.2));padding:9px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:8px;'>"
+   +"<span style='font-size:10px;font-weight:800;color:rgba(255,255,255,0.5);letter-spacing:2px;'>📋 AIDE-MÉMOIRE</span>"
+   +"</div>"
+   +"<div style='display:grid;grid-template-columns:1fr 1fr;'>"
+   +"<div style='padding:14px 18px;border-right:1px solid rgba(255,255,255,0.07);'>"
+   +"<div style='font-size:11px;font-weight:700;color:#FFD166;margin-bottom:5px;'>⏱️ Le Moment (J+15)</div>"
+   +"<div style='font-size:12.5px;color:rgba(255,255,255,0.68);line-height:1.65;'>C&apos;est la fin de la lune de miel. Le client réalise l&apos;effort nécessaire. C&apos;est l&apos;instant T pour proposer de l&apos;aide <em>(Packs)</em> ou une économie <em>(Annuel)</em>.</div>"
+   +"</div>"
+   +"<div style='padding:14px 18px;'>"
+   +"<div style='font-size:11px;font-weight:700;color:#00E8B0;margin-bottom:5px;'>🎯 La Méthode</div>"
+   +"<div style='font-size:12.5px;color:rgba(255,255,255,0.68);line-height:1.65;'>On cherche un <strong style='color:#fff;'>'NON'</strong>. Dire <em>'Non'</em> rassure le client et lui donne l&apos;impression de <strong style='color:#fff;'>garder le contrôle</strong> sur son budget.</div>"
+   +"</div>"
+   +"</div>"
    +"</div>";
-  // Step 1 — Phase
-  h+="<div class='cf-step card' style='padding:20px 22px;margin-bottom:0;animation-delay:0s;'>"
+  // ── STEP 1 : Phase + Thermomètre
+  h+="<div class='cf-step card' style='padding:20px 22px;margin-bottom:0;animation-delay:0.06s;'>"
    +"<div style='font-size:10px;font-weight:800;color:rgba(255,255,255,0.38);letter-spacing:2.5px;margin-bottom:14px;'>① PHASE DU CLIENT</div>"
-   +"<div style='display:flex;gap:10px;flex-wrap:wrap;'>";
+   +"<div style='display:flex;gap:10px;flex-wrap:wrap;"+(phase?"margin-bottom:14px;":"")+"'>";
   phases.forEach(function(p){
     var isAct=phase===p.key;
     h+="<button onclick=\"setCallPhase('"+p.key+"')\" style='flex:1;min-width:110px;padding:14px 8px;border-radius:9px;border:2px solid "+(isAct?p.border:"rgba(255,255,255,0.1)")+";background:"+(isAct?p.bg:"rgba(255,255,255,0.04)")+";color:"+(isAct?p.color:"rgba(255,255,255,0.5)")+";font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.2s;letter-spacing:0.8px;'>"+p.label+"</button>";
   });
-  h+="</div></div>";
-  // Step 2 — Plan
+  h+="</div>";
   if(phase){
-    h+="<div class='cf-step card' style='padding:20px 22px;margin-top:12px;animation-delay:0.12s;'>"
+    var th=CALL_THERMO[phase];
+    h+="<div style='display:flex;align-items:center;gap:14px;background:"+th.bg+";border:1px solid "+th.border+";border-radius:9px;padding:12px 16px;'>"
+     +"<span style='font-size:26px;line-height:1;'>"+th.emoji+"</span>"
+     +"<div>"
+     +"<div style='font-size:12.5px;font-weight:800;color:"+th.color+";margin-bottom:2px;'>"+th.label+"</div>"
+     +"<div style='font-size:12px;color:rgba(255,255,255,0.62);'>"+th.text+"</div>"
+     +"</div>"
+     +"</div>";
+  }
+  h+="</div>";
+  // ── STEP 2 : Plan + PlanType
+  if(phase){
+    h+="<div class='cf-step card' style='padding:20px 22px;margin-top:12px;animation-delay:0.14s;'>"
      +"<div style='font-size:10px;font-weight:800;color:rgba(255,255,255,0.38);letter-spacing:2.5px;margin-bottom:14px;'>② PLAN ACTUEL</div>"
      +"<div style='display:flex;gap:10px;'>";
     [{key:'mensuel',label:'MENSUEL'},{key:'annuel',label:'ANNUEL'}].forEach(function(p){
       var isAct=plan===p.key;
       h+="<button onclick=\"setCallPlan('"+p.key+"')\" style='flex:1;padding:14px 8px;border-radius:9px;border:2px solid "+(isAct?"#00A09D":"rgba(255,255,255,0.1)")+";background:"+(isAct?"rgba(0,160,157,0.2)":"rgba(255,255,255,0.04)")+";color:"+(isAct?"#00E8B0":"rgba(255,255,255,0.5)")+";font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.2s;letter-spacing:0.8px;'>"+p.label+"</button>";
     });
-    h+="</div></div>";
+    h+="</div>";
+    if(plan==='mensuel'){
+      h+="<div style='margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07);'>"
+       +"<div style='font-size:10px;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:2px;margin-bottom:10px;'>TYPE DE PLAN (pour calculer l'économie)</div>"
+       +"<div style='display:flex;gap:10px;'>";
+      [{key:'standard',label:'STANDARD',savings:'+ de 70€',savingsPlain:'70€'},{key:'custom',label:'CUSTOM',savings:'+ de 96€',savingsPlain:'96€'}].forEach(function(p){
+        var isAct=planType===p.key;
+        h+="<button onclick=\"setCallPlanType('"+p.key+"')\" style='flex:1;padding:13px 10px;border-radius:8px;border:2px solid "+(isAct?"rgba(74,222,128,0.65)":"rgba(255,255,255,0.1)")+";background:"+(isAct?"rgba(74,222,128,0.1)":"rgba(255,255,255,0.04)")+";color:"+(isAct?"#4ade80":"rgba(255,255,255,0.5)")+";font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.2s;text-align:center;'>"
+         +p.label
+         +"<span style='display:block;font-size:11px;font-weight:600;margin-top:3px;color:"+(isAct?"rgba(74,222,128,0.85)":"rgba(255,255,255,0.3)")+";'>Éco. <strong>"+p.savings+"</strong>/user/an</span>"
+         +"</button>";
+      });
+      h+="</div></div>";
+    }
+    h+="</div>";
   }
-  // Step 3 — Scripts
-  if(phase&&plan){
+  // ── STEP 3 : Étiquettes de sentiment
+  if(scriptsReady){
+    h+="<div class='cf-step card' style='padding:18px 22px;margin-top:12px;animation-delay:0.22s;'>"
+     +"<div style='font-size:10px;font-weight:800;color:rgba(255,255,255,0.38);letter-spacing:2.5px;margin-bottom:12px;'>③ ÉTIQUETTE DE SENTIMENT</div>"
+     +"<div style='display:flex;gap:8px;flex-wrap:wrap;"+(sentiment?"margin-bottom:12px;":"")+"'>";
+    CALL_SENTIMENTS.forEach(function(s){
+      var isAct=sentiment===s.key;
+      h+="<button onclick=\"setCallSentiment('"+s.key+"')\" style='flex:1;min-width:100px;padding:10px 8px;border-radius:8px;border:2px solid "+(isAct?s.border:"rgba(255,255,255,0.1)")+";background:"+(isAct?s.bg:"rgba(255,255,255,0.04)")+";color:"+(isAct?s.color:"rgba(255,255,255,0.5)")+";font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;'>"+s.label+"</button>";
+    });
+    h+="</div>";
+    if(sentiment){
+      var sentObj=CALL_SENTIMENTS.filter(function(s){return s.key===sentiment;})[0];
+      h+="<div style='display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;'>"
+       +"<em style='font-size:13.5px;color:rgba(255,255,255,0.82);line-height:1.55;'>\""+sentObj.text+"\"</em>"
+       +"<button onclick=\"callFuCopySentiment('"+sentiment+"',this)\" style='flex-shrink:0;padding:6px 12px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;'>📋 Copier</button>"
+       +"</div>";
+    }
+    h+="</div>";
+    // ── STEP 4 : Scripts
     var key=phase+"_"+plan;
     var scripts=CALL_DATA.scripts[key]||{};
-    h+="<div class='cf-step' style='margin-top:12px;animation-delay:0.22s;'>"
-     +"<div style='font-size:10px;font-weight:800;color:rgba(255,255,255,0.38);letter-spacing:2.5px;margin-bottom:14px;'>③ QUESTIONS CIBLES</div>";
+    h+="<div class='cf-step' style='margin-top:12px;animation-delay:0.30s;'>"
+     +"<div style='font-size:10px;font-weight:800;color:rgba(255,255,255,0.38);letter-spacing:2.5px;margin-bottom:14px;'>④ QUESTIONS CIBLES</div>";
     if(plan==='annuel'){
       h+="<div style='background:rgba(255,209,102,0.1);border:1px solid rgba(255,209,102,0.3);border-radius:8px;padding:10px 16px;margin-bottom:14px;font-size:12.5px;color:#FFD166;line-height:1.6;'>⭐ Client déjà en annuel — Proposez uniquement un <strong>Pack Expertise</strong>.</div>";
     }
-    if(scripts.annual){
+    if(plan==='mensuel'){
+      var aDsp,aCopy,aLabel;
+      if(planType==='custom'){
+        aDsp="Seriez-vous opposé à l&apos;idée de récupérer <strong style='color:#4ade80;'>plus de 96€</strong> par utilisateur en sécurisant votre abonnement annuel dès aujourd&apos;hui ?";
+        aCopy="Seriez-vous opposé à l'idée de récupérer plus de 96€ par utilisateur en sécurisant votre abonnement annuel dès aujourd'hui ?";
+        aLabel="📅 ANNUEL — -20% CUSTOM";
+      }else{
+        aDsp="Seriez-vous contre l&apos;idée d&apos;économiser <strong style='color:#4ade80;'>plus de 70€</strong> par utilisateur sur l&apos;année en basculant simplement sur le plan annuel maintenant ?";
+        aCopy="Seriez-vous contre l'idée d'économiser plus de 70€ par utilisateur sur l'année en basculant simplement sur le plan annuel maintenant ?";
+        aLabel="📅 ANNUEL — -20% STANDARD";
+      }
       h+="<div class='card' style='border-left:4px solid #00A09D;padding:20px 22px;margin-bottom:12px;'>"
-       +"<div style='font-size:10px;font-weight:800;color:#00A09D;letter-spacing:2px;margin-bottom:12px;'>📅 ANNUEL — -20%</div>"
-       +"<div style='font-size:15.5px;font-weight:700;color:#d0f7f5;line-height:1.7;margin-bottom:16px;'>\""+scripts.annual+"\"</div>"
-       +"<button onclick=\"callFuCopyScript('"+key+"','annual',this)\" style='padding:8px 18px;background:rgba(0,160,157,0.18);border:1.5px solid #00A09D;color:#00E8B0;border-radius:7px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;'>📋 Copier</button>"
+       +"<div style='font-size:10px;font-weight:800;color:#00A09D;letter-spacing:2px;margin-bottom:12px;'>"+aLabel+"</div>"
+       +"<div style='font-size:15.5px;font-weight:700;color:#d0f7f5;line-height:1.7;margin-bottom:16px;'>\""+aDsp+"\"</div>"
+       +"<button onclick=\"_callFuCopy('"+aCopy.replace(/'/g,"\\x27")+"',this)\" style='padding:8px 18px;background:rgba(0,160,157,0.18);border:1.5px solid #00A09D;color:#00E8B0;border-radius:7px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;'>📋 Copier</button>"
        +"</div>";
     }
     if(scripts.pack){
@@ -2904,8 +2979,8 @@ function renderCallFuView(){
     }
     h+="</div>";
   }
-  // Objections accordion
-  var objDelay=(phase&&plan)?"0.34s":"0.12s";
+  // ── Objections accordion
+  var objDelay=scriptsReady?"0.40s":(phase?"0.22s":"0.14s");
   h+="<div class='cf-step' style='margin-top:20px;animation-delay:"+objDelay+";'>"
    +"<div style='font-size:10px;font-weight:800;color:rgba(255,255,255,0.38);letter-spacing:2.5px;margin-bottom:12px;'>GESTION DES OBJECTIONS</div>";
   CALL_DATA.objections.forEach(function(obj){
@@ -2913,7 +2988,7 @@ function renderCallFuView(){
     h+="<div class='card' style='padding:0;margin-bottom:10px;overflow:hidden;'>"
      +"<button onclick=\"toggleCallObj('"+obj.id+"')\" style='width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;padding:14px 20px;cursor:pointer;font-family:inherit;color:rgba(255,255,255,0.8);font-size:13.5px;font-weight:600;text-align:left;'>"
      +"<span>"+obj.label+"</span>"
-     +"<span style='color:rgba(255,255,255,0.32);font-size:12px;transition:transform 0.25s;display:inline-block;transform:rotate("+(isOpen?"180":"0")+"deg);'>▼</span>"
+     +"<span style='color:rgba(255,255,255,0.32);font-size:12px;display:inline-block;transform:rotate("+(isOpen?"180":"0")+"deg);transition:transform 0.25s;'>▼</span>"
      +"</button>";
     if(isOpen){
       h+="<div style='border-top:1px solid rgba(255,255,255,0.07);padding:16px 20px 18px;'>"
@@ -2924,17 +2999,20 @@ function renderCallFuView(){
     h+="</div>";
   });
   h+="</div>";
-  // Reset button
+  // ── Reset
   h+="<div style='margin-top:28px;padding-bottom:16px;text-align:center;'>"
    +"<button onclick='resetCallFu()' style='padding:12px 36px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.45);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;' onmouseover=\"this.style.background='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.8)'\" onmouseout=\"this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.45)'\">🔄 Reset / Nouvel Appel</button>"
    +"</div>";
   el('callfu-content').innerHTML=h;
 }
-function setCallPhase(p){callState.phase=p;callState.plan=null;renderCallFuView();}
-function setCallPlan(p){callState.plan=p;renderCallFuView();}
+function setCallPhase(p){callState.phase=p;callState.plan=null;callState.planType=null;callState.sentiment=null;renderCallFuView();}
+function setCallPlan(p){callState.plan=p;callState.planType=null;callState.sentiment=null;renderCallFuView();}
+function setCallPlanType(p){callState.planType=p;callState.sentiment=null;renderCallFuView();}
+function setCallSentiment(s){callState.sentiment=(callState.sentiment===s)?null:s;renderCallFuView();}
 function toggleCallObj(id){callState.objOpen[id]=!callState.objOpen[id];renderCallFuView();}
 function callFuCopyScript(key,type,btn){var s=CALL_DATA.scripts[key];_callFuCopy(s?s[type]||'':'',btn);}
 function callFuCopyObj(id,btn){var o=CALL_DATA.objections.filter(function(x){return x.id===id;})[0];_callFuCopy(o?o.text:'',btn);}
+function callFuCopySentiment(key,btn){var s=CALL_SENTIMENTS.filter(function(x){return x.key===key;})[0];_callFuCopy(s?s.text:'',btn);}
 function _callFuCopy(text,btn){
   if(!text)return;
   var orig=btn.textContent;
@@ -2943,7 +3021,7 @@ function _callFuCopy(text,btn){
   if(navigator.clipboard){navigator.clipboard.writeText(text).catch(function(){});}
   else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
 }
-function resetCallFu(){callState={phase:null,plan:null,objOpen:{}};renderCallFuView();}
+function resetCallFu(){callState={phase:null,plan:null,planType:null,sentiment:null,objOpen:{}};renderCallFuView();}
 const canvas=document.getElementById('earthCanvas'),ctx=canvas.getContext('2d');
 let W,H,time=0,highlightedCountry=null,geoData=null;
 const stars=Array.from({length:180},()=>({x:Math.random(),y:Math.random(),s:Math.random()*1.2+0.3,b:Math.random()*0.4+0.15,sp:Math.random()*0.003+0.001}));
