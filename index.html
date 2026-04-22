@@ -1050,6 +1050,7 @@ function openTool(tool){
   el('view-upsell').style.display='none';
   el('view-pitch').style.display='none';
   el('view-hunting').style.display='none';
+  el('view-domain').style.display='none';
   el('btn-back').classList.add('visible');
   el('btn-reset').classList.add('visible');
   document.querySelector('.header').classList.add('in-tool');
@@ -1084,6 +1085,7 @@ function resetTool(){
   recoveryState={type:null,plan:null,pricelist:'high',users:1,recoverable:null};
   accState={scenario:null,added:null,connected:null,contract:null};
   upsellState={reason:null,contract:null,multiType:null,discuss:null}; upsellEmailOpen=false;
+  eligState={target:null,plan:null,billing:null,version:null}; _eligEmailOpen=false;
   pitchCAOpen={};
   huntingDate=new Date();
   // If inside a tool, restore the pristine DOM for that tool
@@ -1194,11 +1196,11 @@ function setLang(l){
   document.title=t('pageTitle');
   el('back-label').textContent=t('backLabel');
   el('header-title').textContent=view==='vat'?t('vatHeaderTitle'):view==='iot'?t('iotHeaderTitle'):view==='hosting'?t('hostingHeaderTitle'):view==='pricing'?t('pricingHeaderTitle'):view==='recovery'?t('recoveryHeaderTitle'):view==='accountant'?t('accHeaderTitle'):view==='upsell'?t('upsellHeaderTitle'):view==='pitch'?t('pitchHeaderTitle'):view==='hunting'?t('huntingHeaderTitle'):view==='domain'?t('domainHeaderTitle'):t('headerTitle');
-  el('badge-accountant').textContent=t('badgeActive'); el('tool-accountant-label').textContent=t('toolAccountantLabel'); el('tool-accountant-sub').textContent=t('toolAccountantSub');
-  el('badge-upsell').textContent=t('badgeActive'); el('tool-upsell-label').textContent=t('toolUpsellLabel'); el('tool-upsell-sub').textContent=t('toolUpsellSub');
-  el('badge-pitch').textContent=t('badgeActive'); el('tool-pitch-label').textContent=t('toolPitchLabel'); el('tool-pitch-sub').textContent=t('toolPitchSub');
-  el('badge-hunting').textContent=t('badgeActive'); el('tool-hunting-label').textContent=t('toolHuntingLabel'); el('tool-hunting-sub').textContent=t('toolHuntingSub');
-  el('badge-domain').textContent=t('badgeActive'); el('tool-domain-label').textContent=t('toolDomainLabel'); el('tool-domain-sub').textContent=t('toolDomainSub');
+  if(el('badge-accountant')) el('badge-accountant').textContent=t('badgeActive'); if(el('tool-accountant-label')) el('tool-accountant-label').textContent=t('toolAccountantLabel'); if(el('tool-accountant-sub')) el('tool-accountant-sub').textContent=t('toolAccountantSub');
+  if(el('badge-upsell')) el('badge-upsell').textContent=t('badgeActive'); if(el('tool-upsell-label')) el('tool-upsell-label').textContent=t('toolUpsellLabel'); if(el('tool-upsell-sub')) el('tool-upsell-sub').textContent=t('toolUpsellSub');
+  if(el('badge-pitch')) el('badge-pitch').textContent=t('badgeActive'); if(el('tool-pitch-label')) el('tool-pitch-label').textContent=t('toolPitchLabel'); if(el('tool-pitch-sub')) el('tool-pitch-sub').textContent=t('toolPitchSub');
+  if(el('badge-hunting')) el('badge-hunting').textContent=t('badgeActive'); if(el('tool-hunting-label')) el('tool-hunting-label').textContent=t('toolHuntingLabel'); if(el('tool-hunting-sub')) el('tool-hunting-sub').textContent=t('toolHuntingSub');
+  if(el('badge-domain')) el('badge-domain').textContent=t('badgeActive'); if(el('tool-domain-label')) el('tool-domain-label').textContent=t('toolDomainLabel'); if(el('tool-domain-sub')) el('tool-domain-sub').textContent=t('toolDomainSub');
   if(el('iot-explain-toggle-label')) el('iot-explain-toggle-label').textContent=_iotExplainOpen?t('iotExplainToggleClose'):t('iotExplainToggle');
   if(_iotExplainOpen && el('iot-explain-content')) el('iot-explain-content').innerHTML=IOT_EXPLAIN[lang];
   if(view==='pitch') renderPitchView();
@@ -1237,18 +1239,18 @@ function setLang(l){
   if(el('email-copy-btn')) el('email-copy-btn').textContent=t('recCopyBtn');
   if(el('email-template-placeholder')) el('email-template-placeholder').textContent=t('recEmailPh');
   // recovery static labels
-  el('badge-recovery').textContent=t('badgeActive'); el('tool-recovery-label').textContent=t('toolRecoveryLabel'); el('tool-recovery-sub').textContent=t('toolRecoverySub');
-  el('recovery-card-header').textContent=t('recoveryCardHeader');
-  el('recovery-label-type').textContent=t('recoveryLabelType');
-  el('recovery-monthly-label').textContent=t('recoveryMonthlyLabel');
-  el('recovery-annual-label').textContent=t('recoveryAnnualLabel');
-  el('recovery-label-dates').textContent=t('recoveryLabelDates');
+  if(el('badge-recovery')) el('badge-recovery').textContent=t('badgeActive'); if(el('tool-recovery-label')) el('tool-recovery-label').textContent=t('toolRecoveryLabel'); if(el('tool-recovery-sub')) el('tool-recovery-sub').textContent=t('toolRecoverySub');
+  if(el('recovery-card-header')) el('recovery-card-header').textContent=t('recoveryCardHeader');
+  if(el('recovery-label-type')) el('recovery-label-type').textContent=t('recoveryLabelType');
+  if(el('recovery-monthly-label')) el('recovery-monthly-label').textContent=t('recoveryMonthlyLabel');
+  if(el('recovery-annual-label')) el('recovery-annual-label').textContent=t('recoveryAnnualLabel');
+  if(el('recovery-label-dates')) el('recovery-label-dates').textContent=t('recoveryLabelDates');
   if(el('recovery-renewal-label')) el('recovery-renewal-label').textContent=t('recoveryRenewalLabel');
   if(el('recovery-today-label')) el('recovery-today-label').textContent=t('recoveryTodayLabel');
   if(el('recovery-label-plan')) el('recovery-label-plan').textContent=t('recoveryLabelPlan');
   if(el('recovery-label-pricelist')) el('recovery-label-pricelist').textContent=t('recoveryLabelPricelist');
   if(el('recovery-users-label')) el('recovery-users-label').textContent=t('recoveryUsersLabel');
-  el('recovery-placeholder-text').innerHTML=t('recoveryPlaceholder');
+  if(el('recovery-placeholder-text')) el('recovery-placeholder-text').innerHTML=t('recoveryPlaceholder');
   if(el('rec-label-recoverable')) el('rec-label-recoverable').textContent=t('recLabelRecoverable');
   if(el('rec-recoverable-yes-label')) el('rec-recoverable-yes-label').textContent=t('recRecoverableYes');
   if(el('rec-recoverable-no-label')) el('rec-recoverable-no-label').textContent=t('recRecoverableNo');
@@ -1265,68 +1267,68 @@ function setLang(l){
   _mfr.forEach((_,i)=>{ const o=el('rec-month-'+i); if(o) o.textContent=(l==='fr'?_mfr:_men)[i]; });
   if(recoveryState.type) calcRecovery();
   // pricing static labels
-  el('pricing-card-header').textContent=t('pricingCardHeader');
-  el('pricing-label-topic').textContent=t('pricingLabelTopic');
-  el('pricing-plans-label').textContent=t('pricingPlansLabel'); el('pricing-plans-sub').textContent=t('pricingPlansSub');
-  el('pricing-tarifs-label').textContent=t('pricingTarifsLabel'); el('pricing-tarifs-sub').textContent=t('pricingTarifsSub');
-  el('pricing-users-label').textContent=t('pricingUsersLabel'); el('pricing-users-sub').textContent=t('pricingUsersSub');
-  el('pricing-free-label').textContent=t('pricingFreeLabel'); el('pricing-free-sub').textContent=t('pricingFreeSub');
-  el('pricing-placeholder-text').innerHTML=t('pricingPlaceholder');
+  if(el('pricing-card-header')) el('pricing-card-header').textContent=t('pricingCardHeader');
+  if(el('pricing-label-topic')) el('pricing-label-topic').textContent=t('pricingLabelTopic');
+  if(el('pricing-plans-label')) el('pricing-plans-label').textContent=t('pricingPlansLabel'); if(el('pricing-plans-sub')) el('pricing-plans-sub').textContent=t('pricingPlansSub');
+  if(el('pricing-tarifs-label')) el('pricing-tarifs-label').textContent=t('pricingTarifsLabel'); if(el('pricing-tarifs-sub')) el('pricing-tarifs-sub').textContent=t('pricingTarifsSub');
+  if(el('pricing-users-label')) el('pricing-users-label').textContent=t('pricingUsersLabel'); if(el('pricing-users-sub')) el('pricing-users-sub').textContent=t('pricingUsersSub');
+  if(el('pricing-free-label')) el('pricing-free-label').textContent=t('pricingFreeLabel'); if(el('pricing-free-sub')) el('pricing-free-sub').textContent=t('pricingFreeSub');
+  if(el('pricing-placeholder-text')) el('pricing-placeholder-text').innerHTML=t('pricingPlaceholder');
   if(pricingState.topic) renderPricingResult();
-  el('home-title').textContent=t('homeTitle'); el('home-sub').textContent=t('homeSub');
-  el('badge-vat').textContent=t('badgeActive'); el('tool-vat-label').textContent=t('toolVatLabel'); el('tool-vat-sub').textContent=t('toolVatSub');
-  el('badge-iot').textContent=t('badgeActive'); el('tool-iot-label').textContent=t('toolIotLabel'); el('tool-iot-sub').textContent=t('toolIotSub');
-  el('badge-hosting').textContent=t('badgeActive'); el('tool-hosting-label').textContent=t('toolHostingLabel'); el('tool-hosting-sub').textContent=t('toolHostingSub');
-  el('badge-pricing').textContent=t('badgeActive'); el('tool-pricing-label').textContent=t('toolPricingLabel'); el('tool-pricing-sub').textContent=t('toolPricingSub');
-  for(let i=5;i<=6;i++){el(`bs${i}`).textContent=t('badgeSoon');el(`tl${i}`).textContent=t('toolEmpty');}
-  el('card-header-loc').textContent=t('cardHeaderLoc'); el('label-where').textContent=t('labelWhere');
-  el('loc-be-label').textContent=t('locBe'); el('loc-eu-label').textContent=t('locEu'); el('loc-eu-sub').textContent=t('locEuSub');
-  el('loc-uk-label').textContent=t('locUk'); el('loc-ch-label').textContent=t('locCh'); el('loc-row-label').textContent=t('locRow');
-  el('label-eu-country').textContent=t('labelEuCountry');
-  const _csi2=el('country-search-input');
+  if(el('home-title')) el('home-title').textContent=t('homeTitle'); if(el('home-sub')) el('home-sub').textContent=t('homeSub');
+  if(el('badge-vat')) el('badge-vat').textContent=t('badgeActive'); if(el('tool-vat-label')) el('tool-vat-label').textContent=t('toolVatLabel'); if(el('tool-vat-sub')) el('tool-vat-sub').textContent=t('toolVatSub');
+  if(el('badge-iot')) el('badge-iot').textContent=t('badgeActive'); if(el('tool-iot-label')) el('tool-iot-label').textContent=t('toolIotLabel'); if(el('tool-iot-sub')) el('tool-iot-sub').textContent=t('toolIotSub');
+  if(el('badge-hosting')) el('badge-hosting').textContent=t('badgeActive'); if(el('tool-hosting-label')) el('tool-hosting-label').textContent=t('toolHostingLabel'); if(el('tool-hosting-sub')) el('tool-hosting-sub').textContent=t('toolHostingSub');
+  if(el('badge-pricing')) el('badge-pricing').textContent=t('badgeActive'); if(el('tool-pricing-label')) el('tool-pricing-label').textContent=t('toolPricingLabel'); if(el('tool-pricing-sub')) el('tool-pricing-sub').textContent=t('toolPricingSub');
+  for(var _i=5;_i<=6;_i++){if(el('bs'+_i))el('bs'+_i).textContent=t('badgeSoon');if(el('tl'+_i))el('tl'+_i).textContent=t('toolEmpty');}
+  if(el('card-header-loc')) el('card-header-loc').textContent=t('cardHeaderLoc'); if(el('label-where')) el('label-where').textContent=t('labelWhere');
+  if(el('loc-be-label')) el('loc-be-label').textContent=t('locBe'); if(el('loc-eu-label')) el('loc-eu-label').textContent=t('locEu'); if(el('loc-eu-sub')) el('loc-eu-sub').textContent=t('locEuSub');
+  if(el('loc-uk-label')) el('loc-uk-label').textContent=t('locUk'); if(el('loc-ch-label')) el('loc-ch-label').textContent=t('locCh'); if(el('loc-row-label')) el('loc-row-label').textContent=t('locRow');
+  if(el('label-eu-country')) el('label-eu-country').textContent=t('labelEuCountry');
+  var _csi2=el('country-search-input');
   if(_csi2) _csi2.placeholder=lang==='fr'?'Rechercher un pays...':'Search a country...';
-  const _sp=el('select-placeholder'); if(_sp) _sp.textContent=t('selectPH');
-  el('label-vat-status').textContent=t('labelVatStatus');
-  el('b2b-label').textContent=t('b2bLabel'); el('b2b-sub').textContent=t('b2bSub');
-  el('b2c-label').textContent=t('b2cLabel'); el('b2c-sub').textContent=t('b2cSub');
-  el('vat-verify-text').innerHTML=t('vatVerifyText'); el('vies-link').textContent=t('viesLink');
-  el('label-vat-check').textContent=t('labelVatCheck'); el('btn-vat-valid').textContent=t('btnVatValid'); el('btn-vat-invalid').textContent=t('btnVatInvalid');
-  el('vat-result-title').textContent=t('vatResultTitle'); el('vat-placeholder-text').innerHTML=t('vatPlaceholder');
-  el('iot-card-header').textContent=t('iotCardHeader'); el('iot-label-type').textContent=t('iotLabelType');
-  el('iot-physical-label').textContent=t('iotPhysicalLabel'); el('iot-physical-sub').textContent=t('iotPhysicalSub');
-  el('iot-virtual-label').textContent=t('iotVirtualLabel'); el('iot-virtual-sub').textContent=t('iotVirtualSub');
-  el('iot-sub-title').textContent=t('iotSubTitle'); el('iot-sub-text').innerHTML=t('iotSubText');
-  el('iot-label-need').textContent=t('iotLabelNeed'); el('iot-label-need-v').textContent=t('iotLabelNeedV');
-  el('need-order').textContent=t('needOrder'); el('need-connect').textContent=t('needConnect'); el('need-ports').textContent=t('needPorts');
-  el('need-client').textContent=t('needClient'); el('need-videos-p').textContent=t('needVideosP'); el('need-contacts').textContent=t('needContacts');
-  el('need-connect-v').textContent=t('needConnectV'); el('need-client-v').textContent=t('needClientV');
-  el('need-videos-v').textContent=t('needVideosV'); el('need-contacts-v').textContent=t('needContactsV');
-  el('iot-result-title').textContent=t('iotResultTitle'); el('iot-placeholder-text').innerHTML=t('iotPlaceholder');
-  el('hosting-card-header').textContent=t('hostingCardHeader');
-  el('hosting-label-type').textContent=t('hostingLabelType');
-  el('hosting-saas-label').textContent=t('hostingSaasLabel'); el('hosting-saas-sub').textContent=t('hostingSaasSub');
-  el('hosting-sh-label').textContent=t('hostingShLabel'); el('hosting-sh-sub').textContent=t('hostingShSub');
-  el('hosting-onprem-label').textContent=t('hostingOnpremLabel'); el('hosting-onprem-sub').textContent=t('hostingOnpremSub');
-  el('hosting-result-title').textContent=t('hostingResultTitle');
-  el('hosting-placeholder-text').innerHTML=t('hostingPlaceholder');
-  el('elig-card-header').textContent=t('eligCardHeader');
-  el('elig-label-target').textContent=t('eligLabelTarget');
-  el('elig-target-sh-label').textContent=t('eligTargetShLabel');
-  el('elig-target-onprem-label').textContent=t('eligTargetOnpremLabel');
-  el('elig-label-plan').textContent=t('eligLabelPlan');
-  el('elig-standard-label').textContent=t('eligStandardLabel');
-  el('elig-custom-label').textContent=t('eligCustomLabel');
-  el('elig-label-billing').textContent=t('eligLabelBilling');
-  el('elig-monthly-label').textContent=t('eligMonthlyLabel');
-  el('elig-yearly-label').textContent=t('eligYearlyLabel');
-  el('elig-label-version').textContent=t('eligLabelVersion');
-  el('elig-version-ph').textContent=t('eligVersionPh');
-  if(typeof eligState!=='undefined'&&(eligState.plan||eligState.billing||eligState.version)) runEligibility();
+  var _sp=el('select-placeholder'); if(_sp) _sp.textContent=t('selectPH');
+  if(el('label-vat-status')) el('label-vat-status').textContent=t('labelVatStatus');
+  if(el('b2b-label')) el('b2b-label').textContent=t('b2bLabel'); if(el('b2b-sub')) el('b2b-sub').textContent=t('b2bSub');
+  if(el('b2c-label')) el('b2c-label').textContent=t('b2cLabel'); if(el('b2c-sub')) el('b2c-sub').textContent=t('b2cSub');
+  if(el('vat-verify-text')) el('vat-verify-text').innerHTML=t('vatVerifyText'); if(el('vies-link')) el('vies-link').textContent=t('viesLink');
+  if(el('label-vat-check')) el('label-vat-check').textContent=t('labelVatCheck'); if(el('btn-vat-valid')) el('btn-vat-valid').textContent=t('btnVatValid'); if(el('btn-vat-invalid')) el('btn-vat-invalid').textContent=t('btnVatInvalid');
+  if(el('vat-result-title')) el('vat-result-title').textContent=t('vatResultTitle'); if(el('vat-placeholder-text')) el('vat-placeholder-text').innerHTML=t('vatPlaceholder');
+  if(el('iot-card-header')) el('iot-card-header').textContent=t('iotCardHeader'); if(el('iot-label-type')) el('iot-label-type').textContent=t('iotLabelType');
+  if(el('iot-physical-label')) el('iot-physical-label').textContent=t('iotPhysicalLabel'); if(el('iot-physical-sub')) el('iot-physical-sub').textContent=t('iotPhysicalSub');
+  if(el('iot-virtual-label')) el('iot-virtual-label').textContent=t('iotVirtualLabel'); if(el('iot-virtual-sub')) el('iot-virtual-sub').textContent=t('iotVirtualSub');
+  if(el('iot-sub-title')) el('iot-sub-title').textContent=t('iotSubTitle'); if(el('iot-sub-text')) el('iot-sub-text').innerHTML=t('iotSubText');
+  if(el('iot-label-need')) el('iot-label-need').textContent=t('iotLabelNeed'); if(el('iot-label-need-v')) el('iot-label-need-v').textContent=t('iotLabelNeedV');
+  if(el('need-order')) el('need-order').textContent=t('needOrder'); if(el('need-connect')) el('need-connect').textContent=t('needConnect'); if(el('need-ports')) el('need-ports').textContent=t('needPorts');
+  if(el('need-client')) el('need-client').textContent=t('needClient'); if(el('need-videos-p')) el('need-videos-p').textContent=t('needVideosP'); if(el('need-contacts')) el('need-contacts').textContent=t('needContacts');
+  if(el('need-connect-v')) el('need-connect-v').textContent=t('needConnectV'); if(el('need-client-v')) el('need-client-v').textContent=t('needClientV');
+  if(el('need-videos-v')) el('need-videos-v').textContent=t('needVideosV'); if(el('need-contacts-v')) el('need-contacts-v').textContent=t('needContactsV');
+  if(el('iot-result-title')) el('iot-result-title').textContent=t('iotResultTitle'); if(el('iot-placeholder-text')) el('iot-placeholder-text').innerHTML=t('iotPlaceholder');
+  if(el('hosting-card-header')) el('hosting-card-header').textContent=t('hostingCardHeader');
+  if(el('hosting-label-type')) el('hosting-label-type').textContent=t('hostingLabelType');
+  if(el('hosting-saas-label')) el('hosting-saas-label').textContent=t('hostingSaasLabel'); if(el('hosting-saas-sub')) el('hosting-saas-sub').textContent=t('hostingSaasSub');
+  if(el('hosting-sh-label')) el('hosting-sh-label').textContent=t('hostingShLabel'); if(el('hosting-sh-sub')) el('hosting-sh-sub').textContent=t('hostingShSub');
+  if(el('hosting-onprem-label')) el('hosting-onprem-label').textContent=t('hostingOnpremLabel'); if(el('hosting-onprem-sub')) el('hosting-onprem-sub').textContent=t('hostingOnpremSub');
+  if(el('hosting-result-title')) el('hosting-result-title').textContent=t('hostingResultTitle');
+  if(el('hosting-placeholder-text')) el('hosting-placeholder-text').innerHTML=t('hostingPlaceholder');
+  if(el('elig-card-header')) el('elig-card-header').textContent=t('eligCardHeader');
+  if(el('elig-label-target')) el('elig-label-target').textContent=t('eligLabelTarget');
+  if(el('elig-target-sh-label')) el('elig-target-sh-label').textContent=t('eligTargetShLabel');
+  if(el('elig-target-onprem-label')) el('elig-target-onprem-label').textContent=t('eligTargetOnpremLabel');
+  if(el('elig-label-plan')) el('elig-label-plan').textContent=t('eligLabelPlan');
+  if(el('elig-standard-label')) el('elig-standard-label').textContent=t('eligStandardLabel');
+  if(el('elig-custom-label')) el('elig-custom-label').textContent=t('eligCustomLabel');
+  if(el('elig-label-billing')) el('elig-label-billing').textContent=t('eligLabelBilling');
+  if(el('elig-monthly-label')) el('elig-monthly-label').textContent=t('eligMonthlyLabel');
+  if(el('elig-yearly-label')) el('elig-yearly-label').textContent=t('eligYearlyLabel');
+  if(el('elig-label-version')) el('elig-label-version').textContent=t('eligLabelVersion');
+  if(el('elig-version-ph')) el('elig-version-ph').textContent=t('eligVersionPh');
+  if(eligState.target||eligState.plan||eligState.billing||eligState.version) runEligibility();
   if(el('elig-email-toggle-label')) el('elig-email-toggle-label').textContent=t('eligEmailToggle');
   if(el('elig-copy-email-label')) el('elig-copy-email-label').textContent=t('eligCopyEmail');
-  if(vatLast)showVatResult(vatLast);
-  if(iotState.need)iotShowResult(iotState.need);
-  if(hostingState.type)hostingShowResult(hostingState.type);
+  if(vatLast) showVatResult(vatLast);
+  if(iotState.need) iotShowResult(iotState.need);
+  if(hostingState.type) hostingShowResult(hostingState.type);
   // upsell labels
   if(el('upsell-card-header'))el('upsell-card-header').textContent=t('upsellCardHeader');
   if(el('upsell-label-reason'))el('upsell-label-reason').textContent=t('upsellLabelReason');
@@ -1346,10 +1348,10 @@ function setLang(l){
   if(el('upsell-discuss-yes-label'))el('upsell-discuss-yes-label').textContent=t('upsellDiscussYes');
   if(el('upsell-discuss-no-label'))el('upsell-discuss-no-label').textContent=t('upsellDiscussNo');
   if(el('upsell-placeholder-text'))el('upsell-placeholder-text').innerHTML=t('upsellPlaceholder');
-  if(el('upsell-result-title')&&typeof upsellState!=='undefined'&&!upsellState.reason)el('upsell-result-title').textContent=t('upsellResultTitle');
-  if(el('upsell-email-toggle-label')&&typeof upsellEmailOpen!=='undefined'&&!upsellEmailOpen)el('upsell-email-toggle-label').textContent=t('upsellEmailToggle');
-  if(el('upsell-copy-email-label'))el('upsell-copy-email-label').textContent=t('upsellCopyEmail');
-  if(typeof upsellState!=='undefined'&&upsellState.reason)renderUpsellResult();
+  if(el('upsell-result-title')&&!upsellState.reason) el('upsell-result-title').textContent=t('upsellResultTitle');
+  if(el('upsell-email-toggle-label')&&!upsellEmailOpen) el('upsell-email-toggle-label').textContent=t('upsellEmailToggle');
+  if(el('upsell-copy-email-label')) el('upsell-copy-email-label').textContent=t('upsellCopyEmail');
+  if(upsellState.reason) renderUpsellResult();
 }
  
 // ── VAT ──
@@ -2527,7 +2529,18 @@ function runEligibility(){
     }
   }
  
-  if(rows.length===0){el('elig-result').style.display='none';var s2=el('elig-email-section');if(s2)s2.style.display='none';return;}
+  if(rows.length===0){
+    el('elig-result').style.display='none';
+    // Still show email if target is selected, even with no other criteria yet
+    if(host){
+      var sec0=el('elig-email-section');if(sec0)sec0.style.display='block';
+      var txt0=el('elig-email-text');if(txt0)txt0.textContent=buildEligEmail();
+      var lbl0=el('elig-email-toggle-label');if(lbl0)lbl0.textContent=t('eligEmailToggle');
+    } else {
+      var s2=el('elig-email-section');if(s2)s2.style.display='none';
+    }
+    return;
+  }
  
   // Verdict
   const koCount=rows.filter(r=>r.ok==='ko').length;
