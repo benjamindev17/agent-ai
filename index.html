@@ -2640,40 +2640,70 @@ function toggleEligEmail(){
 function buildEligEmail(){
   var isFR=lang==='fr';
   var host=eligState.target,plan=eligState.plan,billing=eligState.billing,version=eligState.version;
-  var hostLabel=host==='sh'?'Odoo.sh':host==='onprem'?(isFR?'Auto-hébergement':'On Premise'):'';
-  var planLabel=plan==='standard'?'Standard':plan==='custom'?'Custom':'';
-  var billingLabel=billing==='monthly'?(isFR?'Mensuel':'Monthly'):billing==='yearly'?(isFR?'Annuel':'Yearly'):'';
-  var vMap={'19x':'19.x','19':'19.0','18':'18.0','17':'17.0','16':'16.0','15':'15.0','14':'14.0','older':isFR?'Antérieure à v14':'Older than v14'};
+  if(!host) return isFR?'Sélectionnez une cible de migration pour générer l\'email.':'Select a migration target to generate the email.';
+  var vMap={'19x':'19.x','19':'19.0','18':'18.0','17':'17.0','16':'16.0','15':'15.0','14':'14.0','older':isFR?'antérieure à v14':'older than v14'};
   var vLabel=version?vMap[version]||version:'';
-  var koCount=0,warnCount=0;
-  if(plan==='standard'&&host) warnCount++;
-  if(billing==='monthly'&&host==='onprem') koCount++;
-  if(version==='19x'||version==='older') koCount++;
-  var status=koCount>0?(isFR?'Non éligible':'Not eligible'):warnCount>0?(isFR?'Éligible avec conditions':'Eligible with conditions'):(isFR?'Éligible':'Eligible');
+  var shEnd={'14':'31/10/2026','15':'31/10/2027','16':'31/10/2028','17':'31/10/2029','18':'31/10/2030','19':'31/10/2031'};
+  var shOK=['19','18','17','16','15','14'];
+  var needCustom=plan==='standard';
+  var needYearly=billing==='monthly'&&host==='onprem';
+  var isMinor=version==='19x';
+  var isOld=version==='older'&&host==='sh';
+  var hasKO=needYearly||isMinor||isOld;
+  var hasWarn=needCustom;
+  var hasInfo=!!(plan||billing||version);
   if(isFR){
-    return 'Bonjour [Prénom],\n\n'
-    +'Suite à notre analyse de votre configuration pour une migration vers '+hostLabel+', voici le résultat :\n\n'
-    +'📊 Statut : '+status+'\n'
-    +(planLabel?'• Plan : '+planLabel+'\n':'')
-    +(billingLabel?'• Facturation : '+billingLabel+'\n':'')
-    +(vLabel?'• Version : '+vLabel+'\n':'')
-    +'\n'
-    +(koCount>0?'Des points bloquants ont été détectés. Nous vous proposons de revoir la configuration ensemble avant toute migration.\n\n':'')
-    +(warnCount>0&&!koCount?'La migration est possible sous certaines conditions. Nous vous recommandons de nous contacter pour valider les détails.\n\n':'')
-    +(koCount===0&&warnCount===0?'Votre configuration est compatible. Nous pouvons procéder à la migration selon vos disponibilités.\n\n':'')
-    +'N\'hésitez pas à nous contacter pour la suite.\n\nBonne journée,\n[Signature]';
+    var h=host==='sh'?'Odoo.sh':'l\'auto-hébergement (On Premise)';
+    var hShort=host==='sh'?'Odoo.sh':'L\'auto-hébergement';
+    if(!hasInfo){
+      return 'Bonjour,\n\nJe reviens vers vous concernant votre demande de migration vers '+h+'.\n\nAfin d\'évaluer votre éligibilité, pourriez-vous me confirmer les éléments suivants :\n• Votre type de plan actuel (Standard ou Custom)\n• Votre mode de facturation (mensuel ou annuel)\n• La version de votre base de données\n\nDès réception de ces informations, je pourrai vous faire un retour complet sur la compatibilité de votre configuration.\n\nBonne journée,';
+    }
+    if(!hasKO&&!hasWarn){
+      var lines='';
+      if(plan) lines+='\n• Plan '+(plan==='custom'?'Custom':'Standard')+' — compatible';
+      if(billing) lines+='\n• Facturation '+(billing==='monthly'?'mensuelle':'annuelle')+' — compatible';
+      if(version&&shOK.includes(version)){var e=shEnd[version];lines+='\n• Version '+vLabel+(e?' — supportée jusqu\'au '+e:' — compatible');}
+      else if(version) lines+='\n• Version '+vLabel+' — compatible';
+      return 'Bonjour,\n\nJe reviens vers vous au sujet de votre demande de migration vers '+h+'.\n\nBonne nouvelle : après vérification, votre configuration est entièrement compatible.'+lines+'\n\nNous pouvons dès lors planifier la migration selon vos disponibilités. N\'hésitez pas à revenir vers nous pour convenir des prochaines étapes.\n\nBonne journée,';
+    }
+    if(hasKO){
+      var nb=(needYearly?1:0)+(isMinor?1:0)+(isOld?1:0);
+      var txt='Bonjour,\n\nJe reviens vers vous au sujet de votre demande de migration vers '+h+'.\n\n';
+      txt+=nb>1?'Suite à notre analyse, plusieurs points bloquants ont été identifiés pour cette migration.\n':'Suite à notre analyse, un point bloquant a été identifié pour cette migration.\n';
+      if(needCustom) txt+='\n⚠️ Plan Standard → Custom requis\n'+hShort+' requiert un abonnement Custom. Votre plan actuel (Standard) devra être upgradé avant ou lors de la migration, ce qui impliquera un ajustement tarifaire.\n';
+      if(needYearly) txt+='\n❌ Facturation mensuelle → Annuelle requise\nL\'auto-hébergement (On Premise) est exclusivement compatible avec un contrat annuel. Votre facturation mensuelle actuelle ne permet pas d\'activer ce type d\'hébergement en l\'état.\n';
+      if(isMinor) txt+='\n❌ Version 19.x — version mineure non supportée\nLes versions mineures (ex. 19.1, 19.2…) ne sont pas acceptées sur '+(host==='sh'?'Odoo.sh':'l\'auto-hébergement')+'. Deux options s\'offrent à vous :\n• Ouvrir une nouvelle base en version majeure (19.0)\n• Attendre la mise à jour annuelle vers la version 19.0\n';
+      if(isOld) txt+='\n❌ Version '+vLabel+' — non supportée sur Odoo.sh\nOdoo.sh ne prend en charge que les 6 dernières versions majeures. Votre version actuelle ne rentre plus dans ce périmètre. Une mise à jour préalable de votre version serait nécessaire avant d\'envisager la migration. Je vous recommande de contacter notre support technique (https://www.odoo.com/help) pour évaluer la faisabilité.\n';
+      txt+='\nN\'hésitez pas à revenir vers nous pour analyser ensemble les options disponibles et trouver la solution la mieux adaptée à votre situation.\n\nBonne journée,';
+      return txt;
+    }
+    return 'Bonjour,\n\nJe reviens vers vous au sujet de votre demande de migration vers '+h+'.\n\nBonne nouvelle : une migration est envisageable. Un point nécessite cependant votre attention avant de procéder.\n\n⚠️ Plan Standard → Custom requis\n'+hShort+' requiert un abonnement Custom. Votre plan actuel (Standard) devra être upgradé avant ou lors de la migration, ce qui impliquera un ajustement tarifaire.\n\nJe vous propose que nous examinions ensemble les options disponibles afin de préparer cette transition dans les meilleures conditions.\n\nBonne journée,';
   } else {
-    return 'Hello [First name],\n\n'
-    +'Following our analysis of your configuration for a migration to '+hostLabel+', here is the result:\n\n'
-    +'📊 Status: '+status+'\n'
-    +(planLabel?'• Plan: '+planLabel+'\n':'')
-    +(billingLabel?'• Billing: '+billingLabel+'\n':'')
-    +(vLabel?'• Version: '+vLabel+'\n':'')
-    +'\n'
-    +(koCount>0?'Blocking issues were detected. We suggest reviewing your configuration together before any migration.\n\n':'')
-    +(warnCount>0&&!koCount?'Migration is possible under certain conditions. We recommend contacting us to validate the details.\n\n':'')
-    +(koCount===0&&warnCount===0?'Your configuration is compatible. We can proceed with the migration at your convenience.\n\n':'')
-    +'Do not hesitate to contact us.\n\nBest regards,\n[Signature]';
+    var h=host==='sh'?'Odoo.sh':'On Premise (self-hosted)';
+    var hShort=host==='sh'?'Odoo.sh':'On Premise';
+    if(!hasInfo){
+      return 'Hello,\n\nI am following up regarding your migration request to '+h+'.\n\nIn order to assess your eligibility, could you confirm the following:\n• Your current plan type (Standard or Custom)\n• Your billing cycle (monthly or annual)\n• Your database version\n\nOnce I have this information, I will be able to give you a complete overview of your configuration\'s compatibility.\n\nHave a great day,';
+    }
+    if(!hasKO&&!hasWarn){
+      var lines='';
+      if(plan) lines+='\n• '+(plan==='custom'?'Custom':'Standard')+' plan — compatible';
+      if(billing) lines+='\n• '+(billing==='monthly'?'Monthly':'Annual')+' billing — compatible';
+      if(version&&shOK.includes(version)){var e=shEnd[version];lines+='\n• Version '+vLabel+(e?' — supported until '+e:' — compatible');}
+      else if(version) lines+='\n• Version '+vLabel+' — compatible';
+      return 'Hello,\n\nI am following up regarding your migration request to '+h+'.\n\nGood news: after checking your configuration, everything is fully compatible.'+lines+'\n\nWe can now plan the migration at your convenience. Do not hesitate to get back to us to arrange the next steps.\n\nHave a great day,';
+    }
+    if(hasKO){
+      var nb=(needYearly?1:0)+(isMinor?1:0)+(isOld?1:0);
+      var txt='Hello,\n\nI am following up regarding your migration request to '+h+'.\n\n';
+      txt+=nb>1?'After our analysis, several blocking issues have been identified for this migration.\n':'After our analysis, a blocking issue has been identified for this migration.\n';
+      if(needCustom) txt+='\n⚠️ Standard plan → Custom required\n'+hShort+' requires a Custom subscription. Your current plan (Standard) will need to be upgraded before or during the migration, which will involve a pricing adjustment.\n';
+      if(needYearly) txt+='\n❌ Monthly billing → Annual required\nOn Premise is exclusively compatible with an annual contract. Your current monthly billing does not allow this hosting type to be activated as is.\n';
+      if(isMinor) txt+='\n❌ Version 19.x — minor version not supported\nMinor versions (e.g. 19.1, 19.2…) are not accepted on '+(host==='sh'?'Odoo.sh':'On Premise')+'. Two options are available:\n• Open a new database on a major version (19.0)\n• Wait for the annual update to version 19.0\n';
+      if(isOld) txt+='\n❌ Version '+vLabel+' — not supported on Odoo.sh\nOdoo.sh only supports the last 6 major versions. Your current version is outside this range. A version upgrade would be required before considering migration. I recommend contacting our technical support (https://www.odoo.com/help) to assess feasibility.\n';
+      txt+='\nDo not hesitate to get back to us to discuss the available options and find the most suitable solution for your situation.\n\nHave a great day,';
+      return txt;
+    }
+    return 'Hello,\n\nI am following up regarding your migration request to '+h+'.\n\nGood news: migration is feasible. However, one point requires your attention before proceeding.\n\n⚠️ Standard plan → Custom required\n'+hShort+' requires a Custom subscription. Your current plan (Standard) will need to be upgraded before or during the migration, which will involve a pricing adjustment.\n\nI suggest we review the available options together to prepare this transition under the best conditions.\n\nHave a great day,';
   }
 }
 function copyEligEmail(btn){
