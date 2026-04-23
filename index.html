@@ -2650,60 +2650,76 @@ function buildEligEmail(){
   var isMinor=version==='19x';
   var isOld=version==='older'&&host==='sh';
   var hasKO=needYearly||isMinor||isOld;
-  var hasWarn=needCustom;
   var hasInfo=!!(plan||billing||version);
+  var chooseLink='https://www.odoo.com/fr_FR/blog/business-hacks-1/odoo-online-odoo-sh-on-premise-quelle-est-la-meilleure-solution-pour-vous-593';
   if(isFR){
-    var h=host==='sh'?'Odoo.sh':'l\'auto-hébergement (On Premise)';
-    var hShort=host==='sh'?'Odoo.sh':'L\'auto-hébergement';
+    var h=host==='sh'?'Odoo.sh':'l\'hébergement self-hosted';
     if(!hasInfo){
-      return 'Bonjour,\n\nJe reviens vers vous concernant votre demande de migration vers '+h+'.\n\nAfin d\'évaluer votre éligibilité, pourriez-vous me confirmer les éléments suivants :\n• Votre type de plan actuel (Standard ou Custom)\n• Votre mode de facturation (mensuel ou annuel)\n• La version de votre base de données\n\nDès réception de ces informations, je pourrai vous faire un retour complet sur la compatibilité de votre configuration.\n\nBonne journée,';
+      return 'Bonjour,\n\nJe reviens vers vous concernant votre demande de migration vers '+h+'.\n\nPour pouvoir évaluer votre éligibilité, j\'aurais besoin de quelques informations : votre type de plan actuel (Standard ou Custom), votre mode de facturation (mensuel ou annuel), ainsi que la version de votre base de données.\n\nRevenez vers moi avec ces éléments et je pourrai vous donner un retour complet.\n\nBonne journée,';
     }
-    if(!hasKO&&!hasWarn){
+    if(!hasKO&&!needCustom){
       var lines='';
       if(plan) lines+='\n• Plan '+(plan==='custom'?'Custom':'Standard')+' — compatible';
       if(billing) lines+='\n• Facturation '+(billing==='monthly'?'mensuelle':'annuelle')+' — compatible';
       if(version&&shOK.includes(version)){var e=shEnd[version];lines+='\n• Version '+vLabel+(e?' — supportée jusqu\'au '+e:' — compatible');}
       else if(version) lines+='\n• Version '+vLabel+' — compatible';
-      return 'Bonjour,\n\nJe reviens vers vous au sujet de votre demande de migration vers '+h+'.\n\nBonne nouvelle : après vérification, votre configuration est entièrement compatible.'+lines+'\n\nNous pouvons dès lors planifier la migration selon vos disponibilités. N\'hésitez pas à revenir vers nous pour convenir des prochaines étapes.\n\nBonne journée,';
+      var shNote=host==='sh'?'\n\nPour rappel, Odoo.sh est une plateforme d\'hébergement distincte avec sa propre facturation — cela s\'ajoute à votre abonnement Odoo actuel. Si vous souhaitez comparer les différentes options avant de confirmer, ce guide vous donnera une vue d\'ensemble : '+chooseLink:'';
+      var onpNote=host==='onprem'?'\n\nSi vous souhaitez confirmer que l\'hébergement self-hosted est la solution la plus adaptée à votre situation, ce guide compare les différentes options : '+chooseLink:'';
+      return 'Bonjour,\n\nJe reviens vers vous au sujet de votre migration vers '+h+'.\n\nBonne nouvelle : votre configuration est entièrement compatible.'+lines+shNote+onpNote+'\n\nNous pouvons dès lors planifier la migration selon vos disponibilités.\n\nBonne journée,';
     }
     if(hasKO){
-      var nb=(needYearly?1:0)+(isMinor?1:0)+(isOld?1:0);
-      var txt='Bonjour,\n\nJe reviens vers vous au sujet de votre demande de migration vers '+h+'.\n\n';
-      txt+=nb>1?'Suite à notre analyse, plusieurs points bloquants ont été identifiés pour cette migration.\n':'Suite à notre analyse, un point bloquant a été identifié pour cette migration.\n';
-      if(needCustom) txt+='\n⚠️ Plan Standard → Custom requis\n'+hShort+' requiert un abonnement Custom. Votre plan actuel (Standard) devra être upgradé avant ou lors de la migration, ce qui impliquera un ajustement tarifaire.\n';
-      if(needYearly) txt+='\n❌ Facturation mensuelle → Annuelle requise\nL\'auto-hébergement (On Premise) est exclusivement compatible avec un contrat annuel. Votre facturation mensuelle actuelle ne permet pas d\'activer ce type d\'hébergement en l\'état.\n';
-      if(isMinor) txt+='\n❌ Version 19.x — version mineure non supportée\nLes versions mineures (ex. 19.1, 19.2…) ne sont pas acceptées sur '+(host==='sh'?'Odoo.sh':'l\'auto-hébergement')+'. Deux options s\'offrent à vous :\n• Ouvrir une nouvelle base en version majeure (19.0)\n• Attendre la mise à jour annuelle vers la version 19.0\n';
-      if(isOld) txt+='\n❌ Version '+vLabel+' — non supportée sur Odoo.sh\nOdoo.sh ne prend en charge que les 6 dernières versions majeures. Votre version actuelle ne rentre plus dans ce périmètre. Une mise à jour préalable de votre version serait nécessaire avant d\'envisager la migration. Je vous recommande de contacter notre support technique (https://www.odoo.com/help) pour évaluer la faisabilité.\n';
-      txt+='\nN\'hésitez pas à revenir vers nous pour analyser ensemble les options disponibles et trouver la solution la mieux adaptée à votre situation.\n\nBonne journée,';
-      return txt;
+      var body='';
+      if(isOld){
+        body='Après vérification, votre base de données est en version '+vLabel+', qui n\'est plus dans le périmètre supporté par Odoo.sh — cette plateforme ne prend en charge que les 6 dernières versions majeures. Une mise à jour de version serait donc nécessaire avant d\'envisager la migration. Je vous recommande de contacter notre support technique pour évaluer la faisabilité : https://www.odoo.com/help.';
+        if(needCustom) body+='\n\nPar ailleurs, un upgrade de votre plan Standard vers Custom serait également requis avant la migration.';
+      } else if(isMinor){
+        body='Après vérification, votre base est actuellement en version 19.x, qui est une version mineure. '+(host==='sh'?'Odoo.sh':'L\'hébergement self-hosted')+' n\'accepte que les versions majeures (19.0, 18.0…). Deux options s\'offrent à vous : ouvrir une nouvelle base directement en version 19.0, ou patienter jusqu\'à la mise à jour annuelle qui basculera votre base vers la version majeure.';
+        if(needCustom) body+='\n\nPar ailleurs, un upgrade de votre plan Standard vers Custom serait également requis.';
+        if(needYearly) body+='\n\nEt comme votre facturation est actuellement mensuelle, il faudra également passer sur un contrat annuel — l\'hébergement self-hosted ne fonctionne pas en mensuel.';
+      } else if(needYearly){
+        body='Après vérification, un point bloquant a été identifié : l\'hébergement self-hosted est uniquement disponible avec un contrat annuel. Votre facturation étant actuellement mensuelle, une conversion de votre contrat serait nécessaire avant de pouvoir procéder à la migration.';
+        if(needCustom) body+='\n\nEn parallèle, un upgrade de votre plan Standard vers Custom serait également nécessaire.';
+      }
+      return 'Bonjour,\n\nJe reviens vers vous au sujet de votre migration vers '+h+'.\n\n'+body+'\n\nN\'hésitez pas à revenir vers nous pour qu\'on étudie ensemble les options disponibles. Si vous souhaitez également comparer les types d\'hébergement, ce guide peut vous aider : '+chooseLink+'\n\nBonne journée,';
     }
-    return 'Bonjour,\n\nJe reviens vers vous au sujet de votre demande de migration vers '+h+'.\n\nBonne nouvelle : une migration est envisageable. Un point nécessite cependant votre attention avant de procéder.\n\n⚠️ Plan Standard → Custom requis\n'+hShort+' requiert un abonnement Custom. Votre plan actuel (Standard) devra être upgradé avant ou lors de la migration, ce qui impliquera un ajustement tarifaire.\n\nJe vous propose que nous examinions ensemble les options disponibles afin de préparer cette transition dans les meilleures conditions.\n\nBonne journée,';
+    if(host==='sh'){
+      return 'Bonjour,\n\nJe reviens vers vous au sujet de votre migration vers Odoo.sh.\n\nOdoo.sh est une plateforme d\'hébergement distincte, avec sa propre facturation en plus de votre abonnement Odoo — et elle fonctionne exclusivement avec un plan Custom. Votre plan actuel étant Standard, un upgrade de votre contrat serait nécessaire avant de procéder à la migration. Cela implique un ajustement tarifaire, mais la migration reste tout à fait envisageable.\n\nJe vous propose qu\'on passe en revue les options ensemble pour que la transition se passe dans les meilleures conditions. Si vous souhaitez d\'abord comparer les types d\'hébergement, ce guide peut vous aider à prendre votre décision : '+chooseLink+'\n\nBonne journée,';
+    }
+    return 'Bonjour,\n\nJe reviens vers vous au sujet de votre migration vers l\'hébergement self-hosted.\n\nL\'hébergement self-hosted fonctionne exclusivement avec un plan Custom côté Odoo. Votre plan actuel étant Standard, il faudra procéder à un upgrade de votre contrat avant la migration — ce qui implique un ajustement tarifaire.\n\nÇa reste tout à fait faisable. Je vous propose qu\'on en discute ensemble pour que la transition se passe dans les meilleures conditions. Si vous souhaitez d\'abord comparer les différentes options d\'hébergement, ce lien vous donnera un aperçu complet : '+chooseLink+'\n\nBonne journée,';
   } else {
-    var h=host==='sh'?'Odoo.sh':'On Premise (self-hosted)';
-    var hShort=host==='sh'?'Odoo.sh':'On Premise';
+    var h=host==='sh'?'Odoo.sh':'self-hosted';
     if(!hasInfo){
-      return 'Hello,\n\nI am following up regarding your migration request to '+h+'.\n\nIn order to assess your eligibility, could you confirm the following:\n• Your current plan type (Standard or Custom)\n• Your billing cycle (monthly or annual)\n• Your database version\n\nOnce I have this information, I will be able to give you a complete overview of your configuration\'s compatibility.\n\nHave a great day,';
+      return 'Hello,\n\nI am following up regarding your migration request to '+h+'.\n\nTo assess your eligibility, I would need a few details: your current plan type (Standard or Custom), your billing cycle (monthly or annual), and your database version.\n\nGet back to me with this information and I will be able to give you a full picture.\n\nHave a great day,';
     }
-    if(!hasKO&&!hasWarn){
+    if(!hasKO&&!needCustom){
       var lines='';
       if(plan) lines+='\n• '+(plan==='custom'?'Custom':'Standard')+' plan — compatible';
       if(billing) lines+='\n• '+(billing==='monthly'?'Monthly':'Annual')+' billing — compatible';
       if(version&&shOK.includes(version)){var e=shEnd[version];lines+='\n• Version '+vLabel+(e?' — supported until '+e:' — compatible');}
       else if(version) lines+='\n• Version '+vLabel+' — compatible';
-      return 'Hello,\n\nI am following up regarding your migration request to '+h+'.\n\nGood news: after checking your configuration, everything is fully compatible.'+lines+'\n\nWe can now plan the migration at your convenience. Do not hesitate to get back to us to arrange the next steps.\n\nHave a great day,';
+      var shNote=host==='sh'?'\n\nAs a reminder, Odoo.sh is a separate hosting platform with its own billing on top of your Odoo subscription. If you want to compare all hosting options before confirming, this guide gives a full overview: '+chooseLink:'';
+      var onpNote=host==='onprem'?'\n\nIf you want to confirm that self-hosted is the right fit for your situation, this guide compares the different options: '+chooseLink:'';
+      return 'Hello,\n\nI am following up regarding your migration to '+h+'.\n\nGood news: your configuration is fully compatible.'+lines+shNote+onpNote+'\n\nWe can now plan the migration at your convenience.\n\nHave a great day,';
     }
     if(hasKO){
-      var nb=(needYearly?1:0)+(isMinor?1:0)+(isOld?1:0);
-      var txt='Hello,\n\nI am following up regarding your migration request to '+h+'.\n\n';
-      txt+=nb>1?'After our analysis, several blocking issues have been identified for this migration.\n':'After our analysis, a blocking issue has been identified for this migration.\n';
-      if(needCustom) txt+='\n⚠️ Standard plan → Custom required\n'+hShort+' requires a Custom subscription. Your current plan (Standard) will need to be upgraded before or during the migration, which will involve a pricing adjustment.\n';
-      if(needYearly) txt+='\n❌ Monthly billing → Annual required\nOn Premise is exclusively compatible with an annual contract. Your current monthly billing does not allow this hosting type to be activated as is.\n';
-      if(isMinor) txt+='\n❌ Version 19.x — minor version not supported\nMinor versions (e.g. 19.1, 19.2…) are not accepted on '+(host==='sh'?'Odoo.sh':'On Premise')+'. Two options are available:\n• Open a new database on a major version (19.0)\n• Wait for the annual update to version 19.0\n';
-      if(isOld) txt+='\n❌ Version '+vLabel+' — not supported on Odoo.sh\nOdoo.sh only supports the last 6 major versions. Your current version is outside this range. A version upgrade would be required before considering migration. I recommend contacting our technical support (https://www.odoo.com/help) to assess feasibility.\n';
-      txt+='\nDo not hesitate to get back to us to discuss the available options and find the most suitable solution for your situation.\n\nHave a great day,';
-      return txt;
+      var body='';
+      if(isOld){
+        body='After checking your configuration, your database is on version '+vLabel+', which is no longer within Odoo.sh\'s supported range — it only covers the last 6 major versions. A version upgrade would be required before migration can be considered. I recommend reaching out to our technical support to assess feasibility: https://www.odoo.com/help.';
+        if(needCustom) body+='\n\nOn top of that, upgrading your plan from Standard to Custom would also be required before the migration.';
+      } else if(isMinor){
+        body='After checking your configuration, your database is on version 19.x — a minor version. '+(host==='sh'?'Odoo.sh':'Self-hosted')+' only accepts major versions (19.0, 18.0…). Two options are available: create a new database directly on version 19.0, or wait for the annual update that will automatically move your database to the major version.';
+        if(needCustom) body+='\n\nOn top of that, upgrading your plan from Standard to Custom would also be required.';
+        if(needYearly) body+='\n\nAdditionally, since your billing is currently monthly, switching to an annual contract would also be needed — self-hosted does not work on a monthly basis.';
+      } else if(needYearly){
+        body='After checking your configuration, one blocking issue was identified: self-hosted is only available with an annual contract. Since your billing is currently monthly, converting your contract would be necessary before the migration can go ahead.';
+        if(needCustom) body+='\n\nAlongside that, upgrading your plan from Standard to Custom would also be needed.';
+      }
+      return 'Hello,\n\nI am following up regarding your migration to '+h+'.\n\n'+body+'\n\nDo not hesitate to get back to us so we can look at the available options together. If you would also like to compare hosting types, this guide can help: '+chooseLink+'\n\nHave a great day,';
     }
-    return 'Hello,\n\nI am following up regarding your migration request to '+h+'.\n\nGood news: migration is feasible. However, one point requires your attention before proceeding.\n\n⚠️ Standard plan → Custom required\n'+hShort+' requires a Custom subscription. Your current plan (Standard) will need to be upgraded before or during the migration, which will involve a pricing adjustment.\n\nI suggest we review the available options together to prepare this transition under the best conditions.\n\nHave a great day,';
+    if(host==='sh'){
+      return 'Hello,\n\nI am following up regarding your migration to Odoo.sh.\n\nOdoo.sh is a separate hosting platform with its own billing on top of your Odoo subscription — and it works exclusively with a Custom plan. Since your current plan is Standard, an upgrade would be required before the migration. This does involve a pricing adjustment, but the migration is entirely feasible.\n\nI suggest we go over the options together to make the transition as smooth as possible. If you would like to compare hosting types first, this guide is a good starting point: '+chooseLink+'\n\nHave a great day,';
+    }
+    return 'Hello,\n\nI am following up regarding your migration to self-hosted.\n\nSelf-hosted works exclusively with a Custom Odoo plan. Since your current plan is Standard, an upgrade would be needed before the migration — which involves a pricing adjustment.\n\nThat said, it is entirely doable. I suggest we discuss the options together to make the transition as smooth as possible. If you would like to compare hosting types first, this link gives a complete overview: '+chooseLink+'\n\nHave a great day,';
   }
 }
 function copyEligEmail(btn){
