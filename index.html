@@ -3224,8 +3224,6 @@ function renderHorecaView(){
   // ── SECTION 1 : CONDITIONS DU PACK ──
   html+="<div class='iot-section-title' style='margin-bottom:14px;display:flex;align-items:center;'>"+bubble('🍽','#e85d04')+(isFR?'CONDITIONS DU PACK HORECA':'HORECA PACK CONDITIONS')+"</div>";
   html+="<div style='background:rgba(232,93,4,0.12);border:1.5px solid rgba(232,93,4,0.35);border-radius:12px;padding:18px 20px;margin-bottom:28px;'>";
-  // ── slide image
-  html+="<img src='horeca-pos-offer.png' alt='"+(isFR?'Ce qu\'on propose pour le POS restaurant':'What we offer for POS restaurant')+"' style='width:100%;border-radius:8px;margin-bottom:16px;display:block;' onerror=\"this.style.display=\'none\'\"/>";
   // ── offers
   html+="<div style='font-size:11px;font-weight:700;color:#ff8c42;letter-spacing:1.2px;margin-bottom:14px;'>"+(isFR?'CE QU\'ON PROPOSE':'WHAT WE OFFER')+"</div>";
   html+="<div style='display:flex;flex-direction:column;gap:10px;margin-bottom:16px;'>";
@@ -3243,13 +3241,22 @@ function renderHorecaView(){
   html+="<div style='font-size:13.5px;color:#fff;'>"+(isFR?"Proposer la <strong>Black Box 2 gratuite</strong>":"Propose the <strong>Black Box 2 for free</strong>")+"</div>";
   html+="</div></div>";
   // ── requirements
-  html+="<div style='padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);'>";
+  html+="<div style='padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);margin-bottom:14px;'>";
   html+="<div style='font-size:10px;font-weight:700;color:rgba(255,255,255,0.38);letter-spacing:1.5px;margin-bottom:10px;'>💡 "+(isFR?'PRÉREQUIS':'REQUIREMENTS')+"</div>";
   html+="<div style='display:flex;gap:8px;flex-wrap:wrap;'>";
   [{icon:'🇧🇪',fr:'BE / LUX',en:'BE / LUX'},{icon:'🖥️',fr:'Hardware compatible',en:'Hardware compatible'},{icon:'📅',fr:'Abonnement Annuel',en:'Yearly subscription'}].forEach(function(r){
     html+="<span style='display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;font-size:12px;color:rgba(255,255,255,0.78);'>"+(r.icon+" ")+(isFR?r.fr:r.en)+"</span>";
   });
-  html+="</div></div></div>";
+  html+="</div></div>";
+  // ── accordion : exemple de devis
+  html+="<details style='border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;'>";
+  html+="<summary style='cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:700;color:rgba(255,255,255,0.65);user-select:none;'>";
+  html+="<span>📋 "+(isFR?'Exemple de devis':'Quotation example')+"</span>";
+  html+="<span style='font-size:11px;color:rgba(255,255,255,0.3);'>▼</span>";
+  html+="</summary>";
+  html+="<img src='horeca-pos-offer.png' alt='"+(isFR?'Exemple de devis Horeca':'Horeca quotation example')+"' style='width:100%;border-radius:8px;margin-top:12px;display:block;' onerror=\"this.style.display='none'\"/>";
+  html+="</details>";
+  html+="</div>";
 
   // ── SECTION 2 : PROCESSUS DE VENTE ──
   html+="<div class='iot-section-title' style='margin-bottom:14px;display:flex;align-items:center;'>"+bubble('📋','#6366f1')+(isFR?'PROCESSUS DE VENTE':'SALES PROCESS')+"</div>";
