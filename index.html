@@ -3224,13 +3224,32 @@ function renderHorecaView(){
   // ── SECTION 1 : CONDITIONS DU PACK ──
   html+="<div class='iot-section-title' style='margin-bottom:14px;display:flex;align-items:center;'>"+bubble('🍽','#e85d04')+(isFR?'CONDITIONS DU PACK HORECA':'HORECA PACK CONDITIONS')+"</div>";
   html+="<div style='background:rgba(232,93,4,0.12);border:1.5px solid rgba(232,93,4,0.35);border-radius:12px;padding:18px 20px;margin-bottom:28px;'>";
-  html+="<div style='font-size:11px;font-weight:700;color:#ff8c42;letter-spacing:1.2px;margin-bottom:12px;'>"+(isFR?'INCLUS DANS LE PACK':'INCLUDED IN THE PACK')+"</div>";
-  html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;'>";
-  var items_fr=["📱 Affichage des <strong>QR codes Odoo</strong> sur les tables requis pendant <strong>1 an</strong>","📦 <strong>Licence Standard</strong> (1 an)","🔧 Installation <strong>Point of Sales gratuite</strong> (4h SP sur site)","📦 <strong>IoT Box / BlackBox 2</strong> gratuite","👤 Gestion CCM après <strong>3 mois</strong> (ou 1 mois pour les stagiaires)"];
-  var items_en=["📱 Odoo <strong>QR codes</strong> displayed on tables required for <strong>1 year</strong>","📦 <strong>Standard License</strong> (1 year)","🔧 Free <strong>Point of Sales installation</strong> (4h SP on-site)","📦 Free <strong>IoT Box / BlackBox 2</strong>","👤 CCM management after <strong>3 months</strong> (or 1 month for trainees)"];
-  var items=isFR?items_fr:items_en;
-  items.forEach(function(it){html+="<div style='background:rgba(255,255,255,0.05);border-radius:8px;padding:10px 12px;font-size:12.5px;color:rgba(255,255,255,0.82);line-height:1.5;'>"+it+"</div>";});
+  // ── slide image
+  html+="<img src='horeca-pos-offer.png' alt='"+(isFR?'Ce qu\'on propose pour le POS restaurant':'What we offer for POS restaurant')+"' style='width:100%;border-radius:8px;margin-bottom:16px;display:block;' onerror=\"this.style.display=\'none\'\"/>";
+  // ── offers
+  html+="<div style='font-size:11px;font-weight:700;color:#ff8c42;letter-spacing:1.2px;margin-bottom:14px;'>"+(isFR?'CE QU\'ON PROPOSE':'WHAT WE OFFER')+"</div>";
+  html+="<div style='display:flex;flex-direction:column;gap:10px;margin-bottom:16px;'>";
+  // offer 1 — 8h pack
+  html+="<div style='background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:14px 16px;'>";
+  html+="<div style='display:flex;align-items:flex-start;gap:12px;'>";
+  html+="<span style='font-size:20px;line-height:1.3;'>✅</span><div>";
+  html+="<div style='font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px;'>"+(isFR?"Pack <strong style='color:#ff8c42;'>8h Succès</strong> — Installation Point of Sales":"<strong style='color:#ff8c42;'>8-Hour Success Pack</strong> — Point of Sales Installation")+"</div>";
+  html+="<div style='font-size:12px;color:rgba(255,255,255,0.5);font-style:italic;margin-bottom:10px;'>"+(isFR?'Import produits · Config PoS · Connexion hardware · Formation':'Product import · PoS config · Hardware plugging · Training')+"</div>";
+  html+="<span style='display:inline-flex;align-items:center;gap:6px;background:rgba(232,93,4,0.2);border:1px solid rgba(232,93,4,0.45);border-radius:6px;padding:4px 10px;font-size:11.5px;color:#ff8c42;font-weight:600;'>Consulting Fixed Price &nbsp;·&nbsp; 1 "+(isFR?'jour':'day')+" &nbsp;·&nbsp; <strong>950 €</strong></span>";
+  html+="</div></div></div>";
+  // offer 2 — Black Box 2
+  html+="<div style='background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:14px 16px;display:flex;align-items:center;gap:12px;'>";
+  html+="<span style='font-size:20px;line-height:1;'>✅</span>";
+  html+="<div style='font-size:13.5px;color:#fff;'>"+(isFR?"Proposer la <strong>Black Box 2 gratuite</strong>":"Propose the <strong>Black Box 2 for free</strong>")+"</div>";
   html+="</div></div>";
+  // ── requirements
+  html+="<div style='padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);'>";
+  html+="<div style='font-size:10px;font-weight:700;color:rgba(255,255,255,0.38);letter-spacing:1.5px;margin-bottom:10px;'>💡 "+(isFR?'PRÉREQUIS':'REQUIREMENTS')+"</div>";
+  html+="<div style='display:flex;gap:8px;flex-wrap:wrap;'>";
+  [{icon:'🇧🇪',fr:'BE / LUX',en:'BE / LUX'},{icon:'🖥️',fr:'Hardware compatible',en:'Hardware compatible'},{icon:'📅',fr:'Abonnement Annuel',en:'Yearly subscription'}].forEach(function(r){
+    html+="<span style='display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;font-size:12px;color:rgba(255,255,255,0.78);'>"+(r.icon+" ")+(isFR?r.fr:r.en)+"</span>";
+  });
+  html+="</div></div></div>";
 
   // ── SECTION 2 : PROCESSUS DE VENTE ──
   html+="<div class='iot-section-title' style='margin-bottom:14px;display:flex;align-items:center;'>"+bubble('📋','#6366f1')+(isFR?'PROCESSUS DE VENTE':'SALES PROCESS')+"</div>";
