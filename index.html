@@ -3211,6 +3211,8 @@ function drawFrame(t){
   C.forEach(c=>{const p=project(c.o,c.a,t);if(!p)return;const isHL=highlightedCountry&&c.c===highlightedCountry,pulse=Math.sin(t*0.0025+c.a*0.12)*0.2+0.8,df=Math.pow(Math.max(0,Math.min(1,p.d)),0.5);let col,al,gs;if(isHL){col='0,230,220';al=0.95*df;gs=c.s*5;}else if(c.c){col='255,200,60';al=(0.55+pulse*0.3)*df;gs=c.s*3.5;}else{col='220,180,80';al=0.2*df;gs=c.s*2;}const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,gs);g.addColorStop(0,`rgba(${col},${al})`);g.addColorStop(0.25,`rgba(${col},${al*0.55})`);g.addColorStop(0.6,`rgba(${col},${al*0.15})`);g.addColorStop(1,`rgba(${col},0)`);ctx.beginPath();ctx.arc(p.x,p.y,gs,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,Math.max(0.5,c.s*0.4*df),0,Math.PI*2);ctx.fillStyle=`rgba(${col},${Math.min(1,al*2)})`;ctx.fill();});
   ctx.restore();
 }
+function animate(){time+=16;try{drawFrame(time);}catch(e){}requestAnimationFrame(animate);}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)requestAnimationFrame(animate);});
 function renderHorecaView(){
   var isFR=lang==='fr';
   var c=el('horeca-content'); if(!c) return;
@@ -3219,7 +3221,6 @@ function renderHorecaView(){
   function check(txt){return "<label style='display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07);cursor:pointer;'><input type='checkbox' style='margin-top:3px;accent-color:#00A09D;width:15px;height:15px;flex-shrink:0;'><span style='font-size:13.5px;color:rgba(255,255,255,0.85);line-height:1.6;'>"+txt+"</span></label>";}
   function contact(init,role,col){return "<div style='display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.14);border-radius:8px;padding:8px 14px;margin:4px;'><span style='background:"+col+";color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;'>"+init+"</span><span style='font-size:12px;color:rgba(255,255,255,0.65);'>"+role+"</span></div>";}
   var html='';
-
   // ── SECTION 1 : CONDITIONS DU PACK ──
   html+="<div class='iot-section-title' style='margin-bottom:14px;display:flex;align-items:center;'>"+bubble('🍽','#e85d04')+(isFR?'CONDITIONS DU PACK HORECA':'HORECA PACK CONDITIONS')+"</div>";
   html+="<div style='background:rgba(232,93,4,0.12);border:1.5px solid rgba(232,93,4,0.35);border-radius:12px;padding:18px 20px;margin-bottom:28px;'>";
@@ -3297,7 +3298,6 @@ function renderHorecaView(){
   c.innerHTML=html;
 }
 
-function animate(){time+=16;drawFrame(time);requestAnimationFrame(animate);}
 function highlightCountry(code){if(code==='UK')code='GB';highlightedCountry=code;}
 </script>
 </body>
