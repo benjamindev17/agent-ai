@@ -1414,6 +1414,7 @@ function setLang(l){
   if(el('upsell-email-toggle-label')&&!upsellEmailOpen) el('upsell-email-toggle-label').textContent=t('upsellEmailToggle');
   if(el('upsell-copy-email-label')) el('upsell-copy-email-label').textContent=t('upsellCopyEmail');
   if(upsellState.reason) renderUpsellResult();
+  if(upsellState.reason) renderUpsellEmail();
 }
  
 // ── VAT ──
