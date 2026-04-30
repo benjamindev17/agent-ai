@@ -2779,30 +2779,30 @@ function buildUpsellEmail(reason,contract,multiType,discuss,isFR){
 
   if(reason==='add-users'){
     label=isFR?"Il semblerait que des utilisateurs aient été récemment ajoutés sur votre base de données Odoo.":"It seems that users were recently added to your Odoo database.";
-    context=isFR?"Dans le cadre d'un abonnement standard, chaque utilisateur ayant accès au backend est facturé — les profils Portail et Employé PDV restent, eux, gratuits.":"Under a standard subscription, each user with backend access is billed — Portal and POS Employee profiles remain free of charge.";
-    option1=isFR?"① Réduire le nombre d'utilisateurs en archivant les profils concernés dans Configuration → Utilisateurs.":"① Reduce the number of users by archiving the relevant profiles in Configuration → Users.";
+    context=isFR?"Dans le cadre d'un abonnement standard, chaque utilisateur ayant accès au backend est facturé, les profils Portail et Employé PDV restent, eux, gratuits.":"Under a standard subscription, each user with backend access is billed, Portal and POS Employee profiles remain free of charge.";
+    option1=isFR?"• Réduire le nombre d'utilisateurs en archivant les profils concernés dans Configuration → Utilisateurs.":"• Reduce the number of users by archiving the relevant profiles in Configuration → Users.";
     monthlyBilling=isFR?"Cette régularisation interviendra au prochain renouvellement de votre contrat, sans calcul de prorata.":"This adjustment will apply at your next contract renewal, without proration.";
   }else if(reason==='studio'){
     label=isFR?"Il semblerait que l'application Studio ait été installée sur votre base de données.":"It seems that the Studio application was installed on your database.";
-    context=isFR?"Studio est un outil de personnalisation visuelle très puissant, mais il nécessite un plan Custom pour fonctionner. Un point important : Studio installe automatiquement Base Automation — si vous souhaitez revenir à un plan Standard, ces deux applications devront être désinstallées ensemble.":"Studio is a very powerful visual customization tool, but it requires a Custom plan to operate. One important point: Studio automatically installs Base Automation — if you wish to return to a Standard plan, both applications will need to be uninstalled together.";
-    option1=isFR?"① Désinstaller Studio et Base Automation :\n   - Studio : https://app.tango.us/app/workflow/How-to-remove-Studio-App-e8e9feb460744179b9b6a9eb4403b73e\n   - Base Automation : https://app.tango.us/app/workflow/Uninstall-base-automation-in-Odoo-945b1120fd4d45fcb2c92e742857c7c6":"① Uninstall Studio and Base Automation:\n   - Studio: https://app.tango.us/app/workflow/How-to-remove-Studio-App-e8e9feb460744179b9b6a9eb4403b73e\n   - Base Automation: https://app.tango.us/app/workflow/Uninstall-base-automation-in-Odoo-945b1120fd4d45fcb2c92e742857c7c6";
+    context=isFR?"Studio est un outil de personnalisation visuelle très puissant, mais il nécessite un plan Custom pour fonctionner. Un point important : Studio installe automatiquement Base Automation, et si vous souhaitez revenir à un plan Standard, ces deux applications devront être désinstallées ensemble.":"Studio is a very powerful visual customization tool, but it requires a Custom plan to operate. One important point: Studio automatically installs Base Automation, and if you wish to return to a Standard plan, both applications will need to be uninstalled together.";
+    option1=isFR?"• Désinstaller Studio et Base Automation :\n   - Studio : https://app.tango.us/app/workflow/How-to-remove-Studio-App-e8e9feb460744179b9b6a9eb4403b73e\n   - Base Automation : https://app.tango.us/app/workflow/Uninstall-base-automation-in-Odoo-945b1120fd4d45fcb2c92e742857c7c6":"• Uninstall Studio and Base Automation:\n   - Studio: https://app.tango.us/app/workflow/How-to-remove-Studio-App-e8e9feb460744179b9b6a9eb4403b73e\n   - Base Automation: https://app.tango.us/app/workflow/Uninstall-base-automation-in-Odoo-945b1120fd4d45fcb2c92e742857c7c6";
     monthlyBilling=isFR?"Si vous souhaitez conserver Studio, la mise à niveau vers le plan Custom sera effective au prochain renouvellement.":"If you wish to keep Studio, the upgrade to the Custom plan will take effect at your next renewal.";
   }else if(reason==='base-auto'){
     label=isFR?"Il semblerait que Base Automation ait été installé sur votre base de données.":"It seems that Base Automation was installed on your database.";
-    context=isFR?"Il s'agit d'un module d'automatisation avancée qui nécessite un plan Custom. Il est fréquemment installé automatiquement avec Studio — si c'est le cas, pensez à désinstaller les deux ensemble.":"This is an advanced automation module that requires a Custom plan. It is frequently auto-installed alongside Studio — if that is the case, be sure to uninstall both together.";
-    option1=isFR?"① Désinstaller Base Automation :\n   https://app.tango.us/app/workflow/Uninstall-base-automation-in-Odoo-945b1120fd4d45fcb2c92e742857c7c6":"① Uninstall Base Automation:\n   https://app.tango.us/app/workflow/Uninstall-base-automation-in-Odoo-945b1120fd4d45fcb2c92e742857c7c6";
+    context=isFR?"Il s'agit d'un module d'automatisation avancée qui nécessite un plan Custom. Il est fréquemment installé automatiquement avec Studio, si c'est le cas, pensez à désinstaller les deux ensemble.":"This is an advanced automation module that requires a Custom plan. It is frequently auto-installed alongside Studio, if that is the case, be sure to uninstall both together.";
+    option1=isFR?"• Désinstaller Base Automation :\n   https://app.tango.us/app/workflow/Uninstall-base-automation-in-Odoo-945b1120fd4d45fcb2c92e742857c7c6":"• Uninstall Base Automation:\n   https://app.tango.us/app/workflow/Uninstall-base-automation-in-Odoo-945b1120fd4d45fcb2c92e742857c7c6";
     monthlyBilling=isFR?"La mise à niveau vers le plan Custom sera effective au prochain renouvellement.":"The upgrade to the Custom plan will take effect at your next renewal.";
   }else if(reason==='code'){
     label=isFR?"Il semblerait que des lignes de code personnalisé aient été détectées sur votre base de données Odoo.":"It seems that custom code lines were detected on your Odoo database.";
     context=isFR?"Dans le cadre d'un hébergement Cloud Odoo, la maintenance de ce code est facturée par tranche de 100 lignes. Toute modification du système Odoo standard crée des obligations techniques supplémentaires : Odoo doit s'assurer que vos modules personnalisés ne compromettent pas la sécurité ou la stabilité de la plateforme, et qu'ils restent compatibles avec les futures mises à jour. Ce travail supplémentaire représente un coût opérationnel, couvert par les frais de maintenance.":"Under Odoo Cloud hosting, maintenance for this code is billed per 100-line block. Any modification to the standard Odoo system creates additional technical obligations: Odoo must ensure that your custom modules do not break security or stability and remain compatible with future upgrades. This extra work represents an operational cost, which is covered by the maintenance fee.";
-    alternative=isFR?"Cela dit, si votre objectif est de développer des fonctionnalités sur mesure, il existe peut-être des solutions d'hébergement mieux adaptées à votre situation. Des options comme Odoo.sh ou l'auto-hébergement n'engendrent pas ce type de facturation et offrent davantage de flexibilité pour les projets de développement — ça pourrait valoir la peine d'en discuter.":"That said, if your goal is to develop custom features, there may be hosting solutions better suited to your situation. Options like Odoo.sh or On-Premise hosting do not incur this type of billing and offer greater flexibility for development projects — it might be worth exploring.";
-    option1=isFR?"① Migrer vers Odoo.sh ou l'auto-hébergement, qui n'engendrent pas ce type de facturation.":"① Migrate to Odoo.sh or On-Premise hosting, which do not incur this type of billing.";
+    alternative=isFR?"Cela dit, si votre objectif est de développer des fonctionnalités sur mesure, il existe peut-être des solutions d'hébergement mieux adaptées à votre situation. Des options comme Odoo.sh ou l'auto-hébergement n'engendrent pas ce type de facturation et offrent davantage de flexibilité pour les projets de développement, ça pourrait valoir la peine d'en discuter.":"That said, if your goal is to develop custom features, there may be hosting solutions better suited to your situation. Options like Odoo.sh or On-Premise hosting do not incur this type of billing and offer greater flexibility for development projects, it might be worth exploring.";
+    option1=isFR?"• Migrer vers Odoo.sh ou l'auto-hébergement, qui n'engendrent pas ce type de facturation.":"• Migrate to Odoo.sh or On-Premise hosting, which do not incur this type of billing.";
     monthlyBilling=isFR?"Pour ce cycle, la facturation interviendra au prochain renouvellement de votre contrat.":"For this cycle, billing will apply at your next contract renewal.";
   }else if(reason==='multi'){
     var isCompany=multiType==='company';
     label=isFR?("Il semblerait qu'une "+(isCompany?'société':'branche')+" supplémentaire ait été ajoutée sur votre base de données Odoo."):("It seems that an additional "+(isCompany?'company':'branch')+" was added to your Odoo database.");
     context=isFR?"La fonctionnalité Multi-société nécessite un plan Custom pour être activée.":"The Multi-company feature requires a Custom plan to be activated.";
-    option1=isFR?("① Retirer la "+(isCompany?'société':'branche')+" concernée : Configuration → Sociétés."):("① Remove the "+(isCompany?'company':'branch')+" in question: Configuration → Companies.");
+    option1=isFR?("• Retirer la "+(isCompany?'société':'branche')+" concernée : Configuration → Sociétés."):("• Remove the "+(isCompany?'company':'branch')+" in question: Configuration → Companies.");
     monthlyBilling=isFR?"La mise à niveau vers le plan Custom sera effective au prochain renouvellement.":"The upgrade to the Custom plan will take effect at your next renewal.";
   }
 
@@ -2810,12 +2810,16 @@ function buildUpsellEmail(reason,contract,multiType,discuss,isFR){
   if(alternative){parts.push('',alternative);}
 
   if(isAnnual){
-    var optionsHeader=isFR?"Deux options s'offrent à vous :":"Two options are available to you:";
-    var option2=isFR?"② Conserver la configuration actuelle et signer le devis : [lien du devis]":"② Keep the current configuration and sign the quote: [quote link]";
-    var outro=discussYes
-      ?(isFR?"Je reste bien entendu disponible si vous souhaitez en discuter ou si vous avez des questions.":"I am of course available if you would like to discuss this or if you have any questions.")
-      :(isFR?"Je reste disponible si vous avez des questions.":"Feel free to reach out if you have any questions.");
-    parts.push('',optionsHeader,'',option1,'',option2,'',outro);
+    var option2=isFR?'• Conserver la configuration actuelle et signer le devis : [lien du devis]':'• Keep the current configuration and sign the quote: [quote link]';
+    if(discussYes){
+      var optionsHeader=isFR?"Deux options s'offrent à vous :":"Two options are available to you:";
+      var outro=isFR?"Je reste bien entendu disponible si vous souhaitez en discuter ou si vous avez des questions.":"I am of course available if you would like to discuss this or if you have any questions.";
+      parts.push('',optionsHeader,'',option1,'',option2,'',outro);
+    }else{
+      var optionsHeader=isFR?"Pour régulariser votre situation, voici ce que nous vous conseillons :":"To resolve this, here is what we recommend:";
+      var outro=isFR?"Je reste disponible si vous avez des questions.":"Feel free to reach out if you have any questions.";
+      parts.push('',optionsHeader,'',option1,'',outro);
+    }
   }else{
     var outro=isFR?"Je reste disponible si vous avez des questions.":"Feel free to reach out if you have any questions.";
     parts.push('',monthlyBilling,'',outro);
