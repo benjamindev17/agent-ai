@@ -731,15 +731,12 @@ html { overflow-x: hidden; }
         <div class="card-header"><span style="font-size:18px;">🔓</span><span id="recovery-card-header">Réouverture d'abonnement</span></div>
         <div class="card-body" style="flex:1;">
           <div class="section-label" id="recovery-label-type">Type de contrat</div>
-          <div class="type-grid" style="margin-bottom:20px;grid-template-columns:1fr 1fr 1fr;">
+          <div class="type-grid" style="margin-bottom:20px;">
             <button class="type-btn" data-recovery="monthly" onclick="recoverySelect('monthly')">
               <span class="t-icon">📅</span><span class="t-label" id="recovery-monthly-label">Mensuel</span>
             </button>
             <button class="type-btn" data-recovery="annual" onclick="recoverySelect('annual')">
               <span class="t-icon">📆</span><span class="t-label" id="recovery-annual-label">Annuel</span>
-            </button>
-            <button class="type-btn" data-recovery="manual" onclick="recoverySelect('manual')">
-              <span class="t-icon">✏️</span><span class="t-label" id="recovery-manual-label">Manuelle</span>
             </button>
           </div>
  
@@ -1762,7 +1759,7 @@ function recoverySetRecoverable(val){
   recoveryState.recoverable = val;
   document.querySelectorAll('[data-rec-recoverable]').forEach(b=>b.classList.remove('active'));
   document.querySelector(`[data-rec-recoverable="${val}"]`).classList.add('active');
-  if(el('rec-manual-fields')) el('rec-manual-fields').style.display=(recoveryState.type==='manual'&&val==='yes')?'block':'none';
+  if(el('rec-manual-fields')) el('rec-manual-fields').style.display=(recoveryState.type==='monthly'&&val==='yes')?'block':'none';
   calcRecovery();
 }
 
@@ -1800,7 +1797,7 @@ function calcRecovery(){
  
   // Build periods
   let periods = [];
-  if(type === 'monthly' || type === 'manual'){
+  if(type === 'monthly'){
     let start = new Date(year, parseInt(month), day + 1);
     while(start <= today){
       const end = new Date(start.getFullYear(), start.getMonth() + 1, start.getDate() - 1);
@@ -1834,7 +1831,7 @@ function calcRecovery(){
 
   // Generate payment link for manual mode
   let paymentLink = '';
-  if(type==='manual' && recoveryState.recoverable==='yes' && recoveryState.subRef && recoveryState.subPrice){
+  if(type==='monthly' && recoveryState.recoverable==='yes' && recoveryState.subRef && recoveryState.subPrice){
     const price = parseFloat(recoveryState.subPrice);
     if(!isNaN(price) && price > 0){
       const total = (periods.length * price).toFixed(2);
