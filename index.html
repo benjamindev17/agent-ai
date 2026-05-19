@@ -2819,7 +2819,7 @@ function buildUpsellEmail(reason,contract,multiType,discuss,isFR,codeLinks){
   var codeOption3=reason==='code'&&codeLinks?(isFR?"• Supprimer les lignes de code concernées en vous rendant sur les liens ci-dessus.":"• Remove the relevant code lines by visiting the links above."):'';
 
   if(isAnnual){
-    var option2=isFR?'• Conserver la configuration actuelle et signer le devis : [lien du devis]':'• Keep the current configuration and sign the quote: [quote link]';
+    var option2=isFR?'• Conserver la configuration actuelle et signer le devis attaché au dessus de ce mail':'• Keep the current configuration and sign the quote attached above this email';
     if(discussYes){
       var count=2+(codeOption3?1:0);
       var optionsHeader=isFR?(count===3?"Trois options s'offrent à vous :":"Deux options s'offrent à vous :"):(count===3?"Three options are available to you:":"Two options are available to you:");
