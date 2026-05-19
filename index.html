@@ -731,12 +731,15 @@ html { overflow-x: hidden; }
         <div class="card-header"><span style="font-size:18px;">🔓</span><span id="recovery-card-header">Réouverture d'abonnement</span></div>
         <div class="card-body" style="flex:1;">
           <div class="section-label" id="recovery-label-type">Type de contrat</div>
-          <div class="type-grid" style="margin-bottom:20px;">
+          <div class="type-grid" style="margin-bottom:20px;grid-template-columns:1fr 1fr 1fr;">
             <button class="type-btn" data-recovery="monthly" onclick="recoverySelect('monthly')">
               <span class="t-icon">📅</span><span class="t-label" id="recovery-monthly-label">Mensuel</span>
             </button>
             <button class="type-btn" data-recovery="annual" onclick="recoverySelect('annual')">
               <span class="t-icon">📆</span><span class="t-label" id="recovery-annual-label">Annuel</span>
+            </button>
+            <button class="type-btn" data-recovery="manual" onclick="recoverySelect('manual')">
+              <span class="t-icon">✏️</span><span class="t-label" id="recovery-manual-label">Manuelle</span>
             </button>
           </div>
  
@@ -782,6 +785,13 @@ html { overflow-x: hidden; }
               <button class="type-btn" data-rec-recoverable="no" onclick="recoverySetRecoverable('no')">
                 <span class="t-icon">❌</span><span class="t-label" id="rec-recoverable-no-label">Non</span>
               </button>
+            </div>
+
+            <div id="rec-manual-fields" style="display:none;" class="conditional">
+              <div class="section-label" style="margin-top:4px;">N° d'abonnement</div>
+              <input type="text" id="rec-sub-ref" oninput="recoverySetSubRef(this.value)" placeholder="ex: F1313942" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-bottom:12px;margin-top:4px;">
+              <div class="section-label">Prix par période (€)</div>
+              <input type="text" id="rec-sub-price" oninput="recoverySetSubPrice(this.value)" placeholder="ex: 800.40" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-top:4px;">
             </div>
 
             <div class="section-label" id="recovery-label-plan" style="display:none;"></div>
@@ -1719,7 +1729,7 @@ function pricingReset(){
 }
  
 // ── RECOVERY LOGIC ──
-let recoveryState = {type:null, plan:null, pricelist:'high', users:1, recoverable:null};
+let recoveryState = {type:null, plan:null, pricelist:'high', users:1, recoverable:null, subRef:'', subPrice:''};
  
 // Set today's date as default
 window.addEventListener('DOMContentLoaded', ()=>{
@@ -1731,6 +1741,10 @@ window.addEventListener('DOMContentLoaded', ()=>{
  
 function recoverySelect(type){
   recoveryState.type = type;
+  recoveryState.subRef = ''; recoveryState.subPrice = '';
+  if(el('rec-sub-ref')) el('rec-sub-ref').value='';
+  if(el('rec-sub-price')) el('rec-sub-price').value='';
+  if(el('rec-manual-fields')) el('rec-manual-fields').style.display='none';
   document.querySelectorAll('[data-recovery]').forEach(b=>b.classList.remove('active'));
   document.querySelector(`[data-recovery="${type}"]`).classList.add('active');
   el('recovery-fields').style.display = 'block';
@@ -1748,6 +1762,7 @@ function recoverySetRecoverable(val){
   recoveryState.recoverable = val;
   document.querySelectorAll('[data-rec-recoverable]').forEach(b=>b.classList.remove('active'));
   document.querySelector(`[data-rec-recoverable="${val}"]`).classList.add('active');
+  if(el('rec-manual-fields')) el('rec-manual-fields').style.display=(recoveryState.type==='manual'&&val==='yes')?'block':'none';
   calcRecovery();
 }
 
@@ -1757,6 +1772,9 @@ function recoverySetPl(pl){
   document.querySelector(`[data-rec-pl="${pl}"]`).classList.add('active');
   calcRecovery();
 }
+
+function recoverySetSubRef(v){recoveryState.subRef=v.trim();calcRecovery();}
+function recoverySetSubPrice(v){recoveryState.subPrice=v.replace(/,/g,'.').replace(/€/g,'').trim();calcRecovery();}
  
 function calcRecovery(){
   const {type} = recoveryState;
@@ -1782,7 +1800,7 @@ function calcRecovery(){
  
   // Build periods
   let periods = [];
-  if(type === 'monthly'){
+  if(type === 'monthly' || type === 'manual'){
     let start = new Date(year, parseInt(month), day + 1);
     while(start <= today){
       const end = new Date(start.getFullYear(), start.getMonth() + 1, start.getDate() - 1);
@@ -1813,14 +1831,29 @@ function calcRecovery(){
     <span class="copy-text">📋 ${isFR?'Copier les périodes':'Copy periods'}</span>
     <span class="copy-icon" style="opacity:0.6;font-size:14px;">↗</span>
   </button>`;
- 
+
+  // Generate payment link for manual mode
+  let paymentLink = '';
+  if(type==='manual' && recoveryState.recoverable==='yes' && recoveryState.subRef && recoveryState.subPrice){
+    const price = parseFloat(recoveryState.subPrice);
+    if(!isNaN(price) && price > 0){
+      const total = (periods.length * price).toFixed(2);
+      paymentLink = 'https://www.odoo.com/fr_FR/payment/pay?reference='+recoveryState.subRef+'&amount='+total+'&currency_id=1';
+      const totalLabel = isFR ? `Total : ${periods.length} × ${recoveryState.subPrice.replace('.',',')}€ = ${total.replace('.',',')}€` : `Total: ${periods.length} × €${recoveryState.subPrice} = €${total}`;
+      html += `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,180,0,0.12);border:1.5px solid rgba(255,180,0,0.35);border-radius:8px;font-size:13px;font-weight:600;color:#FFD166;">${totalLabel}</div>`;
+      html += `<a class="iot-link-btn" href="${paymentLink}" target="_blank" rel="noopener" style="margin-top:10px;margin-bottom:4px;"><span class="iot-link-icon">💳</span><span class="iot-link-label">${isFR?'Lien de paiement':'Payment link'}</span><span class="iot-link-arrow">↗</span></a>`;
+      const safeLink = paymentLink.replace(/`/g,'\\`').replace(/\$/g,'\\$');
+      html += `<button class="tax-copy-btn" style="margin-top:8px;" onclick="copyRecovery(this, \`${safeLink}\`)"><span class="copy-text">📋 ${isFR?'Copier le lien':'Copy link'}</span><span class="copy-icon" style="opacity:0.6;font-size:14px;">↗</span></button>`;
+    }
+  }
+
   c.innerHTML = html;
- 
+
   // Update email template
-  updateEmailTemplate(renewal, diffMonths, periods, isFR, recoveryState.recoverable);
+  updateEmailTemplate(renewal, diffMonths, periods, isFR, recoveryState.recoverable, paymentLink);
 }
  
-function updateEmailTemplate(renewal, diffMonths, periods, isFR, recoverable){
+function updateEmailTemplate(renewal, diffMonths, periods, isFR, recoverable, paymentLink){
   const tpl = el('email-template-text');
   const ph  = el('email-template-placeholder');
 
@@ -1848,7 +1881,7 @@ Pour procéder à la réactivation, l'ensemble des périodes écoulées depuis l
 
 ${periodsText}
 
-Voici le lien que vous pouvez consulter pour régulariser vos périodes : www.odoo.com/my/subscriptions
+${paymentLink||'www.odoo.com/my/subscriptions'}
 
 Bonne journée,`
 : `Hello,
@@ -1861,7 +1894,7 @@ To proceed with reactivation, all elapsed periods since expiration will need to 
 
 ${periodsText}
 
-Here is the link you can use to regularize your periods: www.odoo.com/my/subscriptions
+${paymentLink||'www.odoo.com/my/subscriptions'}
 
 Have a great day,`;
   } else {
@@ -1952,7 +1985,7 @@ function recoveryClearResult(){
 }
  
 function recoveryReset(){
-  recoveryState={type:null, plan:null, pricelist:'high', users:1, recoverable:null};
+  recoveryState={type:null, plan:null, pricelist:'high', users:1, recoverable:null, subRef:'', subPrice:''};
   document.querySelectorAll('[data-recovery]').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('[data-rec-recoverable]').forEach(b=>b.classList.remove('active'));
   el('rec-day').value=''; el('rec-month').value=''; el('rec-year').value='2025';
