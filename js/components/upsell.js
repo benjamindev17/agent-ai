@@ -15,7 +15,8 @@ function renderUpsellEmail(){
   if(r==='multi'&&!mt){showPh(isFR?'Sélectionnez le type d\'ajout pour générer le template.':'Select the addition type to generate the template.');return;}
   if(c==='annual'&&!discuss){showPh(isFR?'Indiquez si vous proposez la signature du devis pour générer le template.':'Indicate whether you propose signing the quote to generate the template.');return;}
   var txt=buildUpsellEmail(r,c,mt,discuss,isFR,upsellState.codeLinks);
-  txtEl.textContent=txt;txtEl.style.display='block';phEl.style.display='none';btnEl.style.display='inline-flex';
+  var html=buildUpsellEmailHTML(r,c,mt,discuss,isFR,upsellState.codeLinks);
+  txtEl._emailPlainText=txt;txtEl.innerHTML=html;txtEl.style.display='block';phEl.style.display='none';btnEl.style.display='inline-flex';
 }
 function buildUpsellEmail(reason,contract,multiType,discuss,isFR,codeLinks){
   var isAnnual=contract==='annual',discussYes=discuss==='yes';
@@ -48,9 +49,10 @@ function buildUpsellEmail(reason,contract,multiType,discuss,isFR,codeLinks){
     monthlyBilling=isFR?"Pour ce cycle, la facturation interviendra au prochain renouvellement de votre contrat.":"For this cycle, billing will apply at your next contract renewal.";
   }else if(reason==='multi'){
     var isCompany=multiType==='company';
-    label=isFR?("Il semblerait qu'une "+(isCompany?'société':'branche')+" supplémentaire ait été ajoutée sur votre base de données Odoo."):("It seems that an additional "+(isCompany?'company':'branch')+" was added to your Odoo database.");
-    context=isFR?"La fonctionnalité Multi-société nécessite un plan Custom pour être activée.":"The Multi-company feature requires a Custom plan to be activated.";
-    option1=isFR?("• Retirer la "+(isCompany?'société':'branche')+" concernée : Configuration → Sociétés."):("• Remove the "+(isCompany?'company':'branch')+" in question: Configuration → Companies.");
+    var tutoUrl=isCompany?'https://app.tango.us/app/workflow/How-to-Archive-a-Company-d1305732fb1149a888495a3c10cabcba':'https://app.tango.us/app/workflow/How-to-Archive-a-Branch-514dde5383dc4291a746a82c670737f7';
+    label=isFR?("Je me permets de vous contacter puisqu'il semblerait qu'une "+(isCompany?'société':'branche')+" supplémentaire ait été ajoutée sur votre base de données Odoo."):("It seems that an additional "+(isCompany?'company':'branch')+" was added to your Odoo database.");
+    context=isFR?"La fonctionnalité Multi-société nécessite le passage à un plan Custom pour être activée.":"The Multi-company feature requires a Custom plan to be activated.";
+    option1=isFR?("• Retirer la "+(isCompany?'société':'branche')+" concernée : Configuration → Sociétés. Voici un tutoriel qui pourra vous aider : "+tutoUrl):("• Remove the "+(isCompany?'company':'branch')+" in question: Configuration → Companies.");
     monthlyBilling=isFR?"La mise à niveau vers le plan Custom sera effective au prochain renouvellement.":"The upgrade to the Custom plan will take effect at your next renewal.";
   }
 
@@ -81,5 +83,25 @@ function buildUpsellEmail(reason,contract,multiType,discuss,isFR,codeLinks){
   parts.push('',closing);
   return parts.join('\n');
 }
+function buildUpsellEmailHTML(reason,contract,multiType,discuss,isFR,codeLinks){
+  var txt=buildUpsellEmail(reason,contract,multiType,discuss,isFR,codeLinks);
+  var html=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  if(reason==='multi'&&isFR){
+    var isCompany=multiType==='company';
+    var url=isCompany?'https://app.tango.us/app/workflow/How-to-Archive-a-Company-d1305732fb1149a888495a3c10cabcba':'https://app.tango.us/app/workflow/How-to-Archive-a-Branch-514dde5383dc4291a746a82c670737f7';
+    var linkLabel=isCompany?'Archiver une société':'Archiver une branche';
+    html=html.replace(url,'<a href="'+url+'" target="_blank" style="color:#6ee7b7;">'+linkLabel+'<\/a>');
+  }
+  return html;
+}
 function toggleUpsellEmail(){var b=el('upsell-email-block'),i=el('upsell-email-toggle-icon'),l=el('upsell-email-toggle-label');if(b.style.display==='none'){b.style.display='block';i.style.transform='rotate(180deg)';l.textContent=t('upsellEmailToggleClose');upsellEmailOpen=true;}else{b.style.display='none';i.style.transform='rotate(0deg)';l.textContent=t('upsellEmailToggle');upsellEmailOpen=false;}}
-function copyUpsellEmail(btn){var txt=el('upsell-email-text').textContent;var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');btn.querySelector('span').textContent=t('upsellCopied');setTimeout(function(){btn.querySelector('span').textContent=t('upsellCopyEmail');},2000);}catch(e){}document.body.removeChild(ta);}
+function copyUpsellEmail(btn){
+  var emailEl=el('upsell-email-text');
+  var plainText=emailEl._emailPlainText||emailEl.textContent;
+  var htmlContent=emailEl.innerHTML;
+  function doSuccess(){btn.querySelector('span').textContent=t('upsellCopied');setTimeout(function(){btn.querySelector('span').textContent=t('upsellCopyEmail');},2000);}
+  function fallback(){var ta=document.createElement('textarea');ta.value=plainText;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);doSuccess();}
+  if(navigator.clipboard&&navigator.clipboard.write){
+    try{navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([htmlContent],{type:'text/html'}),'text/plain':new Blob([plainText],{type:'text/plain'})})]).then(doSuccess).catch(fallback);}catch(e){fallback();}
+  }else{fallback();}
+}
