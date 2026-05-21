@@ -18,7 +18,7 @@ function accSetAdded(v){
   document.querySelector(`[data-acc-added="${v}"]`).classList.add('active');
   document.querySelectorAll('[data-acc-connected]').forEach(b=>b.classList.remove('active'));
   el('acc-sub-connected').style.display = v==='yes' ? 'block' : 'none';
-  el('acc-contract-section').style.display = v==='no' ? 'block' : 'none';
+  el('acc-contract-section').style.display = 'none';
   renderAccResult();
 }
  
@@ -100,12 +100,24 @@ function renderAccResult(){
     html += `<div class="iot-section-title" style="margin-top:16px;">${isFR?'CLAUSE CONTRAT':'CONTRACT CLAUSE'}</div>`;
     const isAnnual = contract==='annual';
     const isDebited = contract==='monthly-debited';
-    if(isAnnual){
-      html += `<div class="elig-row warn" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>annuel</strong> : ne pas signer le devis d\'upsell. Il se retirera automatiquement une fois la situation réglée.':'<strong>Annual</strong> contract: do not sign the upsell quote. It will be removed automatically once the situation is resolved.'}</span></div>`;
-    } else if(isDebited){
-      html += `<div class="elig-row ko" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>mensuel déjà débité</strong> : rassurer le client et annoncer un <strong>remboursement</strong> du montant prélevé.':'<strong>Monthly already debited</strong>: reassure client and announce a <strong>refund</strong> of the charged amount.'}</span></div>`;
+    if(active === 'A'){
+      // Accountant not registered → charge is legitimate, no refund, no "won't be charged"
+      if(isAnnual){
+        html += `<div class="elig-row warn" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>annuel</strong> : ne pas signer le devis pour l\'instant — il se retirera une fois le comptable enregistré. La facturation actuelle est <strong>justifiée</strong>.':'<strong>Annual</strong> contract: do not sign the quote for now — it will be removed once the accountant is registered. The current billing is <strong>justified</strong>.'}</span></div>`;
+      } else if(isDebited){
+        html += `<div class="elig-row warn" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>mensuel déjà débité</strong> : le prélèvement est <strong>justifié</strong> — comptable non encore enregistré. Pas de remboursement prévu.':'<strong>Monthly already debited</strong>: the charge is <strong>justified</strong> — accountant not yet registered. No refund applicable.'}</span></div>`;
+      } else {
+        html += `<div class="elig-row warn" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>mensuel non encore débité</strong> : le prélèvement à venir est <strong>justifié</strong> — comptable non encore enregistré.':'<strong>Monthly not yet debited</strong>: the upcoming charge is <strong>justified</strong> — accountant not yet registered.'}</span></div>`;
+      }
     } else {
-      html += `<div class="elig-row ok" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>mensuel non encore débité</strong> : rassurer le client, confirmer qu\'il ne sera <strong>pas débité</strong>.':'<strong>Monthly not yet debited</strong>: reassure client, confirm they will <strong>not be charged</strong>.'}</span></div>`;
+      // Scenarios C, D — accountant is registered, charge is an error
+      if(isAnnual){
+        html += `<div class="elig-row warn" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>annuel</strong> : ne pas signer le devis d\'upsell. Il se retirera automatiquement une fois la situation réglée.':'<strong>Annual</strong> contract: do not sign the upsell quote. It will be removed automatically once the situation is resolved.'}</span></div>`;
+      } else if(isDebited){
+        html += `<div class="elig-row ko" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>mensuel déjà débité</strong> : rassurer le client et annoncer un <strong>remboursement</strong> du montant prélevé.':'<strong>Monthly already debited</strong>: reassure client and announce a <strong>refund</strong> of the charged amount.'}</span></div>`;
+      } else {
+        html += `<div class="elig-row ok" style="margin-bottom:6px;"><span class="elig-text">${isFR?'Contrat <strong>mensuel non encore débité</strong> : rassurer le client, confirmer qu\'il ne sera <strong>pas débité</strong>.':'<strong>Monthly not yet debited</strong>: reassure client, confirm they will <strong>not be charged</strong>.'}</span></div>`;
+      }
     }
   }
  
@@ -124,7 +136,7 @@ function accUpdateEmail(active, contract){
   const phEl     = el('acc-email-placeholder');
   const ticketEl = el('acc-ticket-section');
  
-  if(!active || !contract){ emailEl.style.display='none'; phEl.style.display='block'; if(ticketEl) ticketEl.style.display='none'; return; }
+  if(!active || (!contract && active !== 'B')){ emailEl.style.display='none'; phEl.style.display='block'; if(ticketEl) ticketEl.style.display='none'; return; }
  
   emailEl.style.display='block'; phEl.style.display='none';
   const copyBtn = el('acc-copy-email-btn');
@@ -134,20 +146,41 @@ function accUpdateEmail(active, contract){
   const isDebited  = contract==='monthly-debited';
   const isMonthly  = !isAnnual;
  
-  // Contract tail
+  // Contract tail — logic differs based on scenario
   let tail = '';
-  if(isAnnual){
-    tail = isFR
-      ? 'En attendant, je vous recommande de ne pas valider le devis d\'upsell que vous avez reçu. Dès que la situation sera régularisée, il se retirera de lui-même.'
-      : 'In the meantime, I recommend not validating the upsell quote you received. Once the situation is resolved, it will be removed automatically.';
-  } else if(isDebited){
-    tail = isFR
-      ? 'Je constate que le montant a déjà été prélevé sur votre prochaine facture. Nous allons bien entendu procéder au remboursement de ce montant, vous n\'avez aucune démarche à effectuer de votre côté.'
-      : 'I can see that the amount has already been charged to your next invoice. We will of course proceed with the refund of this amount — there is nothing you need to do on your end.';
+  if(active === 'A'){
+    // Accountant NOT registered → the charge is legitimate, no error from the system
+    if(isAnnual){
+      tail = isFR
+        ? 'En attendant, je vous recommande de ne pas valider le devis d\'upsell reçu pour l\'instant. La facturation est tout à fait normale dans votre situation — votre comptable n\'étant pas encore enregistré comme fiduciaire agréée. Dès que son inscription sera finalisée et les étapes complétées, l\'accès deviendra gratuit et le devis se retirera de lui-même.'
+        : 'In the meantime, I recommend not validating the upsell quote you received for now. The billing is completely normal in your situation — your accountant is not yet registered as an approved fiduciary. Once their registration is finalized and the steps are completed, access will become free and the quote will be removed automatically.';
+    } else if(isDebited){
+      tail = isFR
+        ? 'Je vois qu\'un montant a été prélevé — c\'est tout à fait normal dans votre situation actuelle. Votre comptable n\'étant pas encore enregistré comme fiduciaire agréée, le système n\'a commis aucune erreur. Une fois son inscription validée et les étapes finalisées, l\'accès deviendra gratuit.'
+        : 'I see that an amount has been charged — this is completely normal in your current situation. Your accountant is not yet registered as an approved fiduciary, so the system has not made an error. Once the registration is validated and the steps are completed, access will become free.';
+    } else {
+      tail = isFR
+        ? 'Sachez que le prélèvement à venir est tout à fait justifié dans la situation actuelle — votre comptable n\'est pas encore enregistré comme fiduciaire agréée. Le système fonctionne correctement. Une fois son inscription validée et les étapes complétées, l\'accès deviendra gratuit.'
+        : 'Please note that the upcoming charge is completely justified in the current situation — your accountant is not yet registered as an approved fiduciary. The system is working correctly. Once the registration is validated and the steps are completed, access will become free.';
+    }
+  } else if(active === 'B'){
+    // Accountant registered but not yet added → no billing event has occurred, no tail needed
+    tail = '';
   } else {
-    tail = isFR
-      ? 'Le montant n\'a pas encore été prélevé et ne le sera pas. La situation se régularisera automatiquement une fois les étapes complétées.'
-      : 'The amount has not yet been charged and will not be. The situation will be resolved automatically once the steps are completed.';
+    // Scenarios C, D — accountant is registered, charge is an error, refund/no-charge applies
+    if(isAnnual){
+      tail = isFR
+        ? 'En attendant, je vous recommande de ne pas valider le devis d\'upsell que vous avez reçu. Dès que la situation sera régularisée, il se retirera de lui-même.'
+        : 'In the meantime, I recommend not validating the upsell quote you received. Once the situation is resolved, it will be removed automatically.';
+    } else if(isDebited){
+      tail = isFR
+        ? 'Je constate que le montant a déjà été prélevé sur votre prochaine facture. Nous allons bien entendu procéder au remboursement de ce montant, vous n\'avez aucune démarche à effectuer de votre côté.'
+        : 'I can see that the amount has already been charged to your next invoice. We will of course proceed with the refund of this amount — there is nothing you need to do on your end.';
+    } else {
+      tail = isFR
+        ? 'Le montant n\'a pas encore été prélevé et ne le sera pas. La situation se régularisera automatiquement une fois les étapes complétées.'
+        : 'The amount has not yet been charged and will not be. The situation will be resolved automatically once the steps are completed.';
+    }
   }
  
   const emails = {
@@ -177,30 +210,26 @@ Have a great day,`,
  
     B: isFR
 ? `Bonjour,
- 
+
 Bonne nouvelle, je viens de vérifier et votre comptable est bien enregistré comme fiduciaire agréée sur notre plateforme. L'accès comptable est donc bien gratuit sur votre abonnement Odoo.
- 
+
 Pour que tout se passe correctement, il reste deux étapes à compléter. Tout d'abord, il faudrait ajouter votre comptable comme utilisateur dans votre base de données. Pour cela, rendez-vous dans Configuration, puis Utilisateurs, et créez un nouvel utilisateur avec l'adresse email de votre comptable.
- 
+
 Je vous préviens d'avance : lorsque vous l'ajouterez, une mise à jour de facturation se créera automatiquement. Ne vous en inquiétez pas, c'est tout à fait normal et cela se corrigera d'elle-même une fois la dernière étape complétée.
- 
+
 Cette dernière étape consiste pour votre comptable à se connecter à votre base de données en utilisant son compte Odoo (celui qui est lié à son inscription fiduciaire). Dès qu'il se sera connecté, le système reconnaîtra automatiquement son statut.
- 
-${tail}
- 
+
 Bonne journée,`
 : `Hello,
- 
+
 Great news — I have just checked and your accountant is registered as an approved fiduciary on our platform. Accountant access is therefore free on your Odoo subscription.
- 
+
 For everything to go smoothly, there are two remaining steps. First, you will need to add your accountant as a user in your database. To do this, go to Configuration, then Users, and create a new user with your accountant's email address.
- 
+
 I want to let you know in advance: when you add them, a billing update will be generated automatically. Please do not worry, this is completely normal and will correct itself once the final step is completed.
- 
+
 This final step is for your accountant to connect to your database using their Odoo account (the one linked to their fiduciary registration). Once they have connected, the system will automatically recognize their status.
- 
-${tail}
- 
+
 Have a great day,`,
  
     C: isFR
