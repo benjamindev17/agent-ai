@@ -152,16 +152,16 @@ function accUpdateEmail(active, contract){
     // Accountant NOT registered → the charge is legitimate, no error from the system
     if(isAnnual){
       tail = isFR
-        ? 'En attendant, je vous recommande de ne pas valider le devis d\'upsell reçu pour l\'instant. La facturation est tout à fait normale dans votre situation — votre comptable n\'étant pas encore enregistré comme fiduciaire agréée. Dès que son inscription sera finalisée et les étapes complétées, l\'accès deviendra gratuit et le devis se retirera de lui-même.'
-        : 'In the meantime, I recommend not validating the upsell quote you received for now. The billing is completely normal in your situation — your accountant is not yet registered as an approved fiduciary. Once their registration is finalized and the steps are completed, access will become free and the quote will be removed automatically.';
+        ? 'En attendant, je vous recommande de ne pas valider le devis d\'upsell reçu pour l\'instant. La facturation est tout à fait normale dans votre situation, votre comptable n\'étant pas encore enregistré comme fiduciaire agréée. Dès que son inscription sera finalisée et les étapes complétées, l\'accès deviendra gratuit et le devis se retirera de lui-même.'
+        : 'In the meantime, I recommend not validating the upsell quote you received for now. The billing is completely normal in your situation, your accountant is not yet registered as an approved fiduciary. Once their registration is finalized and the steps are completed, access will become free and the quote will be removed automatically.';
     } else if(isDebited){
       tail = isFR
-        ? 'Je vois qu\'un montant a été prélevé — c\'est tout à fait normal dans votre situation actuelle. Votre comptable n\'étant pas encore enregistré comme fiduciaire agréée, le système n\'a commis aucune erreur. Une fois son inscription validée et les étapes finalisées, l\'accès deviendra gratuit.'
-        : 'I see that an amount has been charged — this is completely normal in your current situation. Your accountant is not yet registered as an approved fiduciary, so the system has not made an error. Once the registration is validated and the steps are completed, access will become free.';
+        ? 'Je vois qu\'un montant a été prélevé, c\'est tout à fait normal dans votre situation actuelle. Votre comptable n\'étant pas encore enregistré comme fiduciaire agréée, le système n\'a commis aucune erreur. Une fois son inscription validée et les étapes finalisées, l\'accès deviendra gratuit.'
+        : 'I see that an amount has been charged, this is completely normal in your current situation. Your accountant is not yet registered as an approved fiduciary, so the system has not made an error. Once the registration is validated and the steps are completed, access will become free.';
     } else {
       tail = isFR
-        ? 'Sachez que le prélèvement à venir est tout à fait justifié dans la situation actuelle — votre comptable n\'est pas encore enregistré comme fiduciaire agréée. Le système fonctionne correctement. Une fois son inscription validée et les étapes complétées, l\'accès deviendra gratuit.'
-        : 'Please note that the upcoming charge is completely justified in the current situation — your accountant is not yet registered as an approved fiduciary. The system is working correctly. Once the registration is validated and the steps are completed, access will become free.';
+        ? 'Sachez que le prélèvement à venir est tout à fait justifié dans la situation actuelle, votre comptable n\'est pas encore enregistré comme fiduciaire agréée. Le système fonctionne correctement. Une fois son inscription validée et les étapes complétées, l\'accès deviendra gratuit.'
+        : 'Please note that the upcoming charge is completely justified in the current situation, your accountant is not yet registered as an approved fiduciary. The system is working correctly. Once the registration is validated and the steps are completed, access will become free.';
     }
   } else if(active === 'B'){
     // Accountant registered but not yet added → no billing event has occurred, no tail needed
@@ -175,7 +175,7 @@ function accUpdateEmail(active, contract){
     } else if(isDebited){
       tail = isFR
         ? 'Je constate que le montant a déjà été prélevé sur votre prochaine facture. Nous allons bien entendu procéder au remboursement de ce montant, vous n\'avez aucune démarche à effectuer de votre côté.'
-        : 'I can see that the amount has already been charged to your next invoice. We will of course proceed with the refund of this amount — there is nothing you need to do on your end.';
+        : 'I can see that the amount has already been charged to your next invoice. We will of course proceed with the refund of this amount, there is nothing you need to do on your end.';
     } else {
       tail = isFR
         ? 'Le montant n\'a pas encore été prélevé et ne le sera pas. La situation se régularisera automatiquement une fois les étapes complétées.'
@@ -222,7 +222,7 @@ Cette dernière étape consiste pour votre comptable à se connecter à votre ba
 Bonne journée,`
 : `Hello,
 
-Great news — I have just checked and your accountant is registered as an approved fiduciary on our platform. Accountant access is therefore free on your Odoo subscription.
+Great news, I have just checked and your accountant is registered as an approved fiduciary on our platform. Accountant access is therefore free on your Odoo subscription.
 
 For everything to go smoothly, there are two remaining steps. First, you will need to add your accountant as a user in your database. To do this, go to Configuration, then Users, and create a new user with your accountant's email address.
 
@@ -246,7 +246,7 @@ Bonne journée,`
  
 I am following up regarding your accountant's access. After verification, your accountant is registered as an approved fiduciary and has been added as a user in your database.
  
-There is one final step remaining: your accountant needs to connect to your database using their Odoo account — the one they used when registering as a fiduciary. Once this connection is made, the system will automatically recognize their status.
+There is one final step remaining: your accountant needs to connect to your database using their Odoo account, the one they used when registering as a fiduciary. Once this connection is made, the system will automatically recognize their status.
  
 ${tail}
  
@@ -289,7 +289,7 @@ Voici l'email du comptable :
 ----`
 : `Hello,
  
-The client has added their Odoo approved accountant, however they continue to generate an upsell — could you please take a look?
+The client has added their Odoo approved accountant, however they continue to generate an upsell, could you please take a look?
  
 Here is the accountant's email:
 ----`;
