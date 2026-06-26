@@ -158,13 +158,14 @@ function renderTriangleView(){
   var g=triangleGeom();
   var html='';
   html+="<style>"+
-    ".tri-root{font-family:'Space Grotesk',sans-serif;height:100%;display:flex;gap:18px;padding:clamp(14px,2.4vw,28px);box-sizing:border-box;align-items:stretch;}"+
+    ".tri-root{font-family:'Space Grotesk',sans-serif;height:calc(100vh - var(--header-h));display:flex;gap:18px;padding:clamp(14px,2.4vw,28px);box-sizing:border-box;align-items:stretch;}"+
     ".tri-card{background:linear-gradient(160deg,rgba(30,24,46,0.55),rgba(13,10,26,0.65));backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.10);border-radius:var(--radius-lg);box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,0.06);display:flex;flex-direction:column;min-height:0;overflow:hidden;}"+
     ".tri-stage{flex:1.25;padding:clamp(16px,2vw,26px);}"+
     ".tri-panel{flex:1;padding:clamp(16px,2vw,26px);justify-content:center;}"+
     ".tri-h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(20px,2.4vw,28px);color:#fff;letter-spacing:-0.5px;margin-bottom:4px;}"+
     ".tri-sub{font-size:12.5px;color:rgba(255,255,255,0.55);margin-bottom:6px;}"+
-    ".tri-svg{flex:1;min-height:0;width:100%;display:block;touch-action:none;cursor:pointer;animation:triFloat 5s ease-in-out infinite;}"+
+    ".tri-svg{flex:1;min-height:0;width:100%;display:block;touch-action:none;cursor:pointer;animation:triFloat 5s ease-in-out infinite;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;}"+
+    ".tri-svg text{user-select:none;-webkit-user-select:none;}"+
     ".tri-svg.tri-grabbing{animation:none;}"+
     "@keyframes triFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}"+
     ".tri-mono{font-family:'Space Mono',monospace;}"+
@@ -180,12 +181,35 @@ function renderTriangleView(){
     ".tri-vhead{font-family:'Fraunces',serif;font-weight:600;font-size:18px;color:#fff;margin-bottom:4px;}"+
     ".tri-vsac{font-family:'Space Mono',monospace;font-size:12px;color:#fbbf24;letter-spacing:0.5px;margin-bottom:8px;}"+
     ".tri-vjust{font-size:13px;color:rgba(255,255,255,0.62);line-height:1.55;}"+
-    "@media(max-width:760px){.tri-root{flex-direction:column;gap:12px;padding:12px;}.tri-stage{flex:1.4;}.tri-panel{flex:1;}.tri-verdict{margin-top:12px;padding:12px 14px;}}"+
+    ".tri-stage-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;}"+
+    ".tri-present-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--teal),var(--teal-dark));border:none;border-radius:var(--radius);padding:8px 14px;cursor:pointer;box-shadow:0 2px 10px rgba(0,160,157,0.35);transition:transform .12s,box-shadow .12s;}"+
+    ".tri-present-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,160,157,0.5);}"+
+    ".tri-present-btn .tri-pico{font-size:14px;line-height:1;}"+
+    // explanation section
+    ".tri-explain{max-width:880px;margin:0 auto;padding:4px clamp(14px,2.4vw,28px) 56px;}"+
+    ".tri-ex-card{background:linear-gradient(160deg,rgba(30,24,46,0.55),rgba(13,10,26,0.65));backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.10);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:clamp(18px,2.4vw,30px);}"+
+    ".tri-ex-h{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(18px,2.2vw,24px);color:#fff;margin-bottom:6px;letter-spacing:-0.4px;}"+
+    ".tri-ex-intro{font-size:13.5px;color:rgba(255,255,255,0.62);line-height:1.6;margin-bottom:18px;}"+
+    ".tri-ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:18px;}"+
+    ".tri-ex-item{display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius);padding:13px 15px;}"+
+    ".tri-ex-ico{font-size:18px;line-height:1.3;flex-shrink:0;}"+
+    ".tri-ex-it-h{font-weight:600;font-size:13.5px;color:#fff;margin-bottom:3px;}"+
+    ".tri-ex-it-t{font-size:12.5px;color:rgba(255,255,255,0.58);line-height:1.5;}"+
+    ".tri-ex-tip{display:flex;gap:10px;align-items:center;font-size:12.5px;color:rgba(255,255,255,0.7);background:rgba(0,160,157,0.10);border:1px solid rgba(0,160,157,0.28);border-radius:var(--radius);padding:12px 15px;line-height:1.5;}"+
+    // presentation overlay
+    ".tri-overlay{position:fixed;inset:0;z-index:3000;background:radial-gradient(circle at 50% 38%,#171122,#08071a 72%);display:flex;align-items:center;justify-content:center;padding:clamp(16px,3vw,48px);box-sizing:border-box;}"+
+    ".tri-ov-close{position:fixed;top:18px;right:20px;z-index:3010;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);color:#fff;font-size:19px;cursor:pointer;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;transition:background .12s;}"+
+    ".tri-ov-close:hover{background:rgba(255,255,255,0.16);}"+
+    ".tri-presenting{flex:none !important;background:transparent !important;border:none !important;box-shadow:none !important;backdrop-filter:none !important;padding:0 !important;width:auto;height:90vh;max-width:96vw;align-items:center;justify-content:center;}"+
+    ".tri-presenting .tri-stage-head,.tri-presenting .tri-hint{display:none !important;}"+
+    ".tri-presenting .tri-svg{height:100%;width:auto;max-width:96vw;flex:none;}"+
+    "@media(max-width:760px){.tri-root{flex-direction:column;gap:12px;padding:12px;}.tri-stage{flex:1.4;}.tri-panel{flex:1;}.tri-verdict{margin-top:12px;padding:12px 14px;}.tri-explain{padding:4px 12px 48px;}.tri-presenting{height:auto;width:96vw;}.tri-presenting .tri-svg{width:100%;height:auto;}}"+
   "</style>";
   html+="<div class='tri-root'>";
   // ── stage ──
-  html+="<div class='tri-card tri-stage'>";
-  html+="<div class='tri-h2'>"+L.title+"</div><div class='tri-sub'>"+L.sub+"</div>";
+  html+="<div class='tri-card tri-stage' id='tri-stage'>";
+  html+="<div class='tri-stage-head'><div><div class='tri-h2'>"+L.title+"</div><div class='tri-sub'>"+L.sub+"</div></div>"+
+        "<button class='tri-present-btn' onclick='triangleExpand()'><span class='tri-pico'>⤢</span>"+(isFR?'Présenter':'Present')+"</button></div>";
   html+="<svg id='tri-svg' class='tri-svg' viewBox='0 0 320 305' preserveAspectRatio='xMidYMid meet'>";
   html+="<defs>"+
     "<radialGradient id='triFill' cx='50%' cy='58%' r='62%'>"+
@@ -234,9 +258,69 @@ function renderTriangleView(){
   });
   html+="<div class='tri-verdict'><div class='tri-vhead' id='tri-vhead'></div><div class='tri-vsac' id='tri-vsac'></div><div class='tri-vjust' id='tri-vjust'></div></div>";
   html+="</div>";
+  html+="</div>"; // /tri-root
+  // ── explanation (use cases) ──
+  var EX=isFR?{
+    h:'Quand utiliser le Triangle d\'Or ?',
+    intro:'Un support visuel pour cadrer les attentes : sur un projet, on ne peut optimiser que deux des trois critères à la fois. Choisir, c\'est renoncer au troisième.',
+    items:[
+      {i:'🧭',h:'Cadrer un devis',t:'Faites choisir au client ses deux priorités plutôt que de promettre qualité, délai et budget en même temps.'},
+      {i:'⏱️',h:'Justifier un délai ou un coût',t:'Montrez concrètement le compromis derrière chaque demande : « plus vite et moins cher » a un prix sur la qualité.'},
+      {i:'🤝',h:'Recentrer une négociation',t:'Quand un client veut « tout, vite et pas cher », le triangle rend l\'arbitrage évident et factuel.'},
+      {i:'🎯',h:'Aligner les attentes',t:'Un langage commun, simple et visuel, pour décider ensemble des priorités d\'un projet.'}
+    ],
+    tip:'Astuce : cliquez sur « Présenter » pour afficher uniquement le triangle en plein écran et le manipuler devant le client, sans montrer ces notes internes.'
+  }:{
+    h:'When to use the Golden Triangle?',
+    intro:'A visual aid to frame expectations: on any project you can only optimize two of the three criteria at once. Choosing means giving up the third.',
+    items:[
+      {i:'🧭',h:'Frame a quote',t:'Have the client pick their two priorities instead of promising quality, time and budget all at once.'},
+      {i:'⏱️',h:'Justify a delay or a cost',t:'Show the concrete trade-off behind each request: "faster and cheaper" has a price on quality.'},
+      {i:'🤝',h:'Refocus a negotiation',t:'When a client wants "all of it, fast and cheap", the triangle makes the trade-off obvious and factual.'},
+      {i:'🎯',h:'Align expectations',t:'A simple, shared visual language to decide project priorities together.'}
+    ],
+    tip:'Tip: click "Present" to show only the triangle full-screen and manipulate it in front of the client, without these internal notes.'
+  };
+  html+="<div class='tri-explain'><div class='tri-ex-card'>";
+  html+="<div class='tri-ex-h'>"+EX.h+"</div><div class='tri-ex-intro'>"+EX.intro+"</div>";
+  html+="<div class='tri-ex-grid'>";
+  EX.items.forEach(function(it){
+    html+="<div class='tri-ex-item'><span class='tri-ex-ico'>"+it.i+"</span><div><div class='tri-ex-it-h'>"+it.h+"</div><div class='tri-ex-it-t'>"+it.t+"</div></div></div>";
+  });
   html+="</div>";
+  html+="<div class='tri-ex-tip'><span style='font-size:15px;'>💡</span><span>"+EX.tip+"</span></div>";
+  html+="</div></div>";
+  // remove any stale presentation overlay before re-rendering
+  var staleOv=el('tri-overlay'); if(staleOv&&staleOv.parentNode) staleOv.parentNode.removeChild(staleOv);
+  if(triangleEscHandler){ window.removeEventListener('keydown',triangleEscHandler); triangleEscHandler=null; }
   c.innerHTML=html;
   triangleAxis=null; triangleT=0;
   triangleWire();
+  triangleRedraw();
+}
+
+var triangleEscHandler=null;
+function triangleExpand(){
+  var stage=el('tri-stage'); if(!stage||el('tri-overlay')) return;
+  var ov=document.createElement('div'); ov.className='tri-overlay'; ov.id='tri-overlay';
+  var close=document.createElement('button'); close.className='tri-ov-close'; close.setAttribute('aria-label','Fermer'); close.textContent='✕';
+  close.onclick=triangleCollapse;
+  document.body.appendChild(ov);
+  ov.appendChild(close);
+  // remember origin to restore later
+  stage._homeParent=stage.parentNode; stage._homeNext=stage.nextSibling;
+  stage.classList.add('tri-presenting');
+  ov.appendChild(stage);
+  triangleEscHandler=function(e){ if(e.key==='Escape') triangleCollapse(); };
+  window.addEventListener('keydown',triangleEscHandler);
+}
+function triangleCollapse(){
+  var stage=el('tri-stage'), ov=el('tri-overlay');
+  if(stage){
+    stage.classList.remove('tri-presenting');
+    if(stage._homeParent) stage._homeParent.insertBefore(stage, stage._homeNext||null);
+  }
+  if(ov&&ov.parentNode) ov.parentNode.removeChild(ov);
+  if(triangleEscHandler){ window.removeEventListener('keydown',triangleEscHandler); triangleEscHandler=null; }
   triangleRedraw();
 }
