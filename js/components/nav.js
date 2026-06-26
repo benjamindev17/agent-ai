@@ -11,7 +11,7 @@ function openTool(tool){
   el('view-pitch').style.display='none';
   el('view-hunting').style.display='none';
   el('view-domain').style.display='none';
-  el('view-callfu').style.display='none';el('view-horeca').style.display='none';
+  el('view-callfu').style.display='none';el('view-triangle').style.display='none';
   el('btn-back').classList.add('visible');
   el('btn-reset').classList.add('visible');
   document.querySelector('.header').classList.add('in-tool');
@@ -27,16 +27,16 @@ function openTool(tool){
   else if(tool==='hunting'){el('view-hunting').style.display='block';el('header-icon-el').textContent='📅';el('header-title').textContent=t('huntingHeaderTitle');renderHuntingView();}
   else if(tool==='domain'){el('view-domain').style.display='block';el('header-icon-el').textContent='🌐';el('header-title').textContent=t('domainHeaderTitle');renderDomainView();}
   else if(tool==='callfu'){el('view-callfu').style.display='block';el('header-icon-el').textContent='📞';el('header-title').textContent=t('callHeaderTitle');renderCallFuView();}
-  else if(tool==='horeca'){el('view-horeca').style.display='block';el('header-icon-el').textContent='🍽️';el('header-title').textContent=t('horecaHeaderTitle');renderHorecaView();}
+  else if(tool==='triangle'){el('view-triangle').style.display='block';el('header-icon-el').textContent='🔺';el('header-title').textContent=t('triangleHeaderTitle');renderTriangleView();}
   setLang(lang);
 }
 function goHome(){
-  el('view-home').style.display='flex';el('view-vat').style.display='none';el('view-iot').style.display='none';el('view-hosting').style.display='none';el('view-pricing').style.display='none';el('view-recovery').style.display='none';el('view-accountant').style.display='none';el('view-upsell').style.display='none';el('view-pitch').style.display='none';el('view-hunting').style.display='none';el('view-domain').style.display='none';el('view-callfu').style.display='none';el('view-horeca').style.display='none';
+  el('view-home').style.display='flex';el('view-vat').style.display='none';el('view-iot').style.display='none';el('view-hosting').style.display='none';el('view-pricing').style.display='none';el('view-recovery').style.display='none';el('view-accountant').style.display='none';el('view-upsell').style.display='none';el('view-pitch').style.display='none';el('view-hunting').style.display='none';el('view-domain').style.display='none';el('view-callfu').style.display='none';el('view-triangle').style.display='none';
   el('btn-back').classList.remove('visible');document.querySelector('.header').classList.remove('in-tool');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
 }
 var VIEW_ORIGINALS={};
 // Save pristine HTML immediately — script is at end of body so DOM is ready
-['vat','iot','hosting','pricing','recovery','accountant','upsell','pitch','hunting','domain','callfu','horeca'].forEach(function(tid){
+['vat','iot','hosting','pricing','recovery','accountant','upsell','pitch','hunting','domain','callfu','triangle'].forEach(function(tid){
   var v=el('view-'+tid); if(v) VIEW_ORIGINALS[tid]=v.innerHTML;
 });
 function resetTool(){
@@ -60,7 +60,7 @@ function resetTool(){
     if(view==='hunting') renderHuntingView();
     if(view==='domain') renderDomainView();
     if(view==='callfu') renderCallFuView();
-    if(view==='horeca') renderHorecaView();
+    if(view==='triangle') renderTriangleView();
   }
   // Re-apply current language
   setLang(lang);

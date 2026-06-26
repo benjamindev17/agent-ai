@@ -6,21 +6,21 @@ function setLang(l){
   el('lang-fr').classList.toggle('active',l==='fr'); el('lang-en').classList.toggle('active',l==='en');
   document.title=t('pageTitle');
   el('back-label').textContent=t('backLabel');
-  el('header-title').textContent=view==='vat'?t('vatHeaderTitle'):view==='iot'?t('iotHeaderTitle'):view==='hosting'?t('hostingHeaderTitle'):view==='pricing'?t('pricingHeaderTitle'):view==='recovery'?t('recoveryHeaderTitle'):view==='accountant'?t('accHeaderTitle'):view==='upsell'?t('upsellHeaderTitle'):view==='pitch'?t('pitchHeaderTitle'):view==='hunting'?t('huntingHeaderTitle'):view==='domain'?t('domainHeaderTitle'):view==='callfu'?t('callHeaderTitle'):view==='horeca'?t('horecaHeaderTitle'):t('headerTitle');
+  el('header-title').textContent=view==='vat'?t('vatHeaderTitle'):view==='iot'?t('iotHeaderTitle'):view==='hosting'?t('hostingHeaderTitle'):view==='pricing'?t('pricingHeaderTitle'):view==='recovery'?t('recoveryHeaderTitle'):view==='accountant'?t('accHeaderTitle'):view==='upsell'?t('upsellHeaderTitle'):view==='pitch'?t('pitchHeaderTitle'):view==='hunting'?t('huntingHeaderTitle'):view==='domain'?t('domainHeaderTitle'):view==='callfu'?t('callHeaderTitle'):view==='triangle'?t('triangleHeaderTitle'):t('headerTitle');
   if(el('badge-accountant')) el('badge-accountant').textContent=t('badgeActive'); if(el('tool-accountant-label')) el('tool-accountant-label').textContent=t('toolAccountantLabel'); if(el('tool-accountant-sub')) el('tool-accountant-sub').textContent=t('toolAccountantSub');
   if(el('badge-upsell')) el('badge-upsell').textContent=t('badgeActive'); if(el('tool-upsell-label')) el('tool-upsell-label').textContent=t('toolUpsellLabel'); if(el('tool-upsell-sub')) el('tool-upsell-sub').textContent=t('toolUpsellSub');
   if(el('badge-pitch')) el('badge-pitch').textContent=t('badgeActive'); if(el('tool-pitch-label')) el('tool-pitch-label').textContent=t('toolPitchLabel'); if(el('tool-pitch-sub')) el('tool-pitch-sub').textContent=t('toolPitchSub');
   if(el('badge-hunting')) el('badge-hunting').textContent=t('badgeActive'); if(el('tool-hunting-label')) el('tool-hunting-label').textContent=t('toolHuntingLabel'); if(el('tool-hunting-sub')) el('tool-hunting-sub').textContent=t('toolHuntingSub');
   if(el('badge-domain')) el('badge-domain').textContent=t('badgeActive'); if(el('tool-domain-label')) el('tool-domain-label').textContent=t('toolDomainLabel'); if(el('tool-domain-sub')) el('tool-domain-sub').textContent=t('toolDomainSub');
   if(el('badge-callfu')) el('badge-callfu').textContent=t('badgeActive'); if(el('tool-callfu-label')) el('tool-callfu-label').textContent=t('toolCallLabel'); if(el('tool-callfu-sub')) el('tool-callfu-sub').textContent=t('toolCallSub');
-  if(el('badge-horeca')) el('badge-horeca').textContent=t('badgeActive'); if(el('tool-horeca-label')) el('tool-horeca-label').textContent=t('toolHorecaLabel'); if(el('tool-horeca-sub')) el('tool-horeca-sub').textContent=t('toolHorecaSub');
+  if(el('badge-triangle')) el('badge-triangle').textContent=t('badgeActive'); if(el('tool-triangle-label')) el('tool-triangle-label').textContent=t('toolTriangleLabel'); if(el('tool-triangle-sub')) el('tool-triangle-sub').textContent=t('toolTriangleSub');
   if(el('iot-explain-toggle-label')) el('iot-explain-toggle-label').textContent=_iotExplainOpen?t('iotExplainToggleClose'):t('iotExplainToggle');
   if(_iotExplainOpen && el('iot-explain-content')) el('iot-explain-content').innerHTML=IOT_EXPLAIN[lang];
   if(view==='pitch') renderPitchView();
   if(view==='hunting') renderHuntingView();
   if(view==='domain') renderDomainView();
   if(view==='callfu') renderCallFuView();
-  if(view==='horeca') renderHorecaView();
+  if(view==='triangle') renderTriangleView();
   if(accState.scenario) renderAccResult();
   // Accountant static labels
   if(el('acc-card-header')) el('acc-card-header').textContent=t('accCardHeader');
