@@ -221,8 +221,8 @@ function renderTriangleView(){
     "<radialGradient id='triHandle' cx='38%' cy='32%' r='75%'>"+
       "<stop offset='0%' stop-color='#ffffff'/><stop offset='55%' stop-color='#f3eef1'/><stop offset='100%' stop-color='#d9c7d2'/>"+
     "</radialGradient>"+
-    "<filter id='triGlow' x='-60%' y='-60%' width='220%' height='220%'><feGaussianBlur stdDeviation='3.2' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter>"+
-    "<filter id='triHandleGlow' x='-120%' y='-120%' width='340%' height='340%'><feGaussianBlur stdDeviation='4' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter>"+
+    "<filter id='triGlow' filterUnits='userSpaceOnUse' x='-20' y='-20' width='360' height='360'><feGaussianBlur stdDeviation='3.2' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter>"+
+    "<filter id='triHandleGlow' filterUnits='userSpaceOnUse' x='-20' y='-20' width='360' height='360'><feGaussianBlur stdDeviation='4' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter>"+
   "</defs>";
   // fill
   html+="<polygon points='"+g.A.x+","+g.A.y+" "+g.B.x+","+g.B.y+" "+g.C.x+","+g.C.y+"' fill='url(#triFill)'/>";
@@ -236,8 +236,8 @@ function renderTriangleView(){
   html+="<line id='tri-edge-ca' x1='"+g.C.x+"' y1='"+g.C.y+"' x2='"+g.A.x+"' y2='"+g.A.y+"' stroke='rgb(154,160,166)' stroke-width='2' stroke-linecap='round'/>";
   // vertices + labels
   html+="<circle id='tri-vx-q' cx='"+g.A.x+"' cy='"+g.A.y+"' r='5.5' fill='rgb(45,212,191)'/>";
-  html+="<text id='tri-word-q' x='"+g.A.x+"' y='25' text-anchor='middle' font-family='Fraunces,serif' font-weight='600' font-size='17' fill='rgba(255,255,255,0.92)'>"+L.A+"</text>";
-  html+="<text id='tri-sub-q' x='"+g.A.x+"' y='37' text-anchor='middle' class='tri-mono' font-size='9' letter-spacing='1.5' fill='rgba(255,255,255,0.4)'>"+L.Asub+"</text>";
+  html+="<text id='tri-word-q' x='"+g.A.x+"' y='14' text-anchor='middle' font-family='Fraunces,serif' font-weight='600' font-size='17' fill='rgba(255,255,255,0.92)'>"+L.A+"</text>";
+  html+="<text id='tri-sub-q' x='"+g.A.x+"' y='27' text-anchor='middle' class='tri-mono' font-size='9' letter-spacing='1.5' fill='rgba(255,255,255,0.4)'>"+L.Asub+"</text>";
   html+="<circle id='tri-vx-s' cx='"+g.B.x+"' cy='"+g.B.y+"' r='5.5' fill='rgb(167,139,250)'/>";
   html+="<text id='tri-word-s' x='"+g.B.x+"' y='276' text-anchor='middle' font-family='Fraunces,serif' font-weight='600' font-size='17' fill='rgba(255,255,255,0.92)'>"+L.B+"</text>";
   html+="<text id='tri-sub-s' x='"+g.B.x+"' y='289' text-anchor='middle' class='tri-mono' font-size='9' letter-spacing='1.5' fill='rgba(255,255,255,0.4)'>"+L.Bsub+"</text>";
