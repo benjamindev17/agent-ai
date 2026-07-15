@@ -464,9 +464,18 @@
             </div>
  
             <!-- Recoverable toggle -->
-            <div class="section-label" id="rec-label-recoverable">Base de données récupérable ?</div>
+            <div class="section-label" style="display:flex;align-items:center;gap:6px;">
+              <span id="rec-label-recoverable">Base de données récupérable ?</span>
+              <span class="rec-info-wrap">
+                <button type="button" class="rec-info-btn" onclick="toggleRecInfo(event,this)" aria-label="Aide">i</button>
+                <div class="rec-info-popup" id="rec-info-popup">
+                  <div class="rec-info-popup-title" id="rec-info-title">Comment vérifier la récupérabilité ?</div>
+                  <div class="rec-info-popup-text" id="rec-info-text">Rendez-vous sur l'abonnement du client → cliquez sur <strong>Base de données</strong> → connectez-vous et indiquez <code>ping check recup db</code>.<br><br>Lisez le message :<br>• <strong>Accessible</strong> → ne rien faire<br>• En <strong>« drop mode »</strong> → ne rien faire<br>• <strong>Plus disponible</strong> → contacter le support technique</div>
+                </div>
+              </span>
+            </div>
             <div class="type-grid" style="margin-bottom:12px;">
-              <button class="type-btn" data-rec-recoverable="yes" onclick="recoverySetRecoverable('yes')">
+              <button class="type-btn active" data-rec-recoverable="yes" onclick="recoverySetRecoverable('yes')">
                 <span class="t-icon">✅</span><span class="t-label" id="rec-recoverable-yes-label">Oui</span>
               </button>
               <button class="type-btn" data-rec-recoverable="no" onclick="recoverySetRecoverable('no')">

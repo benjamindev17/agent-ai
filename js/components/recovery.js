@@ -1,4 +1,4 @@
-let recoveryState = {type:null, plan:null, pricelist:'high', users:1, recoverable:null, subRef:'', subPrice:'', currency:'eur'};
+let recoveryState = {type:null, plan:null, pricelist:'high', users:1, recoverable:'yes', subRef:'', subPrice:'', currency:'eur'};
 var REC_CUR_ID = {eur:1, usd:2};
 var REC_CUR_SYMBOL = {eur:'€', usd:'$'};
  
@@ -36,6 +36,16 @@ function recoverySetPl(pl){
   document.querySelector(`[data-rec-pl="${pl}"]`).classList.add('active');
   calcRecovery();
 }
+
+function toggleRecInfo(e, btn){
+  e.stopPropagation();
+  const popup = el('rec-info-popup');
+  if(popup) popup.classList.toggle('open');
+}
+document.addEventListener('click', function(e){
+  const popup = el('rec-info-popup');
+  if(popup && popup.classList.contains('open') && !e.target.closest('.rec-info-wrap')) popup.classList.remove('open');
+});
 
 function recoverySetSubRef(v){recoveryState.subRef=v.trim();calcRecovery();}
 function recoverySetSubPrice(v){recoveryState.subPrice=v.replace(/,/g,'.').replace(/€/g,'').trim();calcRecovery();}
@@ -262,7 +272,7 @@ function recoveryClearResult(){
 }
  
 function recoveryReset(){
-  recoveryState={type:null, plan:null, pricelist:'high', users:1, recoverable:null, subRef:'', subPrice:'', currency:'eur'};
+  recoveryState={type:null, plan:null, pricelist:'high', users:1, recoverable:'yes', subRef:'', subPrice:'', currency:'eur'};
   document.querySelectorAll('[data-recovery]').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('[data-rec-recoverable]').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('[data-rec-currency]').forEach(b=>b.classList.remove('active'));
@@ -271,4 +281,5 @@ function recoveryReset(){
   el('recovery-fields').style.display='none';
   recoveryClearResult();
   recoverySelect('monthly');
+  recoverySetRecoverable('yes');
 }
