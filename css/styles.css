@@ -134,6 +134,13 @@ html { overflow-x: hidden; }
 .type-btn .t-sub { font-size:11px; color:rgba(255,255,255,0.75); }
 .type-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
+/* Compact variant — recovery tool toggles */
+#view-recovery .type-grid { gap:8px; }
+#view-recovery .type-btn { flex-direction:row; justify-content:center; padding:9px 12px; gap:7px; border-width:1px; }
+#view-recovery .type-btn .t-icon { font-size:15px; }
+#view-recovery .type-btn .t-label { font-size:12.5px; }
+#view-recovery .type-btn.active { box-shadow:0 0 0 1px #00C896; }
+
 /* VAT */
 .loc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px; }
 .loc-grid.row2 { margin-top:10px; }
