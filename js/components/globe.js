@@ -2,21 +2,35 @@
 const canvas=document.getElementById('earthCanvas'),ctx=canvas.getContext('2d');
 let W,H,time=0,highlightedCountry=null,geoData=null;
 const stars=Array.from({length:180},()=>({x:Math.random(),y:Math.random(),s:Math.random()*1.2+0.3,b:Math.random()*0.4+0.15,sp:Math.random()*0.003+0.001}));
-// ── ISS state (occasional decorative fly-by) ──
-var iss={active:false,x:0,y:0,vx:0,vy:0,ang:0,trail:[],nextSpawn:2200+Math.random()*2600};
+// ── ISS state (occasional decorative fly-by, time-based so speed is frame-rate independent) ──
+var iss={active:false,x:0,y:0,ang:0,trail:[],sx:0,sy:0,ex:0,ey:0,t0:0,dur:0,nextSpawn:performance.now()+2200+Math.random()*2600};
+// fraction of the start→end segment that is actually inside the screen (Liang–Barsky)
+function issVisibleFrac(sx,sy,ex,ey){
+  var dx=ex-sx, dy=ey-sy, u0=0, u1=1, p=[-dx,dx,-dy,dy], q=[sx,W-sx,sy,H-sy];
+  for(var i=0;i<4;i++){
+    if(p[i]===0){ if(q[i]<0) return 0; }
+    else { var r=q[i]/p[i]; if(p[i]<0){ if(r>u1) return 0; if(r>u0) u0=r; } else { if(r<u0) return 0; if(r<u1) u1=r; } }
+  }
+  return Math.max(0,u1-u0);
+}
 function issSpawn(){
   var dir=Math.random()*Math.PI*2, vx=Math.cos(dir), vy=Math.sin(dir);
-  var cx=W/2, cy=H/2, half=Math.sqrt(W*W+H*H)/2+90, perp=(Math.random()-0.5)*Math.min(W,H)*0.75;
-  iss.x=cx-vx*half-vy*perp; iss.y=cy-vy*half+vx*perp;
-  iss.vx=vx; iss.vy=vy; iss.ang=Math.atan2(vy,vx); iss.active=true; iss.trail=[];
+  var cx=W/2, cy=H/2, half=Math.sqrt(W*W+H*H)/2+90, perp=(Math.random()-0.5)*Math.min(W,H)*0.55;
+  iss.sx=cx-vx*half-vy*perp; iss.sy=cy-vy*half+vx*perp;
+  iss.ex=cx+vx*half-vy*perp; iss.ey=cy+vy*half+vx*perp;
+  iss.x=iss.sx; iss.y=iss.sy; iss.ang=Math.atan2(iss.ey-iss.sy,iss.ex-iss.sx);
+  // random 5–8 s for the ON-SCREEN crossing; scale total by the visible fraction of the path
+  var frac=issVisibleFrac(iss.sx,iss.sy,iss.ex,iss.ey); if(frac<0.25) frac=0.25;
+  iss.dur=(5000+Math.random()*3000)/frac;
+  iss.t0=performance.now(); iss.active=true; iss.trail=[];
 }
-function issUpdate(t){
-  if(!iss.active){ if(t>=iss.nextSpawn) issSpawn(); return; }
-  var SP=1.55;
-  iss.x+=iss.vx*SP; iss.y+=iss.vy*SP;
+function issUpdate(){
+  var now=performance.now();
+  if(!iss.active){ if(now>=iss.nextSpawn) issSpawn(); return; }
+  var p=(now-iss.t0)/iss.dur;
+  if(p>=1){ iss.active=false; iss.nextSpawn=now+16000+Math.random()*22000; return; }
+  iss.x=iss.sx+(iss.ex-iss.sx)*p; iss.y=iss.sy+(iss.ey-iss.sy)*p;
   iss.trail.push({x:iss.x,y:iss.y}); if(iss.trail.length>26) iss.trail.shift();
-  var cx=W/2, cy=H/2, half=Math.sqrt(W*W+H*H)/2+90;
-  if((iss.x-cx)*iss.vx+(iss.y-cy)*iss.vy>half){ iss.active=false; iss.nextSpawn=t+16000+Math.random()*22000; }
 }
 function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
 resize();window.addEventListener('resize',resize);
@@ -62,7 +76,7 @@ function drawFrame(t){
   // ── city glow markers (over the globe, unclipped) ──
   C.forEach(c=>{const p=project(c.o,c.a,t);if(!p)return;const isHL=highlightedCountry&&c.c===highlightedCountry,pulse=Math.sin(t*0.0025+c.a*0.12)*0.2+0.8,df=Math.pow(Math.max(0,Math.min(1,p.d)),0.5);let col,al,gs;if(isHL){col='0,230,220';al=0.95*df;gs=c.s*5;}else if(c.c){col='255,200,60';al=(0.55+pulse*0.3)*df;gs=c.s*3.5;}else{col='220,180,80';al=0.2*df;gs=c.s*2;}const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,gs);g.addColorStop(0,`rgba(${col},${al})`);g.addColorStop(0.25,`rgba(${col},${al*0.55})`);g.addColorStop(0.6,`rgba(${col},${al*0.15})`);g.addColorStop(1,`rgba(${col},0)`);ctx.beginPath();ctx.arc(p.x,p.y,gs,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,Math.max(0.5,c.s*0.4*df),0,Math.PI*2);ctx.fillStyle=`rgba(${col},${Math.min(1,al*2)})`;ctx.fill();});
   // ── ISS occasional fly-by (decorative, behind content) ──
-  issUpdate(t);
+  issUpdate();
   if(iss.active){
     // light trail behind
     for(var i=1;i<iss.trail.length;i++){
