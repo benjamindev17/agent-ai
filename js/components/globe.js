@@ -2,6 +2,22 @@
 const canvas=document.getElementById('earthCanvas'),ctx=canvas.getContext('2d');
 let W,H,time=0,highlightedCountry=null,geoData=null;
 const stars=Array.from({length:180},()=>({x:Math.random(),y:Math.random(),s:Math.random()*1.2+0.3,b:Math.random()*0.4+0.15,sp:Math.random()*0.003+0.001}));
+// ── ISS state (occasional decorative fly-by) ──
+var iss={active:false,x:0,y:0,vx:0,vy:0,ang:0,trail:[],nextSpawn:2200+Math.random()*2600};
+function issSpawn(){
+  var dir=Math.random()*Math.PI*2, vx=Math.cos(dir), vy=Math.sin(dir);
+  var cx=W/2, cy=H/2, half=Math.sqrt(W*W+H*H)/2+90, perp=(Math.random()-0.5)*Math.min(W,H)*0.75;
+  iss.x=cx-vx*half-vy*perp; iss.y=cy-vy*half+vx*perp;
+  iss.vx=vx; iss.vy=vy; iss.ang=Math.atan2(vy,vx); iss.active=true; iss.trail=[];
+}
+function issUpdate(t){
+  if(!iss.active){ if(t>=iss.nextSpawn) issSpawn(); return; }
+  var SP=1.55;
+  iss.x+=iss.vx*SP; iss.y+=iss.vy*SP;
+  iss.trail.push({x:iss.x,y:iss.y}); if(iss.trail.length>26) iss.trail.shift();
+  var cx=W/2, cy=H/2, half=Math.sqrt(W*W+H*H)/2+90;
+  if((iss.x-cx)*iss.vx+(iss.y-cy)*iss.vy>half){ iss.active=false; iss.nextSpawn=t+16000+Math.random()*22000; }
+}
 function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
 resize();window.addEventListener('resize',resize);
 fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r=>r.json()).then(topo=>{geoData=decodeTopo(topo);animate();}).catch(()=>animate());
@@ -45,6 +61,47 @@ function drawFrame(t){
   }
   // ── city glow markers (over the globe, unclipped) ──
   C.forEach(c=>{const p=project(c.o,c.a,t);if(!p)return;const isHL=highlightedCountry&&c.c===highlightedCountry,pulse=Math.sin(t*0.0025+c.a*0.12)*0.2+0.8,df=Math.pow(Math.max(0,Math.min(1,p.d)),0.5);let col,al,gs;if(isHL){col='0,230,220';al=0.95*df;gs=c.s*5;}else if(c.c){col='255,200,60';al=(0.55+pulse*0.3)*df;gs=c.s*3.5;}else{col='220,180,80';al=0.2*df;gs=c.s*2;}const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,gs);g.addColorStop(0,`rgba(${col},${al})`);g.addColorStop(0.25,`rgba(${col},${al*0.55})`);g.addColorStop(0.6,`rgba(${col},${al*0.15})`);g.addColorStop(1,`rgba(${col},0)`);ctx.beginPath();ctx.arc(p.x,p.y,gs,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,Math.max(0.5,c.s*0.4*df),0,Math.PI*2);ctx.fillStyle=`rgba(${col},${Math.min(1,al*2)})`;ctx.fill();});
+  // ── ISS occasional fly-by (decorative, behind content) ──
+  issUpdate(t);
+  if(iss.active){
+    // light trail behind
+    for(var i=1;i<iss.trail.length;i++){
+      var a=iss.trail[i-1], b=iss.trail[i], k=i/iss.trail.length;
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle='rgba(180,215,255,'+(k*0.28)+')';ctx.lineWidth=k*2.1;ctx.lineCap='round';ctx.stroke();
+    }
+    drawISS(iss.x,iss.y,iss.ang,9,0.97);
+  }
+}
+// ── ISS (stylised: central module + solar arrays + soft glow) ──
+function drawISS(x,y,ang,S,alpha){
+  ctx.save();
+  ctx.translate(x,y);ctx.rotate(ang);ctx.globalAlpha=alpha;
+  // soft halo
+  const gl=ctx.createRadialGradient(0,0,0,0,0,S*2.4);
+  gl.addColorStop(0,'rgba(180,215,255,0.16)');gl.addColorStop(1,'rgba(180,215,255,0)');
+  ctx.fillStyle=gl;ctx.beginPath();ctx.arc(0,0,S*2.4,0,Math.PI*2);ctx.fill();
+  // central truss
+  ctx.strokeStyle='rgba(205,210,220,0.95)';ctx.lineWidth=S*0.13;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-S*1.85,0);ctx.lineTo(S*1.85,0);ctx.stroke();
+  // solar array panels (2 per side)
+  function panel(cx){
+    const pw=S*0.62, ph=S*1.7;
+    const pg=ctx.createLinearGradient(cx-pw/2,0,cx+pw/2,0);
+    pg.addColorStop(0,'#123456');pg.addColorStop(0.5,'#2b5a86');pg.addColorStop(1,'#123456');
+    ctx.fillStyle=pg;ctx.fillRect(cx-pw/2,-ph/2,pw,ph);
+    ctx.strokeStyle='rgba(130,180,230,0.55)';ctx.lineWidth=Math.max(0.4,S*0.03);
+    ctx.beginPath();ctx.moveTo(cx-pw/2,0);ctx.lineTo(cx+pw/2,0);ctx.stroke();
+    for(let i=1;i<3;i++){const gx=cx-pw/2+pw*i/3;ctx.beginPath();ctx.moveTo(gx,-ph/2);ctx.lineTo(gx,ph/2);ctx.stroke();}
+    ctx.strokeStyle='rgba(205,215,230,0.55)';ctx.lineWidth=Math.max(0.4,S*0.04);ctx.strokeRect(cx-pw/2,-ph/2,pw,ph);
+  }
+  panel(-S*1.42);panel(-S*0.72);panel(S*0.72);panel(S*1.42);
+  // central module
+  ctx.fillStyle='rgba(228,231,238,0.98)';
+  const bw=S*0.5,bh=S*0.66,br=S*0.14;
+  ctx.beginPath();ctx.moveTo(-bw/2+br,-bh/2);ctx.arcTo(bw/2,-bh/2,bw/2,bh/2,br);ctx.arcTo(bw/2,bh/2,-bw/2,bh/2,br);ctx.arcTo(-bw/2,bh/2,-bw/2,-bh/2,br);ctx.arcTo(-bw/2,-bh/2,bw/2,-bh/2,br);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(90,190,255,0.95)';ctx.beginPath();ctx.arc(0,0,S*0.13,0,Math.PI*2);ctx.fill();
+  ctx.restore();
 }
 function animate(){time+=16;try{drawFrame(time);}catch(e){}requestAnimationFrame(animate);}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)requestAnimationFrame(animate);});
