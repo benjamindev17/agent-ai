@@ -93,16 +93,16 @@ function calcRecovery(){
   let html = '';
  
   if(over3months){
-    html += `<div class="recovery-warn"><span style="font-size:18px;flex-shrink:0;">⚠️</span><div><strong>${isFR?'Rétention dépassée (> 3 mois)':'Retention exceeded (> 3 months)'}</strong><br>${isFR?'Contacter le support avant de procéder à la réouverture.':'Contact support before proceeding with recovery.'}</div></div>`;
-    html += `<a class="iot-link-btn" href="https://www.odoo.com/help" target="_blank" rel="noopener" style="margin-bottom:14px;"><span class="iot-link-icon">🆘</span><span class="iot-link-label">${isFR?'Contacter le support Odoo':'Contact Odoo support'}</span><span class="iot-link-arrow">↗</span></a>`;
+    html += `<div class="recovery-warn"><span style="font-size:18px;flex-shrink:0;">⚠️</span><div style="flex:1;"><strong>${isFR?'Rétention dépassée (> 3 mois)':'Retention exceeded (> 3 months)'}</strong><br>${isFR?'Contacter le support avant de procéder à la réouverture.':'Contact support before proceeding with recovery.'}</div><a class="recovery-warn-btn" href="https://www.odoo.com/help" target="_blank" rel="noopener">${isFR?'Support':'Support'} ↗</a></div>`;
   }
- 
+
   const copyText = periods.join('\n');
-  html += `<div class="recovery-periods-block">${periods.map(p=>`<div class="recovery-bullet-line">${p}</div>`).join('')}</div>`;
-  html += `<button class="tax-copy-btn" style="margin-top:12px;" onclick="copyRecovery(this, \`${copyText.replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)">
-    <span class="copy-text">📋 ${isFR?'Copier les périodes':'Copy periods'}</span>
-    <span class="copy-icon" style="opacity:0.6;font-size:14px;">↗</span>
-  </button>`;
+  html += `<div class="recovery-periods-block">
+    <div class="recovery-periods-head">
+      <button class="recovery-mini-copy" onclick="copyRecovery(this, \`${copyText.replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)"><span class="copy-text">📋 ${isFR?'Copier':'Copy'}</span></button>
+    </div>
+    ${periods.map(p=>`<div class="recovery-bullet-line">${p}</div>`).join('')}
+  </div>`;
 
   // Generate payment link for manual mode
   let paymentLink = '';
@@ -115,9 +115,8 @@ function calcRecovery(){
       paymentLink = 'https://www.odoo.com/fr_FR/payment/pay?reference='+recoveryState.subRef+'&amount='+total+'&currency_id='+curId;
       const totalLabel = isFR ? `Total : ${periods.length} × ${recoveryState.subPrice.replace('.',',')}${curSym} = ${total.replace('.',',')}${curSym}` : `Total: ${periods.length} × ${curSym}${recoveryState.subPrice} = ${curSym}${total}`;
       html += `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,180,0,0.12);border:1.5px solid rgba(255,180,0,0.35);border-radius:8px;font-size:13px;font-weight:600;color:#FFD166;">${totalLabel}</div>`;
-      html += `<a class="iot-link-btn" href="${paymentLink}" target="_blank" rel="noopener" style="margin-top:10px;margin-bottom:4px;"><span class="iot-link-icon">💳</span><span class="iot-link-label">${isFR?'Lien de paiement':'Payment link'}</span><span class="iot-link-arrow">↗</span></a>`;
       const safeLink = paymentLink.replace(/`/g,'\\`').replace(/\$/g,'\\$');
-      html += `<button class="tax-copy-btn" style="margin-top:8px;" onclick="copyRecovery(this, \`${safeLink}\`)"><span class="copy-text">📋 ${isFR?'Copier le lien':'Copy link'}</span><span class="copy-icon" style="opacity:0.6;font-size:14px;">↗</span></button>`;
+      html += `<button class="iot-link-btn" style="margin-top:10px;cursor:pointer;" onclick="copyRecovery(this, \`${safeLink}\`)"><span class="iot-link-icon">💳</span><span class="iot-link-label copy-text">${isFR?'Copier le lien de paiement':'Copy payment link'}</span><span class="iot-link-arrow">📋</span></button>`;
     }
   }
 
@@ -242,8 +241,12 @@ function copyRecovery(btn, text){
   document.body.appendChild(ta); ta.select();
   try {
     document.execCommand('copy');
-    btn.querySelector('.copy-text').textContent = lang==='fr' ? '✅ Copié !' : '✅ Copied!';
-    setTimeout(()=>{ btn.querySelector('.copy-text').textContent = `📋 ${lang==='fr'?'Copier les périodes':'Copy periods'}`; }, 2000);
+    const span = btn.querySelector('.copy-text');
+    if(span){
+      if(!span.dataset.original) span.dataset.original = span.textContent;
+      span.textContent = lang==='fr' ? '✅ Copié !' : '✅ Copied!';
+      setTimeout(()=>{ span.textContent = span.dataset.original; }, 2000);
+    }
   } catch(e){ window.prompt('Copy:', text); }
   document.body.removeChild(ta);
 }
