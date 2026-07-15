@@ -69,6 +69,8 @@ function setLang(l){
   if(el('rec-label-recoverable')) el('rec-label-recoverable').textContent=t('recLabelRecoverable');
   if(el('rec-recoverable-yes-label')) el('rec-recoverable-yes-label').textContent=t('recRecoverableYes');
   if(el('rec-recoverable-no-label')) el('rec-recoverable-no-label').textContent=t('recRecoverableNo');
+  if(el('rec-label-currency')) el('rec-label-currency').textContent=l==='fr'?'Devise du lien de paiement':'Payment link currency';
+  if(el('rec-label-price')) el('rec-label-price').textContent=(l==='fr'?'Prix par période (':'Price per period (')+(REC_CUR_SYMBOL[recoveryState.currency]||'€')+')';
   // date selector labels
   const _rl={day:{fr:'Jour',en:'Day'},month:{fr:'Mois',en:'Month'},year:{fr:'Année',en:'Year'}};
   if(el('rec-label-day')) el('rec-label-day').textContent=_rl.day[l];
