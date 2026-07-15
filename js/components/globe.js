@@ -32,6 +32,68 @@ function issUpdate(){
   iss.x=iss.sx+(iss.ex-iss.sx)*p; iss.y=iss.sy+(iss.ey-iss.sy)*p;
   iss.trail.push({x:iss.x,y:iss.y}); if(iss.trail.length>26) iss.trail.shift();
 }
+// ── silly easter egg: click the ISS to blow it up 💥 ──
+var issDebris=[], issFlash={x:0,y:0,life:0};
+function issExplode(x,y){
+  iss.active=false; iss.nextSpawn=performance.now()+16000+Math.random()*22000;
+  var pal=[[255,255,255],[120,210,245],[255,190,70],[255,120,45],[205,210,220]];
+  for(var i=0;i<30;i++){
+    var a=Math.random()*Math.PI*2, sp=1.2+Math.random()*4.5, c=pal[(Math.random()*pal.length)|0];
+    issDebris.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:0.010+Math.random()*0.018,size:1+Math.random()*2.6,col:c});
+  }
+  issFlash={x:x,y:y,life:1};
+}
+function issDebrisDraw(){
+  if(issFlash.life>0){ // quick expanding white flash
+    var r=42*(1.1-issFlash.life);
+    var fg=ctx.createRadialGradient(issFlash.x,issFlash.y,0,issFlash.x,issFlash.y,r);
+    fg.addColorStop(0,'rgba(255,245,225,'+(issFlash.life*0.8)+')');fg.addColorStop(0.5,'rgba(255,200,120,'+(issFlash.life*0.35)+')');fg.addColorStop(1,'rgba(255,180,80,0)');
+    ctx.beginPath();ctx.arc(issFlash.x,issFlash.y,r,0,Math.PI*2);ctx.fillStyle=fg;ctx.fill();
+    issFlash.life-=0.06;
+  }
+  for(var i=issDebris.length-1;i>=0;i--){
+    var d=issDebris[i];
+    d.x+=d.vx; d.y+=d.vy; d.vx*=0.97; d.vy*=0.97; d.life-=d.decay;
+    if(d.life<=0){ issDebris.splice(i,1); continue; }
+    ctx.beginPath();ctx.arc(d.x,d.y,d.size*Math.max(0.2,d.life),0,Math.PI*2);
+    ctx.fillStyle='rgba('+d.col[0]+','+d.col[1]+','+d.col[2]+','+d.life+')';ctx.fill();
+  }
+}
+// ── shooting star (soft but fast, curves past the Earth from time to time) ──
+var shoot={active:false,x:0,y:0,t0:0,dur:0,pts:null,trail:[],nextSpawn:performance.now()+7000+Math.random()*11000};
+function shootSpawn(){
+  var cx=W/2, cy=H/2, R=Math.sqrt(W*W+H*H)/2+120;
+  var a0=Math.random()*Math.PI*2;
+  var a1=a0+(Math.random()<0.5?1:-1)*(Math.PI*0.55+Math.random()*Math.PI*0.3);
+  var sx=cx+Math.cos(a0)*R, sy=cy+Math.sin(a0)*R;
+  var ex=cx+Math.cos(a1)*R, ey=cy+Math.sin(a1)*R;
+  var mx=(sx+ex)/2, my=(sy+ey)/2, toC=Math.atan2(cy-my,cx-mx);
+  var bend=(Math.random()<0.5?1:-1)*(140+Math.random()*260);
+  shoot.pts={sx:sx,sy:sy,cx:mx+Math.cos(toC)*bend,cy:my+Math.sin(toC)*bend,ex:ex,ey:ey};
+  shoot.dur=900+Math.random()*700; // fast: 0.9–1.6 s
+  shoot.t0=performance.now(); shoot.active=true; shoot.trail=[];
+}
+function shootUpdate(){
+  var now=performance.now();
+  if(!shoot.active){ if(now>=shoot.nextSpawn) shootSpawn(); return; }
+  var p=(now-shoot.t0)/shoot.dur;
+  if(p>=1){ shoot.active=false; shoot.nextSpawn=now+9000+Math.random()*13000; return; }
+  var q=shoot.pts, mt=1-p;
+  shoot.x=mt*mt*q.sx+2*mt*p*q.cx+p*p*q.ex;
+  shoot.y=mt*mt*q.sy+2*mt*p*q.cy+p*p*q.ey;
+  shoot.trail.push({x:shoot.x,y:shoot.y}); if(shoot.trail.length>20) shoot.trail.shift();
+}
+function shootDraw(){
+  if(!shoot.active||shoot.trail.length<2) return;
+  for(var i=1;i<shoot.trail.length;i++){
+    var a=shoot.trail[i-1], b=shoot.trail[i], k=i/shoot.trail.length;
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+    ctx.strokeStyle='rgba(255,255,255,'+(k*0.55)+')';ctx.lineWidth=k*2.2;ctx.lineCap='round';ctx.stroke();
+  }
+  var hg=ctx.createRadialGradient(shoot.x,shoot.y,0,shoot.x,shoot.y,7);
+  hg.addColorStop(0,'rgba(255,255,255,0.95)');hg.addColorStop(0.4,'rgba(205,228,255,0.5)');hg.addColorStop(1,'rgba(205,228,255,0)');
+  ctx.beginPath();ctx.arc(shoot.x,shoot.y,7,0,Math.PI*2);ctx.fillStyle=hg;ctx.fill();
+}
 function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
 resize();window.addEventListener('resize',resize);
 fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r=>r.json()).then(topo=>{geoData=decodeTopo(topo);animate();}).catch(()=>animate());
@@ -75,6 +137,8 @@ function drawFrame(t){
   }
   // ── city glow markers (over the globe, unclipped) ──
   C.forEach(c=>{const p=project(c.o,c.a,t);if(!p)return;const isHL=highlightedCountry&&c.c===highlightedCountry,pulse=Math.sin(t*0.0025+c.a*0.12)*0.2+0.8,df=Math.pow(Math.max(0,Math.min(1,p.d)),0.5);let col,al,gs;if(isHL){col='0,230,220';al=0.95*df;gs=c.s*5;}else if(c.c){col='255,200,60';al=(0.55+pulse*0.3)*df;gs=c.s*3.5;}else{col='220,180,80';al=0.2*df;gs=c.s*2;}const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,gs);g.addColorStop(0,`rgba(${col},${al})`);g.addColorStop(0.25,`rgba(${col},${al*0.55})`);g.addColorStop(0.6,`rgba(${col},${al*0.15})`);g.addColorStop(1,`rgba(${col},0)`);ctx.beginPath();ctx.arc(p.x,p.y,gs,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,Math.max(0.5,c.s*0.4*df),0,Math.PI*2);ctx.fillStyle=`rgba(${col},${Math.min(1,al*2)})`;ctx.fill();});
+  // ── shooting star (soft, fast, curves past the Earth) ──
+  shootUpdate(); shootDraw();
   // ── ISS occasional fly-by (decorative, behind content) ──
   issUpdate();
   if(iss.active){
@@ -86,6 +150,8 @@ function drawFrame(t){
     }
     drawISS(iss.x,iss.y,iss.ang,9,0.97);
   }
+  // ── explosion debris (from clicking the ISS) ──
+  issDebrisDraw();
 }
 // ── ISS (stylised: central module + solar arrays + soft glow) ──
 function drawISS(x,y,ang,S,alpha){
@@ -120,3 +186,9 @@ function drawISS(x,y,ang,S,alpha){
 function animate(){time+=16;try{drawFrame(time);}catch(e){}requestAnimationFrame(animate);}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)requestAnimationFrame(animate);});
 function highlightCountry(code){if(code==='UK')code='GB';highlightedCountry=code;}
+// click the ISS → it explodes 💥 (canvas fills the viewport, so client coords = canvas coords)
+window.addEventListener('pointerdown',function(e){
+  if(!iss.active) return;
+  var dx=e.clientX-iss.x, dy=e.clientY-iss.y;
+  if(dx*dx+dy*dy<=30*30) issExplode(iss.x,iss.y);
+});
