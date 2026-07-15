@@ -477,8 +477,17 @@
             <div id="rec-manual-fields" style="display:none;" class="conditional">
               <div class="section-label" style="margin-top:4px;">N° d'abonnement</div>
               <input type="text" id="rec-sub-ref" oninput="recoverySetSubRef(this.value)" placeholder="ex: F1313942" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-bottom:12px;margin-top:4px;">
-              <div class="section-label">Prix par période (€)</div>
+              <div class="section-label" id="rec-label-price">Prix par période (€)</div>
               <input type="text" id="rec-sub-price" oninput="recoverySetSubPrice(this.value)" placeholder="ex: 800.40" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-top:4px;">
+              <div class="section-label" id="rec-label-currency" style="margin-top:12px;">Devise du lien de paiement</div>
+              <div class="type-grid" style="margin-bottom:0;">
+                <button class="type-btn active" data-rec-currency="eur" onclick="recoverySetCurrency('eur')">
+                  <span class="t-icon">💶</span><span class="t-label">Euro (€)</span>
+                </button>
+                <button class="type-btn" data-rec-currency="usd" onclick="recoverySetCurrency('usd')">
+                  <span class="t-icon">💵</span><span class="t-label">Dollar ($)</span>
+                </button>
+              </div>
             </div>
 
             <div class="section-label" id="recovery-label-plan" style="display:none;"></div>

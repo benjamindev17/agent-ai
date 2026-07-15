@@ -1,4 +1,6 @@
-let recoveryState = {type:null, plan:null, pricelist:'high', users:1, recoverable:null, subRef:'', subPrice:''};
+let recoveryState = {type:null, plan:null, pricelist:'high', users:1, recoverable:null, subRef:'', subPrice:'', currency:'eur'};
+var REC_CUR_ID = {eur:1, usd:2};
+var REC_CUR_SYMBOL = {eur:'€', usd:'$'};
  
 
 function recoverySelect(type){
@@ -37,6 +39,14 @@ function recoverySetPl(pl){
 
 function recoverySetSubRef(v){recoveryState.subRef=v.trim();calcRecovery();}
 function recoverySetSubPrice(v){recoveryState.subPrice=v.replace(/,/g,'.').replace(/€/g,'').trim();calcRecovery();}
+function recoverySetCurrency(cur){
+  recoveryState.currency = cur;
+  document.querySelectorAll('[data-rec-currency]').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`[data-rec-currency="${cur}"]`).classList.add('active');
+  const priceLabel = el('rec-label-price');
+  if(priceLabel) priceLabel.textContent = (lang==='fr'?'Prix par période (':'Price per period (') + REC_CUR_SYMBOL[cur] + ')';
+  calcRecovery();
+}
  
 function calcRecovery(){
   const {type} = recoveryState;
@@ -100,8 +110,10 @@ function calcRecovery(){
     const price = parseFloat(recoveryState.subPrice);
     if(!isNaN(price) && price > 0){
       const total = (periods.length * price).toFixed(2);
-      paymentLink = 'https://www.odoo.com/fr_FR/payment/pay?reference='+recoveryState.subRef+'&amount='+total+'&currency_id=1';
-      const totalLabel = isFR ? `Total : ${periods.length} × ${recoveryState.subPrice.replace('.',',')}€ = ${total.replace('.',',')}€` : `Total: ${periods.length} × €${recoveryState.subPrice} = €${total}`;
+      const curId = REC_CUR_ID[recoveryState.currency] || 1;
+      const curSym = REC_CUR_SYMBOL[recoveryState.currency] || '€';
+      paymentLink = 'https://www.odoo.com/fr_FR/payment/pay?reference='+recoveryState.subRef+'&amount='+total+'&currency_id='+curId;
+      const totalLabel = isFR ? `Total : ${periods.length} × ${recoveryState.subPrice.replace('.',',')}${curSym} = ${total.replace('.',',')}${curSym}` : `Total: ${periods.length} × ${curSym}${recoveryState.subPrice} = ${curSym}${total}`;
       html += `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,180,0,0.12);border:1.5px solid rgba(255,180,0,0.35);border-radius:8px;font-size:13px;font-weight:600;color:#FFD166;">${totalLabel}</div>`;
       html += `<a class="iot-link-btn" href="${paymentLink}" target="_blank" rel="noopener" style="margin-top:10px;margin-bottom:4px;"><span class="iot-link-icon">💳</span><span class="iot-link-label">${isFR?'Lien de paiement':'Payment link'}</span><span class="iot-link-arrow">↗</span></a>`;
       const safeLink = paymentLink.replace(/`/g,'\\`').replace(/\$/g,'\\$');
@@ -247,10 +259,13 @@ function recoveryClearResult(){
 }
  
 function recoveryReset(){
-  recoveryState={type:null, plan:null, pricelist:'high', users:1, recoverable:null, subRef:'', subPrice:''};
+  recoveryState={type:null, plan:null, pricelist:'high', users:1, recoverable:null, subRef:'', subPrice:'', currency:'eur'};
   document.querySelectorAll('[data-recovery]').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('[data-rec-recoverable]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[data-rec-currency]').forEach(b=>b.classList.remove('active'));
+  var eurBtn=document.querySelector('[data-rec-currency="eur"]'); if(eurBtn) eurBtn.classList.add('active');
   el('rec-day').value=''; el('rec-month').value=''; el('rec-year').value='2025';
   el('recovery-fields').style.display='none';
   recoveryClearResult();
+  recoverySelect('monthly');
 }

@@ -20,7 +20,7 @@ function openTool(tool){
   else if(tool==='iot'){el('view-iot').style.display='block';el('header-icon-el').textContent='🔌';el('header-title').textContent=t('iotHeaderTitle');}
   else if(tool==='hosting'){el('view-hosting').style.display='block';el('header-icon-el').textContent='🖥️';el('header-title').textContent=t('hostingHeaderTitle');}
   else if(tool==='pricing'){el('view-pricing').style.display='block';el('header-icon-el').textContent='💶';el('header-title').textContent=t('pricingHeaderTitle');}
-  else if(tool==='recovery'){el('view-recovery').style.display='block';el('header-icon-el').textContent='🔓';el('header-title').textContent=t('recoveryHeaderTitle');}
+  else if(tool==='recovery'){el('view-recovery').style.display='block';el('header-icon-el').textContent='🔓';el('header-title').textContent=t('recoveryHeaderTitle');recoverySelect('monthly');}
   else if(tool==='accountant'){el('view-accountant').style.display='block';el('header-icon-el').textContent='🧾';el('header-title').textContent=t('accHeaderTitle');}
   else if(tool==='upsell'){el('view-upsell').style.display='block';el('header-icon-el').textContent='📈';el('header-title').textContent=t('upsellHeaderTitle');}
   else if(tool==='pitch'){el('view-pitch').style.display='block';el('header-icon-el').textContent='🎯';el('header-title').textContent=t('pitchHeaderTitle');renderPitchView();}
@@ -45,7 +45,7 @@ function resetTool(){
   iotState={type:null,need:null};
   hostingState={type:null};
   pricingState={topic:null,pricelist:'high',billing:'monthly'};
-  recoveryState={type:null,plan:null,pricelist:'high',users:1,recoverable:null};
+  recoveryState={type:null,plan:null,pricelist:'high',users:1,recoverable:null,subRef:'',subPrice:'',currency:'eur'};
   accState={scenario:null,added:null,connected:null,contract:null};
   upsellState={reason:null,contract:null,multiType:null,discuss:null,codeLinks:''}; upsellEmailOpen=false;
   eligState={target:null,plan:null,billing:null,version:null}; _eligEmailOpen=false;
@@ -61,6 +61,7 @@ function resetTool(){
     if(view==='domain') renderDomainView();
     if(view==='callfu') renderCallFuView();
     if(view==='triangle') renderTriangleView();
+    if(view==='recovery') recoverySelect('monthly');
   }
   // Re-apply current language
   setLang(lang);
