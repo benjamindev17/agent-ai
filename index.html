@@ -7,8 +7,8 @@
 <title>CCM Toolbox</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/variables.css?v=8">
-<link rel="stylesheet" href="css/styles.css?v=8">
+<link rel="stylesheet" href="css/variables.css?v=9">
+<link rel="stylesheet" href="css/styles.css?v=9">
 </head>
 <body>
  
@@ -38,6 +38,12 @@
         <div class="home-hero-title" id="home-title">CCM Toolbox</div>
       </div>
       <div class="tool-grid">
+        <button class="tool-btn" onclick="openTool('indexation')">
+          <span class="tool-badge" id="badge-indexation">Actif</span>
+          <span class="tool-icon">🔁</span>
+          <span class="tool-label" id="tool-indexation-label">Indexation 7%</span>
+          <span class="tool-sub" id="tool-indexation-sub">Renouvellement · Plafond +7% · Compensation</span>
+        </button>
         <button class="tool-btn" onclick="openTool('vat')">
           <span class="tool-badge" id="badge-vat">Actif</span>
           <span class="tool-icon">📋</span>
@@ -104,6 +110,11 @@
     </div>
   </div>
  
+  <!-- INDEXATION 7% VIEW -->
+  <div id="view-indexation" style="display:none;">
+    <div id="indexation-content" style="max-width:1080px;width:100%;margin:0 auto;padding:24px 24px 32px;box-sizing:border-box;"></div>
+  </div>
+
   <!-- VAT VIEW -->
   <div id="view-vat" style="display:none;">
     <div class="tool-main">
@@ -754,23 +765,24 @@
 
 
 
-<script src="js/data/translations.js?v=8"></script>
-<script src="js/data/constants.js?v=8"></script>
-<script src="js/utils/helpers.js?v=8"></script>
-<script src="js/components/globe.js?v=8"></script>
-<script src="js/components/vat.js?v=8"></script>
-<script src="js/components/iot.js?v=8"></script>
-<script src="js/components/hosting.js?v=8"></script>
-<script src="js/components/pricing.js?v=8"></script>
-<script src="js/components/recovery.js?v=8"></script>
-<script src="js/components/accountant.js?v=8"></script>
-<script src="js/components/upsell.js?v=8"></script>
-<script src="js/components/pitch.js?v=8"></script>
-<script src="js/components/hunting.js?v=8"></script>
-<script src="js/components/domain.js?v=8"></script>
-<script src="js/components/callfu.js?v=8"></script>
-<script src="js/components/triangle.js?v=8"></script>
-<script src="js/components/nav.js?v=8"></script>
-<script src="js/main.js?v=8"></script>
+<script src="js/components/indexation.js?v=9"></script>
+<script src="js/data/translations.js?v=9"></script>
+<script src="js/data/constants.js?v=9"></script>
+<script src="js/utils/helpers.js?v=9"></script>
+<script src="js/components/globe.js?v=9"></script>
+<script src="js/components/vat.js?v=9"></script>
+<script src="js/components/iot.js?v=9"></script>
+<script src="js/components/hosting.js?v=9"></script>
+<script src="js/components/pricing.js?v=9"></script>
+<script src="js/components/recovery.js?v=9"></script>
+<script src="js/components/accountant.js?v=9"></script>
+<script src="js/components/upsell.js?v=9"></script>
+<script src="js/components/pitch.js?v=9"></script>
+<script src="js/components/hunting.js?v=9"></script>
+<script src="js/components/domain.js?v=9"></script>
+<script src="js/components/callfu.js?v=9"></script>
+<script src="js/components/triangle.js?v=9"></script>
+<script src="js/components/nav.js?v=9"></script>
+<script src="js/main.js?v=9"></script>
 </body>
 </html>

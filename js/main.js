@@ -6,7 +6,7 @@ function setLang(l){
   el('lang-fr').classList.toggle('active',l==='fr'); el('lang-en').classList.toggle('active',l==='en');
   document.title=t('pageTitle');
   el('back-label').textContent=t('backLabel');
-  el('header-title').textContent=view==='vat'?t('vatHeaderTitle'):view==='iot'?t('iotHeaderTitle'):view==='hosting'?t('hostingHeaderTitle'):view==='pricing'?t('pricingHeaderTitle'):view==='recovery'?t('recoveryHeaderTitle'):view==='accountant'?t('accHeaderTitle'):view==='upsell'?t('upsellHeaderTitle'):view==='pitch'?t('pitchHeaderTitle'):view==='hunting'?t('huntingHeaderTitle'):view==='domain'?t('domainHeaderTitle'):view==='callfu'?t('callHeaderTitle'):view==='triangle'?t('triangleHeaderTitle'):t('headerTitle');
+  el('header-title').textContent=view==='indexation'?t('indexationHeaderTitle'):view==='vat'?t('vatHeaderTitle'):view==='iot'?t('iotHeaderTitle'):view==='hosting'?t('hostingHeaderTitle'):view==='pricing'?t('pricingHeaderTitle'):view==='recovery'?t('recoveryHeaderTitle'):view==='accountant'?t('accHeaderTitle'):view==='upsell'?t('upsellHeaderTitle'):view==='pitch'?t('pitchHeaderTitle'):view==='hunting'?t('huntingHeaderTitle'):view==='domain'?t('domainHeaderTitle'):view==='callfu'?t('callHeaderTitle'):view==='triangle'?t('triangleHeaderTitle'):t('headerTitle');
   if(el('badge-accountant')) el('badge-accountant').textContent=t('badgeActive'); if(el('tool-accountant-label')) el('tool-accountant-label').textContent=t('toolAccountantLabel'); if(el('tool-accountant-sub')) el('tool-accountant-sub').textContent=t('toolAccountantSub');
   if(el('badge-upsell')) el('badge-upsell').textContent=t('badgeActive'); if(el('tool-upsell-label')) el('tool-upsell-label').textContent=t('toolUpsellLabel'); if(el('tool-upsell-sub')) el('tool-upsell-sub').textContent=t('toolUpsellSub');
   if(el('badge-pitch')) el('badge-pitch').textContent=t('badgeActive'); if(el('tool-pitch-label')) el('tool-pitch-label').textContent=t('toolPitchLabel'); if(el('tool-pitch-sub')) el('tool-pitch-sub').textContent=t('toolPitchSub');
@@ -16,12 +16,14 @@ function setLang(l){
   if(el('badge-triangle')) el('badge-triangle').textContent=t('badgeActive'); if(el('tool-triangle-label')) el('tool-triangle-label').textContent=t('toolTriangleLabel'); if(el('tool-triangle-sub')) el('tool-triangle-sub').textContent=t('toolTriangleSub');
   if(el('iot-explain-toggle-label')) el('iot-explain-toggle-label').textContent=_iotExplainOpen?t('iotExplainToggleClose'):t('iotExplainToggle');
   if(_iotExplainOpen && el('iot-explain-content')) el('iot-explain-content').innerHTML=IOT_EXPLAIN[lang];
+  if(view==='indexation') renderIndexationView();
   if(view==='pitch') renderPitchView();
   if(view==='hunting') renderHuntingView();
   if(view==='domain') renderDomainView();
   if(view==='callfu') renderCallFuView();
   if(view==='triangle') renderTriangleView();
   if(accState.scenario) renderAccResult();
+  if(el('badge-indexation')) el('badge-indexation').textContent=t('badgeActive'); if(el('tool-indexation-label')) el('tool-indexation-label').textContent=t('toolIndexationLabel'); if(el('tool-indexation-sub')) el('tool-indexation-sub').textContent=t('toolIndexationSub');
   // Accountant static labels
   if(el('acc-card-header')) el('acc-card-header').textContent=t('accCardHeader');
   if(el('acc-label-scenario')) el('acc-label-scenario').textContent=t('accLabelScenario');

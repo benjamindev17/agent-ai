@@ -9,18 +9,19 @@ const IOT={fr:{order:{title:'Commander une box',sections:[{label:'RESSOURCES INT
 en:{order:{title:'Order a box',sections:[{label:'INTERNAL RESOURCES',links:[{icon:'🚚',label:'Ordering physical IoT boxes via Odoo',url:'https://www.odoo.com/knowledge/article/11470'},{icon:'📁',label:'Project — IoT Tasks',url:'https://www.odoo.com/odoo/project/1712/tasks'},{icon:'💾',label:'IoT General Guide',url:'https://www.odoo.com/knowledge/article/7689'}]},{label:'SUBSCRIPTION',links:[{icon:'🧾',label:'IoT Subscription — info',url:'https://www.odoo.com'}]}]},connect:{title:'Connect the box',sections:[{label:'INTERNAL RESOURCES',links:[{icon:'💾',label:'Physical IoT — Connection guide',url:'https://www.odoo.com/knowledge/article/10373'},{icon:'🧐',label:'Virtual or Physical IoT?',url:'https://www.odoo.com/knowledge/article/20367'}]},{label:'DOCUMENTATION',links:[{icon:'📄',label:'Odoo — IoT Documentation',url:'https://www.odoo.com/documentation/16.0/applications/general/iot.html'}]}]},ports:{title:'Ports & compatibility',sections:[{label:'INTERNAL RESOURCES',links:[{icon:'📄',label:'IoT Box (Physical) — Ports',url:'https://www.odoo.com/knowledge/article/16583'},{icon:'🖨️',label:'Hardware in a flash — Compatibility',url:'https://www.odoo.com/knowledge/article/16640'}]}]},client:{title:'Client resources',sections:[{label:'FOR CLIENTS',links:[{icon:'🌐',label:'Nalios — Demystifying IoT',url:'https://www.nalios.com'},{icon:'📄',label:'Odoo — IoT documentation',url:'https://www.odoo.com/documentation/16.0/applications/general/iot.html'}]}]},'videos-p':{title:'Physical IoT Videos',sections:[{label:'TUTORIALS',links:[{icon:'▶️',label:'How to — IoT Box',url:'https://www.youtube.com/watch?v=w2_Dcm3r_7o'},{icon:'▶️',label:'Flashing the IoT — Step 1',url:'https://youtu.be/7xlgVrhMhEU'},{icon:'▶️',label:'Connecting IoT — Step 2',url:'https://youtu.be/9maW3p7nrsM'}]},{label:'ADVANCED',links:[{icon:'▶️',label:'Advanced configuration',url:'https://www.youtube.com/watch?v=gnTaiW65ncg'}]}]},contacts:{title:'IoT Reference contacts',contacts:[{i:'MOBT',r:'Product Owner',c:'#714B67'},{i:'QCE',r:'Technical',c:'#017E84'},{i:'HKS',r:'Technical',c:'#017E84'},{i:'QUEL',r:'Expert BA',c:'#3b82f6'},{i:'ISES',r:'Expert BA',c:'#3b82f6'},{i:'TANO',r:'Expert BA',c:'#3b82f6'},{i:'RHE',r:'Expert BA',c:'#3b82f6'},{i:'CHE',r:'Delivery',c:'#e85d04'}]},'connect-v':{title:'Connect Virtual IoT',sections:[{label:'INTERNAL RESOURCES',links:[{icon:'💻',label:'Virtual IoT — Connection guide',url:'https://www.odoo.com/knowledge/article/10372'},{icon:'🧐',label:'Virtual or Physical IoT?',url:'https://www.odoo.com/knowledge/article/20367'}]},{label:'DOCUMENTATION',links:[{icon:'📄',label:'Odoo — Windows Virtual IoT',url:'https://www.odoo.com/documentation/18.0/applications/general/iot/windows_iot.html'}]}]},'client-v':{title:'Virtual client resources',sections:[{label:'FOR CLIENTS',links:[{icon:'🌐',label:'Nalios — Demystifying IoT',url:'https://www.nalios.com'},{icon:'📄',label:'Odoo — IoT documentation',url:'https://www.odoo.com/documentation/16.0/applications/general/iot.html'}]}]},'videos-v':{title:'Virtual IoT Videos',sections:[{label:'TUTORIALS',links:[{icon:'▶️',label:'Windows Virtual IoT — Installation tutorial',url:'https://youtu.be/VfX54CJPNLI'}]}]},'contacts-v':{title:'IoT Reference contacts',contacts:[{i:'MOBT',r:'Product Owner',c:'#714B67'},{i:'QCE',r:'Technical',c:'#017E84'},{i:'HKS',r:'Technical',c:'#017E84'},{i:'QUEL',r:'Expert BA',c:'#3b82f6'},{i:'ISES',r:'Expert BA',c:'#3b82f6'},{i:'TANO',r:'Expert BA',c:'#3b82f6'},{i:'RHE',r:'Expert BA',c:'#3b82f6'},{i:'CHE',r:'Delivery',c:'#e85d04'}]}}};
 
 // ── PRICING DATA ──
+// Prix Custom = +20% (nouvelle grille Odoo). Standard inchangé.
 const PRICING_DATA = {
   high: {
-    monthly_fyd:  {standard:24.90, custom:37.40},
-    annual_fyd:   {standard:19.90, custom:29.90},
-    monthly_norm: {standard:31.10, custom:46.80},
-    annual_norm:  {standard:24.90, custom:37.40}
+    monthly_fyd:  {standard:24.90, custom:44.88},
+    annual_fyd:   {standard:19.90, custom:35.88},
+    monthly_norm: {standard:31.10, custom:56.16},
+    annual_norm:  {standard:24.90, custom:44.88}
   },
   low: {
-    monthly_fyd:  {standard:14.80, custom:22.40},
-    annual_fyd:   {standard:11.90, custom:17.90},
-    monthly_norm: {standard:18.60, custom:28.00},
-    annual_norm:  {standard:14.90, custom:22.40}
+    monthly_fyd:  {standard:14.80, custom:26.88},
+    annual_fyd:   {standard:11.90, custom:21.48},
+    monthly_norm: {standard:18.60, custom:33.60},
+    annual_norm:  {standard:14.90, custom:26.88}
   }
 };
 
