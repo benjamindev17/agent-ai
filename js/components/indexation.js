@@ -1,7 +1,16 @@
 // ── INDEXATION 7% ──
 // Outil dynamique de renouvellement : plafond +7%/an + Pricing Compensation.
-var indexState = {cur:'eur', planChange:'no', toMonthly:'no', years:1, prev:'', catalog:''};
+var indexState = {cur:'eur', planChange:'no', toMonthly:'no', years:1, prev:'', catalog:'', catalogTouched:false};
 var INDEX_CUR_SYMBOL = {eur:'€', usd:'$'};
+var INDEX_CUSTOM_UP = 1.20; // hausse grille Custom : +20%
+
+// Prix catalogue par défaut = prix précédent +20%, formaté selon la langue.
+function indexDefaultCatalog(prevStr){
+  var p = indexNum(prevStr);
+  if(p===null) return '';
+  var s = indexR2(p * INDEX_CUSTOM_UP).toFixed(2);
+  return (lang==='fr') ? s.replace('.', ',') : s;
+}
 
 function indexNum(v){ var n = parseFloat(String(v==null?'':v).replace(',', '.').replace(/[^0-9.\-]/g,'')); return isNaN(n)?null:n; }
 function indexR2(x){ return Math.round(x*100)/100; }
@@ -11,8 +20,16 @@ function indexSetCur(c){ indexState.cur=c; document.querySelectorAll('[data-inde
 function indexSetPlanChange(v){ indexState.planChange=v; document.querySelectorAll('[data-index-plan]').forEach(function(b){b.classList.toggle('active', b.getAttribute('data-index-plan')===v);}); indexCompute(); }
 function indexSetMonthly(v){ indexState.toMonthly=v; document.querySelectorAll('[data-index-monthly]').forEach(function(b){b.classList.toggle('active', b.getAttribute('data-index-monthly')===v);}); indexCompute(); }
 function indexSetYears(n){ indexState.years=n; document.querySelectorAll('[data-index-years]').forEach(function(b){b.classList.toggle('active', parseInt(b.getAttribute('data-index-years'),10)===n);}); indexCompute(); }
-function indexSetPrev(v){ indexState.prev=v; indexCompute(); }
-function indexSetCatalog(v){ indexState.catalog=v; indexCompute(); }
+function indexSetPrev(v){
+  indexState.prev=v;
+  // Tant que l'utilisateur n'a pas modifié le catalogue à la main, on le pré-remplit à +20%.
+  if(!indexState.catalogTouched){
+    indexState.catalog = indexDefaultCatalog(v);
+    var ci = el('index-catalog'); if(ci) ci.value = indexState.catalog;
+  }
+  indexCompute();
+}
+function indexSetCatalog(v){ indexState.catalog=v; indexState.catalogTouched=true; indexCompute(); }
 
 function indexCompute(){
   var box = el('index-result'); if(!box) return;
@@ -163,7 +180,8 @@ function renderIndexationView(){
     +'<input type="text" id="index-prev" value="'+(st.prev||'')+'" oninput="indexSetPrev(this.value)" placeholder="'+(isFR?'ex : 448,80':'e.g. 448.80')+'" style="'+inputStyle+'margin-bottom:14px;">'
 
     +'<div class="section-label" id="index-catalog-label">'+(isFR?'Nouveau prix catalogue (':'New catalog price (')+sym+')</div>'
-    +'<input type="text" id="index-catalog" value="'+(st.catalog||'')+'" oninput="indexSetCatalog(this.value)" placeholder="'+(isFR?'ex : 538,80':'e.g. 538.80')+'" style="'+inputStyle+'margin-bottom:18px;">'
+    +'<input type="text" id="index-catalog" value="'+(st.catalog||'')+'" oninput="indexSetCatalog(this.value)" placeholder="'+(isFR?'ex : 538,80':'e.g. 538.80')+'" style="'+inputStyle+'margin-bottom:5px;">'
+    +'<div style="font-size:11px;color:rgba(255,209,102,0.85);margin-bottom:18px;line-height:1.45;">💡 '+(isFR?'Pré-rempli à <strong>+20%</strong> (nouvelle grille Custom). Cliquez pour le modifier.':'Pre-filled at <strong>+20%</strong> (new Custom grid). Click to edit.')+'</div>'
 
     +'<div class="section-label">'+(isFR?'Durée du renouvellement':'Renewal duration')+'</div>'
     +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px;">'+yearBtns+'</div>'
