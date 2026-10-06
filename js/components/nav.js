@@ -43,7 +43,7 @@ var VIEW_ORIGINALS={};
 });
 function resetTool(){
   // Reset ALL JS states regardless of current view
-  indexState={oldGrid:'yes',cur:'eur',planChange:'no',toMonthly:'no',years:1,prev:'',catalog:'',catalogTouched:false};
+  indexState={oldGrid:'yes',cur:'eur',planChange:'no',toMonthly:'no',years:1,prev:'',catalog:''};
   vatState={location:null,euCountry:'',status:null,vatResult:null}; vatLast=null;
   iotState={type:null,need:null};
   hostingState={type:null};
