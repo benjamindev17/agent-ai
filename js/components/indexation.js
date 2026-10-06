@@ -132,6 +132,27 @@ function indexCompute(){
   });
   h += '</tbody></table></div>';
 
+  // Global pricing compensation (multi-year)
+  if(!excluded && years>1){
+    var totalComp = 0, totalCharged = 0;
+    rows.forEach(function(r){ totalComp += r.comp; totalCharged += r.charged; });
+    totalComp = indexR2(totalComp);
+    totalCharged = indexR2(totalCharged);
+    var totalCatalog = indexR2(catalog * years);
+    var gStr = totalComp.toFixed(2);
+    h += '<div style="margin-top:4px;background:rgba(255,209,102,0.12);border:1.5px solid rgba(255,209,102,0.45);border-radius:10px;padding:14px 16px;">'
+      +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,209,102,0.9);margin-bottom:10px;">Σ '+(isFR?'Pricing compensation globale — '+years+' ans':'Global pricing compensation — '+years+' yrs')+'</div>'
+      +'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+      +'<span style="font-size:22px;font-weight:800;color:#FFD166;font-variant-numeric:tabular-nums;white-space:nowrap;">'+gStr+' '+sym+'</span>'
+      +'<button id="idx-cp-global" title="'+cp+'" onclick="huntingCopy(\''+gStr+'\',\'idx-cp-global\')" style="background:rgba(113,75,103,0.35);border:1.5px solid rgba(143,100,135,0.7);color:rgba(230,195,230,0.98);border-radius:7px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">📋 '+cp+'</button>'
+      +'</div>'
+      +'<div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:10px;font-variant-numeric:tabular-nums;">'
+      +(isFR?'Somme des compensations des '+years+' années.':'Sum of the '+years+' yearly compensations.')+'<br>'
+      +(isFR?'Total facturé sur la durée':'Total charged over the period')+' : <strong style="color:#00E8B0;">'+totalCharged.toFixed(2)+' '+sym+'</strong> '
+      +(isFR?'(au lieu de ':'(instead of ')+totalCatalog.toFixed(2)+' '+sym+' '+(isFR?'au catalogue plein).':'at full catalog).')
+      +'</div></div>';
+  }
+
   // Formula reminder (year 1, user numbers)
   if(!excluded){
     var cap1 = rows[0].cap, comp1 = rows[0].comp;
@@ -171,7 +192,7 @@ function renderIndexationView(){
     yearBtns += '<button class="type-btn'+(st.years===n?' active':'')+'" data-index-years="'+n+'" onclick="indexSetYears('+n+')" style="min-width:0;padding:10px 0;"><span class="t-label">'+n+' '+(isFR?'an':'yr')+(n>1&&isFR?'s':'')+(n>1&&!isFR?'s':'')+'</span></button>';
   }
 
-  var h = '<div class="tool-main" style="align-items:stretch;">'
+  var h = '<div class="tool-main" style="align-items:stretch;grid-template-columns:1fr 1fr;">'
     // LEFT CARD
     +'<div class="card" style="display:flex;flex-direction:column;">'
     +'<div class="card-header"><span style="font-size:18px;">🔁</span><span>'+(isFR?'Renouvellement de contrat':'Contract renewal')+'</span></div>'
@@ -217,7 +238,7 @@ function renderIndexationView(){
     // RIGHT CARD
     +'<div class="result-card has-result" style="display:flex;flex-direction:column;">'
     +'<div class="result-header"><span>📊</span><span>'+(isFR?'Résultat du renouvellement':'Renewal result')+'</span></div>'
-    +'<div class="result-body" style="overflow-y:auto;max-height:calc(100vh - 160px);display:flex;flex-direction:column;gap:0;">'
+    +'<div class="result-body" style="display:flex;flex-direction:column;gap:0;">'
     // Static explanation
     +'<div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);">'
     +'<div class="iot-section-title" style="margin-bottom:8px;">ℹ️ '+(isFR?'RÈGLE DES 7%':'THE 7% RULE')+'</div>'
