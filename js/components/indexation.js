@@ -1,6 +1,6 @@
 // ── INDEXATION 7% ──
 // Outil dynamique de renouvellement : plafond +7%/an + Pricing Compensation.
-var indexState = {cur:'eur', planChange:'no', toMonthly:'no', years:1, prev:'', catalog:'', catalogTouched:false};
+var indexState = {oldGrid:'yes', cur:'eur', planChange:'no', toMonthly:'no', years:1, prev:'', catalog:'', catalogTouched:false};
 var INDEX_CUR_SYMBOL = {eur:'€', usd:'$'};
 var INDEX_CUSTOM_UP = 1.20; // hausse grille Custom : +20%
 
@@ -17,6 +17,7 @@ function indexR2(x){ return Math.round(x*100)/100; }
 function indexFmt(x){ return indexR2(x).toFixed(2) + ' ' + (INDEX_CUR_SYMBOL[indexState.cur]||'€'); }
 
 function indexSetCur(c){ indexState.cur=c; document.querySelectorAll('[data-index-cur]').forEach(function(b){b.classList.toggle('active', b.getAttribute('data-index-cur')===c);}); var pl=el('index-prev-label'); var cl=el('index-catalog-label'); var s=INDEX_CUR_SYMBOL[c]||'€'; var isFR=lang==='fr'; if(pl) pl.textContent=(isFR?'Prix du contrat précédent (':'Previous contract price (')+s+')'; if(cl) cl.textContent=(isFR?'Nouveau prix catalogue (':'New catalog price (')+s+')'; indexCompute(); }
+function indexSetOldGrid(v){ indexState.oldGrid=v; document.querySelectorAll('[data-index-oldgrid]').forEach(function(b){b.classList.toggle('active', b.getAttribute('data-index-oldgrid')===v);}); indexCompute(); }
 function indexSetPlanChange(v){ indexState.planChange=v; document.querySelectorAll('[data-index-plan]').forEach(function(b){b.classList.toggle('active', b.getAttribute('data-index-plan')===v);}); indexCompute(); }
 function indexSetMonthly(v){ indexState.toMonthly=v; document.querySelectorAll('[data-index-monthly]').forEach(function(b){b.classList.toggle('active', b.getAttribute('data-index-monthly')===v);}); indexCompute(); }
 function indexSetYears(n){ indexState.years=n; document.querySelectorAll('[data-index-years]').forEach(function(b){b.classList.toggle('active', parseInt(b.getAttribute('data-index-years'),10)===n);}); indexCompute(); }
@@ -36,7 +37,7 @@ function indexCompute(){
   var isFR = lang==='fr';
   var prev = indexNum(indexState.prev);
   var catalog = indexNum(indexState.catalog);
-  var excluded = indexState.planChange==='yes' || indexState.toMonthly==='yes';
+  var excluded = indexState.oldGrid==='no' || indexState.planChange==='yes' || indexState.toMonthly==='yes';
 
   // Placeholder while prices missing
   if(prev===null || catalog===null){
@@ -56,11 +57,17 @@ function indexCompute(){
 
   // Eligibility verdict banner
   if(excluded){
-    var reason = indexState.planChange==='yes'
-      ? (isFR?'Passage Standard → Custom/Studio : bascule directe au <strong>tarif catalogue</strong> de la nouvelle grille Custom. Le plafond de 7% ne s\'applique pas.'
-             :'Standard → Custom/Studio switch: moves directly to the new Custom <strong>catalog price</strong>. The 7% cap does not apply.')
-      : (isFR?'Passage à une facturation <strong>mensuelle</strong> : annule l\'éligibilité à la Pricing Compensation. Tarif catalogue plein.'
-             :'Switch to <strong>monthly</strong> billing: cancels Pricing Compensation eligibility. Full catalog price.');
+    var reason;
+    if(indexState.oldGrid==='no'){
+      reason = isFR?'Contrat <strong>déjà sous la nouvelle grille</strong> tarifaire : la Pricing Compensation ne s\'applique pas (réservée aux contrats de l\'ancienne grille, souscrits avant le 19/12/2025 / &lt; 09/2026). Tarif catalogue plein.'
+                   :'Contract <strong>already on the new pricelist</strong>: Pricing Compensation does not apply (reserved for old-grid contracts subscribed before 19/12/2025 / &lt; 09/2026). Full catalog price.';
+    } else if(indexState.planChange==='yes'){
+      reason = isFR?'Passage Standard → Custom/Studio : bascule directe au <strong>tarif catalogue</strong> de la nouvelle grille Custom. Le plafond de 7% ne s\'applique pas.'
+                   :'Standard → Custom/Studio switch: moves directly to the new Custom <strong>catalog price</strong>. The 7% cap does not apply.';
+    } else {
+      reason = isFR?'Passage à une facturation <strong>mensuelle</strong> : annule l\'éligibilité à la Pricing Compensation. Tarif catalogue plein.'
+                   :'Switch to <strong>monthly</strong> billing: cancels Pricing Compensation eligibility. Full catalog price.';
+    }
     h += '<div style="background:rgba(255,80,60,0.15);border:1.5px solid rgba(255,80,60,0.5);border-radius:10px;padding:14px 16px;margin-bottom:16px;">'
       +'<div style="font-size:13px;font-weight:700;color:#ff9080;margin-bottom:4px;">⛔ '+(isFR?'Pricing Compensation NON applicable':'Pricing Compensation NOT applicable')+'</div>'
       +'<div style="font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.55;">'+reason+'</div></div>';
@@ -169,6 +176,13 @@ function renderIndexationView(){
     +'<div class="card" style="display:flex;flex-direction:column;">'
     +'<div class="card-header"><span style="font-size:18px;">🔁</span><span>'+(isFR?'Renouvellement de contrat':'Contract renewal')+'</span></div>'
     +'<div class="card-body" style="flex:1;">'
+
+    +'<div class="section-label">'+(isFR?'Contrat existant sous l\'ancienne grille ?':'Existing contract on the old pricelist?')+'</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,0.45);margin:-6px 0 8px;line-height:1.45;">'+(isFR?'Souscrit / renouvelé avant le 19/12/2025 (&lt; 09/2026).':'Subscribed / renewed before 19/12/2025 (&lt; 09/2026).')+'</div>'
+    +'<div class="type-grid" style="margin-bottom:16px;">'
+    +'<button class="type-btn'+(st.oldGrid==='yes'?' active':'')+'" data-index-oldgrid="yes" onclick="indexSetOldGrid(\'yes\')"><span class="t-icon">✅</span><span class="t-label">'+(isFR?'Oui':'Yes')+'</span></button>'
+    +'<button class="type-btn'+(st.oldGrid==='no'?' active':'')+'" data-index-oldgrid="no" onclick="indexSetOldGrid(\'no\')"><span class="t-icon">⚠️</span><span class="t-label">'+(isFR?'Non':'No')+'</span></button>'
+    +'</div>'
 
     +'<div class="section-label">'+(isFR?'Devise':'Currency')+'</div>'
     +'<div class="type-grid" style="margin-bottom:14px;">'
