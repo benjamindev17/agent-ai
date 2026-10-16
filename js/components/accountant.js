@@ -130,6 +130,25 @@ function renderAccResult(){
   accUpdateEmail(active, contract);
 }
 
+// Retire la formule d'appel (Bonjour/Hello) et la formule de politesse
+// (Bonne journée/Have a great day) : le composer Odoo les ajoute déjà.
+function accStripSalutations(text){
+  const greetings = ['bonjour,','hello,'];
+  const closings  = ['bonne journée,','have a great day,'];
+  let lines = text.split('\n');
+  while(lines.length && lines[0].trim()==='') lines.shift();
+  if(lines.length && greetings.indexOf(lines[0].trim().toLowerCase())!==-1){
+    lines.shift();
+    while(lines.length && lines[0].trim()==='') lines.shift();
+  }
+  while(lines.length && lines[lines.length-1].trim()==='') lines.pop();
+  if(lines.length && closings.indexOf(lines[lines.length-1].trim().toLowerCase())!==-1){
+    lines.pop();
+    while(lines.length && lines[lines.length-1].trim()==='') lines.pop();
+  }
+  return lines.join('\n');
+}
+
 function accUpdateEmail(active, contract){
   const isFR = lang==='fr';
   const emailEl  = el('acc-email-text');
@@ -273,8 +292,9 @@ I will follow up with you as soon as the situation is resolved.
 Have a great day,`,
   };
 
-  emailEl.textContent = emails[active] || '';
-  emailEl.dataset.fulltext = emails[active] || '';
+  const body = accStripSalutations(emails[active] || '');
+  emailEl.textContent = body;
+  emailEl.dataset.fulltext = body;
 
   // Ticket for D
   if(ticketEl){
