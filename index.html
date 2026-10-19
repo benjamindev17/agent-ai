@@ -7,8 +7,8 @@
 <title>CCM Toolbox</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/variables.css?v=9">
-<link rel="stylesheet" href="css/styles.css?v=9">
+<link rel="stylesheet" href="css/variables.css?v=10">
+<link rel="stylesheet" href="css/styles.css?v=10">
 </head>
 <body>
  
@@ -443,36 +443,7 @@
  
           <div id="recovery-fields" class="conditional" style="display:none;">
             <div class="section-label" id="recovery-label-dates">Date de renouvellement originale</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
-              <div>
-                <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:5px;" id="rec-label-day">Jour</div>
-                <div class="select-wrap" style="margin-bottom:0;">
-                  <select id="rec-day" onchange="calcRecovery()">
-                    <option value="" id="rec-day-ph">Jour</option>
-                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:5px;" id="rec-label-month">Mois</div>
-                <div class="select-wrap" style="margin-bottom:0;">
-                  <select id="rec-month" onchange="calcRecovery()">
-                    <option value="" id="rec-month-ph">Mois</option>
-                    <option value="0" id="rec-month-0">Janvier</option><option value="1" id="rec-month-1">Février</option><option value="2" id="rec-month-2">Mars</option><option value="3" id="rec-month-3">Avril</option><option value="4" id="rec-month-4">Mai</option><option value="5" id="rec-month-5">Juin</option><option value="6" id="rec-month-6">Juillet</option><option value="7" id="rec-month-7">Août</option><option value="8" id="rec-month-8">Septembre</option><option value="9" id="rec-month-9">Octobre</option><option value="10" id="rec-month-10">Novembre</option><option value="11" id="rec-month-11">Décembre</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:5px;" id="rec-label-year">Année</div>
-                <div class="select-wrap" style="margin-bottom:0;">
-                  <select id="rec-year" onchange="calcRecovery()">
-                    <option value="" id="rec-year-ph">Année</option>
-                    <option value="2026" selected>2026</option>
-                    <option value="2025">2025</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+            <input type="date" id="rec-date" class="date-input" oninput="calcRecovery()" style="margin-bottom:20px;">
  
             <!-- Recoverable toggle -->
             <div class="section-label" style="display:flex;align-items:center;gap:6px;">
@@ -765,24 +736,24 @@
 
 
 
-<script src="js/components/indexation.js?v=9"></script>
-<script src="js/data/translations.js?v=9"></script>
-<script src="js/data/constants.js?v=9"></script>
-<script src="js/utils/helpers.js?v=9"></script>
-<script src="js/components/globe.js?v=9"></script>
-<script src="js/components/vat.js?v=9"></script>
-<script src="js/components/iot.js?v=9"></script>
-<script src="js/components/hosting.js?v=9"></script>
-<script src="js/components/pricing.js?v=9"></script>
-<script src="js/components/recovery.js?v=9"></script>
-<script src="js/components/accountant.js?v=9"></script>
-<script src="js/components/upsell.js?v=9"></script>
-<script src="js/components/pitch.js?v=9"></script>
-<script src="js/components/hunting.js?v=9"></script>
-<script src="js/components/domain.js?v=9"></script>
-<script src="js/components/callfu.js?v=9"></script>
-<script src="js/components/triangle.js?v=9"></script>
-<script src="js/components/nav.js?v=9"></script>
-<script src="js/main.js?v=9"></script>
+<script src="js/components/indexation.js?v=10"></script>
+<script src="js/data/translations.js?v=10"></script>
+<script src="js/data/constants.js?v=10"></script>
+<script src="js/utils/helpers.js?v=10"></script>
+<script src="js/components/globe.js?v=10"></script>
+<script src="js/components/vat.js?v=10"></script>
+<script src="js/components/iot.js?v=10"></script>
+<script src="js/components/hosting.js?v=10"></script>
+<script src="js/components/pricing.js?v=10"></script>
+<script src="js/components/recovery.js?v=10"></script>
+<script src="js/components/accountant.js?v=10"></script>
+<script src="js/components/upsell.js?v=10"></script>
+<script src="js/components/pitch.js?v=10"></script>
+<script src="js/components/hunting.js?v=10"></script>
+<script src="js/components/domain.js?v=10"></script>
+<script src="js/components/callfu.js?v=10"></script>
+<script src="js/components/triangle.js?v=10"></script>
+<script src="js/components/nav.js?v=10"></script>
+<script src="js/main.js?v=10"></script>
 </body>
 </html>

@@ -9,6 +9,9 @@ function recoverySelect(type){
   if(el('rec-sub-ref')) el('rec-sub-ref').value='';
   if(el('rec-sub-price')) el('rec-sub-price').value='';
   if(el('rec-manual-fields')) el('rec-manual-fields').style.display='none';
+  // Une date de renouvellement future ne donne aucune période due : on la bloque dans le calendrier
+  const d = new Date();
+  if(el('rec-date')) el('rec-date').max = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   document.querySelectorAll('[data-recovery]').forEach(b=>b.classList.remove('active'));
   document.querySelector(`[data-recovery="${type}"]`).classList.add('active');
   el('recovery-fields').style.display = 'block';
@@ -60,18 +63,18 @@ function recoverySetCurrency(cur){
  
 function calcRecovery(){
   const {type} = recoveryState;
-  const day   = parseInt(el('rec-day').value);
-  const month = el('rec-month').value;
-  const year  = parseInt(el('rec-year').value);
+  const dateVal = el('rec-date').value; // AAAA-MM-JJ, vide tant que la date est incomplète
   const isFR  = lang === 'fr';
- 
-  if(!type || !day || month==='' || !year) return recoveryClearResult();
+
+  if(!type || !dateVal) return recoveryClearResult();
+  const [year, monthNum, day] = dateVal.split('-').map(Number);
+  const month = monthNum - 1; // index 0-11 attendu par Date
  
   const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const formatDate = d => `${d.getDate()} ${isFR ? MONTHS_FR[d.getMonth()] : MONTHS_EN[d.getMonth()]} ${d.getFullYear()}`;
  
-  const renewal = new Date(year, parseInt(month), day);
+  const renewal = new Date(year, month, day);
   const today   = new Date(); today.setHours(0,0,0,0);
  
   if(today <= renewal) return recoveryClearResult();
@@ -83,15 +86,15 @@ function calcRecovery(){
   // Build periods
   let periods = [];
   if(type === 'monthly'){
-    let start = new Date(year, parseInt(month), day + 1);
+    let start = new Date(year, month, day + 1);
     while(start <= today){
       const end = new Date(start.getFullYear(), start.getMonth() + 1, start.getDate() - 1);
       periods.push(`• ${isFR?'du':'from'} ${formatDate(start)} ${isFR?'au':'to'} ${formatDate(end)}`);
       start = new Date(start.getFullYear(), start.getMonth() + 1, start.getDate());
     }
   } else {
-    const start = new Date(year, parseInt(month), day + 1);
-    const end   = new Date(year + 1, parseInt(month), day);
+    const start = new Date(year, month, day + 1);
+    const end   = new Date(year + 1, month, day);
     periods.push(`• ${isFR?'du':'from'} ${formatDate(start)} ${isFR?'au':'to'} ${formatDate(end)}`);
   }
  
@@ -267,7 +270,7 @@ function recoveryClearResult(){
   el('recovery-result-content').innerHTML='';
   const tpl=el('email-template-text');
   const ph=el('email-template-placeholder');
-  if(tpl){ tpl.textContent=''; tpl.style.display='none'; }
+  if(tpl){ tpl.textContent=''; tpl.style.display='none'; delete tpl.dataset.fulltext; }
   if(ph) ph.style.display='block';
 }
  
@@ -277,7 +280,7 @@ function recoveryReset(){
   document.querySelectorAll('[data-rec-recoverable]').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('[data-rec-currency]').forEach(b=>b.classList.remove('active'));
   var eurBtn=document.querySelector('[data-rec-currency="eur"]'); if(eurBtn) eurBtn.classList.add('active');
-  el('rec-day').value=''; el('rec-month').value=''; el('rec-year').value='2025';
+  el('rec-date').value='';
   el('recovery-fields').style.display='none';
   recoveryClearResult();
   recoverySelect('monthly');

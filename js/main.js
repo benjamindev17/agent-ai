@@ -75,17 +75,6 @@ function setLang(l){
   if(el('rec-info-text')) el('rec-info-text').innerHTML=t('recInfoText');
   if(el('rec-label-currency')) el('rec-label-currency').textContent=l==='fr'?'Devise du lien de paiement':'Payment link currency';
   if(el('rec-label-price')) el('rec-label-price').textContent=(l==='fr'?'Prix par période (':'Price per period (')+(REC_CUR_SYMBOL[recoveryState.currency]||'€')+')';
-  // date selector labels
-  const _rl={day:{fr:'Jour',en:'Day'},month:{fr:'Mois',en:'Month'},year:{fr:'Année',en:'Year'}};
-  if(el('rec-label-day')) el('rec-label-day').textContent=_rl.day[l];
-  if(el('rec-label-month')) el('rec-label-month').textContent=_rl.month[l];
-  if(el('rec-label-year')) el('rec-label-year').textContent=_rl.year[l];
-  if(el('rec-day-ph')) el('rec-day-ph').textContent=l==='fr'?'Jour':'Day';
-  if(el('rec-month-ph')) el('rec-month-ph').textContent=l==='fr'?'Mois':'Month';
-  if(el('rec-year-ph')) el('rec-year-ph').textContent=l==='fr'?'Année':'Year';
-  const _mfr=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-  const _men=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  _mfr.forEach((_,i)=>{ const o=el('rec-month-'+i); if(o) o.textContent=(l==='fr'?_mfr:_men)[i]; });
   if(recoveryState.type) calcRecovery();
   // pricing static labels
   if(el('pricing-card-header')) el('pricing-card-header').textContent=t('pricingCardHeader');

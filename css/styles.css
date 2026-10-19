@@ -155,6 +155,8 @@ html { overflow-x: hidden; }
 .select-wrap { position:relative; margin-bottom:18px; }
 .select-wrap select { width:100%; padding:11px 38px 11px 14px; border:1.5px solid rgba(255,255,255,0.4); border-radius:8px; font-family:inherit; font-size:13.5px; color:#2C2C33; background:rgba(255,255,255,0.55); appearance:none; cursor:pointer; }
 .select-wrap select:focus { outline:none; border-color:#00C896; }
+.date-input { width:100%; padding:10px 14px; border:1.5px solid rgba(255,255,255,0.4); border-radius:8px; font-family:inherit; font-size:13.5px; color:#2C2C33; background:rgba(255,255,255,0.55); color-scheme:light; cursor:pointer; }
+.date-input:focus { outline:none; border-color:#00C896; }
 .select-wrap::after { content:'▾'; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#6B7280; pointer-events:none; }
 .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .status-btn { background:rgba(255,255,255,0.55); border:1.5px solid rgba(255,255,255,0.7); border-radius:var(--radius); padding:16px 10px 14px; cursor:pointer; text-align:center; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:8px; font-family:inherit; }
