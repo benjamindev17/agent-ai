@@ -140,8 +140,22 @@
     +'.hw-coffin{width:70px;height:104px;opacity:0.6;bottom:14px;left:14px;animation:hw-tilt 8s ease-in-out infinite;}'
     +'.hw-frank{width:66px;height:84px;opacity:0.6;bottom:12px;right:18px;animation:hw-bob 6s ease-in-out infinite;}'
     +'.hw-pumpkin{width:46px;height:44px;opacity:0.6;bottom:18px;left:50%;margin-left:-180px;animation:hw-glow 3.5s ease-in-out infinite;}'
-    +'.hw-ufo{width:150px;height:100px;top:12%;left:-200px;opacity:0.72;}'
+    +'.hw-ufo{width:150px;height:100px;top:12%;left:-200px;opacity:0.85;pointer-events:none;}'
     +'.hw-ufo.go{animation:hw-ufo-cross 17s linear forwards;}'
+    +'.hw-ufo-inner{position:relative;width:100%;height:100%;transform-origin:50% 45%;pointer-events:auto;cursor:crosshair;}'
+    +'.hw-ufo-inner.lvl1{animation:hw-wobble 1.1s ease-in-out infinite;}'
+    +'.hw-ufo-inner.lvl2{animation:hw-wobble 0.6s ease-in-out infinite;}'
+    +'.hw-ufo-inner.lvl3{animation:hw-wobble 0.34s ease-in-out infinite;}'
+    +'.hw-ufo-inner.frantic{animation:hw-frantic 0.3s steps(1,end) infinite;}'
+    +'.hw-ufo-inner.dead{opacity:0;}'
+    +'.hw-ufo-smoke{position:absolute;left:50%;top:28%;width:72px;height:72px;transform:translate(-50%,-50%);border-radius:50%;opacity:0;pointer-events:none;background:radial-gradient(circle,rgba(90,90,100,0.6),rgba(90,90,100,0) 70%);transition:opacity .3s;}'
+    +'.hw-ufo-inner.lvl1 .hw-ufo-smoke{opacity:0.4;}'
+    +'.hw-ufo-inner.lvl2 .hw-ufo-smoke{opacity:0.75;background:radial-gradient(circle,rgba(70,70,80,0.78),rgba(217,119,46,0.3) 52%,rgba(0,0,0,0) 72%);}'
+    +'.hw-ufo-inner.lvl3 .hw-ufo-smoke{opacity:0.95;width:92px;height:92px;background:radial-gradient(circle,rgba(50,45,55,0.85),rgba(255,120,40,0.55) 42%,rgba(255,80,30,0.12) 66%,rgba(0,0,0,0) 78%);}'
+    +'.hw-spark{position:fixed;pointer-events:none;font-family:"Space Grotesk","Noto Sans",sans-serif;font-weight:800;white-space:nowrap;transform:translate(-50%,-50%);will-change:transform,opacity;z-index:4;}'
+    +'.hw-spark.go{animation:hw-spark-fly var(--dur,1.1s) ease-out forwards;}'
+    +'.hw-boom{position:fixed;pointer-events:none;width:22px;height:22px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,240,200,0.95),rgba(255,150,50,0.7) 40%,rgba(255,90,30,0) 70%);z-index:4;}'
+    +'.hw-boom.go{animation:hw-boom-pop 0.55s ease-out forwards;}'
     +'.hw-bend{position:absolute;left:-30vw;top:46%;font-family:"Fraunces","Space Grotesk",serif;font-weight:600;font-size:15vw;letter-spacing:0.12em;color:rgba(230,223,244,0.22);filter:blur(1.6px);text-shadow:0 0 26px rgba(113,75,103,0.55),0 0 60px rgba(160,120,150,0.35);white-space:nowrap;opacity:0;}'
     +'.hw-bend.go{animation:hw-bend-fly 15s ease-in-out forwards;}'
     +'@keyframes hw-sway{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}'
@@ -151,6 +165,10 @@
     +'@keyframes hw-tilt{0%,100%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}}'
     +'@keyframes hw-glow{0%,100%{opacity:0.45;filter:drop-shadow(0 0 4px rgba(217,119,46,0.4));}50%{opacity:0.72;filter:drop-shadow(0 0 14px rgba(255,160,60,0.7));}}'
     +'@keyframes hw-ufo-cross{0%{transform:translate(0,0);}25%{transform:translate(30vw,22px);}50%{transform:translate(60vw,-18px);}75%{transform:translate(90vw,14px);}100%{transform:translate(130vw,0);}}'
+    +'@keyframes hw-wobble{0%,100%{transform:rotate(-7deg);}50%{transform:rotate(7deg);}}'
+    +'@keyframes hw-frantic{0%{transform:translate(-14px,8px) rotate(-14deg);}14%{transform:translate(16px,-10px) rotate(15deg);}28%{transform:translate(-10px,-12px) rotate(-9deg);}42%{transform:translate(18px,7px) rotate(12deg);}56%{transform:translate(-17px,11px) rotate(-15deg);}70%{transform:translate(12px,-8px) rotate(10deg);}84%{transform:translate(-8px,10px) rotate(-11deg);}100%{transform:translate(14px,-6px) rotate(13deg);}}'
+    +'@keyframes hw-spark-fly{0%{opacity:1;transform:translate(-50%,-50%) translate(0,0) scale(0.55) rotate(0);}20%{opacity:1;}100%{opacity:0;transform:translate(-50%,-50%) translate(var(--dx,0),var(--dy,0)) scale(var(--sc,1.2)) rotate(var(--rot,0deg));}}'
+    +'@keyframes hw-boom-pop{0%{opacity:0.95;transform:translate(-50%,-50%) scale(0.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(11);}}'
     +'@keyframes hw-bend-fly{0%{opacity:0;transform:translate(0,16px) scale(0.9) skewX(-6deg);}18%{opacity:0.28;}80%{opacity:0.2;}100%{opacity:0;transform:translate(95vw,-40px) scale(1.4) skewX(6deg);}}'
     +'@media(max-width:768px){.hw-web{width:104px;height:104px;}.hw-bat.b1,.hw-bat.b3,.hw-pumpkin,.hw-ghost{display:none;}.hw-coffin{width:52px;height:78px;}.hw-frank{width:50px;height:64px;}.hw-bend{font-size:26vw;}}'
     +'@media(prefers-reduced-motion:reduce){.hw,.hw-bend{animation:none!important;}.hw-ufo,.hw-bend{display:none;}}';
@@ -183,11 +201,80 @@
 
   if(reduce) return; // pas d'animations périodiques en mode réduit
 
-  // ---- UFO périodique ----
-  var ufo = document.createElement('div'); ufo.className = 'hw hw-ufo'; ufo.innerHTML = ufoSVG();
-  bg.appendChild(ufo);
-  ufo.addEventListener('animationend', function(){ ufo.classList.remove('go'); });
-  function flyUfo(){ ufo.classList.remove('go'); void ufo.offsetWidth; ufo.classList.add('go'); }
+  // ---- UFO périodique + Easter egg « tir » ----
+  var TEAM = ['GRO','LEGU','LAGOV','HUPAS','DMAR','BEBLE','JULE'];
+  var SPARK_COLORS = ['#ffd166','#d9772e','#00e8b0','#c9a0ff','#ffffff','#ff7a45'];
+
+  var ufo = document.createElement('div'); ufo.className = 'hw hw-ufo';
+  ufo.innerHTML = '<div class="hw-ufo-inner"><div class="hw-ufo-smoke"></div>'+ufoSVG()+'</div>';
+  fg.appendChild(ufo); // dans la couche avant → cliquable au-dessus des cartes
+  var ufoInner = ufo.querySelector('.hw-ufo-inner');
+  var ufoHits = 0;
+
+  ufo.addEventListener('animationend', function(e){ if(e.animationName==='hw-ufo-cross'){ ufo.classList.remove('go'); } });
+
+  function ufoDamage(){
+    var lvl = ufoHits<=2 ? 1 : (ufoHits<=6 ? 2 : 3);
+    ufoInner.className = 'hw-ufo-inner lvl'+lvl + (ufoHits>=7 ? ' frantic' : '');
+  }
+
+  function ufoCenter(){ var r = ufoInner.getBoundingClientRect(); return { x:r.left+r.width/2, y:r.top+r.height/2 }; }
+
+  function spark(x, y, o){
+    o = o || {};
+    var s = document.createElement('div'); s.className = 'hw-spark';
+    var col = SPARK_COLORS[(Math.random()*SPARK_COLORS.length)|0];
+    s.style.left = x+'px'; s.style.top = y+'px'; s.style.color = col;
+    if(o.text){ s.textContent = o.text; s.style.fontSize = (o.size||13)+'px'; s.style.textShadow = '0 0 8px '+col+',0 0 18px rgba(255,180,80,0.5)'; }
+    else { s.textContent = '•'; s.style.fontSize = (o.size||10)+'px'; s.style.textShadow = '0 0 6px '+col; }
+    var ang = (o.ang!=null) ? o.ang : Math.random()*Math.PI*2;
+    var dist = o.dist || (40 + Math.random()*120);
+    s.style.setProperty('--dx', (Math.cos(ang)*dist).toFixed(0)+'px');
+    s.style.setProperty('--dy', (Math.sin(ang)*dist - (o.lift||0)).toFixed(0)+'px');
+    s.style.setProperty('--sc', (0.8 + Math.random()*1.3).toFixed(2));
+    s.style.setProperty('--rot', ((Math.random()*120-60)|0)+'deg');
+    s.style.setProperty('--dur', (0.8 + Math.random()*0.7).toFixed(2)+'s');
+    fg.appendChild(s); void s.offsetWidth; s.classList.add('go');
+    s.addEventListener('animationend', function(){ s.remove(); });
+  }
+
+  function ufoExplode(x, y){
+    ufoInner.classList.add('dead');
+    var boom = document.createElement('div'); boom.className = 'hw-boom';
+    boom.style.left = x+'px'; boom.style.top = y+'px';
+    fg.appendChild(boom); void boom.offsetWidth; boom.classList.add('go');
+    boom.addEventListener('animationend', function(){ boom.remove(); });
+    // noms de l'équipe projetés en étincelles (chaque nom plusieurs fois)
+    var names = [];
+    for(var k=0;k<3;k++){ TEAM.forEach(function(nm){ names.push(nm); }); }
+    names.sort(function(){ return Math.random()-0.5; });
+    var total = 22;
+    for(var i=0;i<total;i++){
+      (function(idx){
+        setTimeout(function(){
+          var ang = (idx/total)*Math.PI*2 + Math.random()*0.6;
+          spark(x, y, { text:names[idx%names.length], ang:ang, dist:90+Math.random()*190, size:12+Math.random()*10, lift:18 });
+        }, Math.random()*140);
+      })(i);
+    }
+    for(var j=0;j<18;j++){ spark(x, y, { ang:Math.random()*Math.PI*2, dist:60+Math.random()*170, size:8+Math.random()*6, lift:10 }); }
+    ufo.classList.remove('go'); // stoppe le vol en cours
+    setTimeout(function(){ ufoHits = 0; ufoInner.className = 'hw-ufo-inner'; }, 650);
+  }
+
+  function ufoHit(e){
+    if(e){ e.preventDefault(); e.stopPropagation(); }
+    if(!ufo.classList.contains('go') || ufoInner.classList.contains('dead')) return;
+    ufoHits++;
+    var c = ufoCenter();
+    var n = 3 + ufoHits; // de plus en plus d'étincelles à chaque coup
+    for(var i=0;i<n;i++) spark(c.x+(Math.random()*30-15), c.y+(Math.random()*20-10), { dist:25+Math.random()*60, size:9 });
+    if(ufoHits>=10){ ufoExplode(c.x, c.y); return; }
+    ufoDamage();
+  }
+  ufo.addEventListener('click', ufoHit);
+
+  function flyUfo(){ if(ufoInner.classList.contains('dead')) return; ufo.classList.remove('go'); void ufo.offsetWidth; ufo.classList.add('go'); }
   function scheduleUfo(){ setTimeout(function(){ flyUfo(); scheduleUfo(); }, 22000 + Math.random()*20000); }
   setTimeout(scheduleUfo, 6000);
 
