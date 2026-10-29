@@ -2,7 +2,7 @@
 function openTool(tool){
   el('view-home').style.display='none';
   el('view-vat').style.display='none';
-  el('view-iot').style.display='none';
+  el('view-quiz').style.display='none';
   el('view-hosting').style.display='none';
   el('view-pricing').style.display='none';
   el('view-recovery').style.display='none';
@@ -17,7 +17,7 @@ function openTool(tool){
   document.querySelector('.header').classList.add('in-tool');
   view=tool;
   if(tool==='vat'){el('view-vat').style.display='block';el('header-icon-el').textContent='📋';el('header-title').textContent=t('vatHeaderTitle');}
-  else if(tool==='iot'){el('view-iot').style.display='block';el('header-icon-el').textContent='🔌';el('header-title').textContent=t('iotHeaderTitle');}
+  else if(tool==='quiz'){el('view-quiz').style.display='block';el('header-icon-el').textContent='🎓';el('header-title').textContent=t('quizHeaderTitle');renderQuizView();}
   else if(tool==='hosting'){el('view-hosting').style.display='block';el('header-icon-el').textContent='🖥️';el('header-title').textContent=t('hostingHeaderTitle');}
   else if(tool==='pricing'){el('view-pricing').style.display='block';el('header-icon-el').textContent='💶';el('header-title').textContent=t('pricingHeaderTitle');}
   else if(tool==='recovery'){el('view-recovery').style.display='block';el('header-icon-el').textContent='🔓';el('header-title').textContent=t('recoveryHeaderTitle');recoverySelect('monthly');recoverySetRecoverable('yes');}
@@ -31,18 +31,18 @@ function openTool(tool){
   setLang(lang);
 }
 function goHome(){
-  el('view-home').style.display='flex';el('view-vat').style.display='none';el('view-iot').style.display='none';el('view-hosting').style.display='none';el('view-pricing').style.display='none';el('view-recovery').style.display='none';el('view-accountant').style.display='none';el('view-upsell').style.display='none';el('view-pitch').style.display='none';el('view-hunting').style.display='none';el('view-domain').style.display='none';el('view-callfu').style.display='none';el('view-triangle').style.display='none';
+  el('view-home').style.display='flex';el('view-vat').style.display='none';el('view-quiz').style.display='none';el('view-hosting').style.display='none';el('view-pricing').style.display='none';el('view-recovery').style.display='none';el('view-accountant').style.display='none';el('view-upsell').style.display='none';el('view-pitch').style.display='none';el('view-hunting').style.display='none';el('view-domain').style.display='none';el('view-callfu').style.display='none';el('view-triangle').style.display='none';
   el('btn-back').classList.remove('visible');document.querySelector('.header').classList.remove('in-tool');el('header-icon-el').textContent='🧰';el('header-title').textContent=t('headerTitle');view='home';
 }
 var VIEW_ORIGINALS={};
 // Save pristine HTML immediately — script is at end of body so DOM is ready
-['vat','iot','hosting','pricing','recovery','accountant','upsell','pitch','hunting','domain','callfu','triangle'].forEach(function(tid){
+['vat','quiz','hosting','pricing','recovery','accountant','upsell','pitch','hunting','domain','callfu','triangle'].forEach(function(tid){
   var v=el('view-'+tid); if(v) VIEW_ORIGINALS[tid]=v.innerHTML;
 });
 function resetTool(){
   // Reset ALL JS states regardless of current view
   vatState={location:null,euCountry:'',status:null,vatResult:null}; vatLast=null;
-  iotState={type:null,need:null};
+  quizState=quizInitState();
   hostingState={type:null};
   pricingState={topic:null,pricelist:'high',billing:'monthly'};
   recoveryState={type:null,plan:null,pricelist:'high',users:1,recoverable:'yes',subRef:'',subPrice:'',currency:'eur'};
@@ -61,6 +61,7 @@ function resetTool(){
     if(view==='domain') renderDomainView();
     if(view==='callfu') renderCallFuView();
     if(view==='triangle') renderTriangleView();
+    if(view==='quiz') renderQuizView();
     if(view==='recovery'){ recoverySelect('monthly'); recoverySetRecoverable('yes'); }
   }
   // Re-apply current language

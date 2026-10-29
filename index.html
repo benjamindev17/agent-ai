@@ -7,8 +7,8 @@
 <title>CCM Toolbox</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/variables.css?v=17">
-<link rel="stylesheet" href="css/styles.css?v=17">
+<link rel="stylesheet" href="css/variables.css?v=18">
+<link rel="stylesheet" href="css/styles.css?v=18">
 </head>
 <body>
  
@@ -44,11 +44,11 @@
           <span class="tool-label" id="tool-vat-label">Vérification TVA</span>
           <span class="tool-sub" id="tool-vat-sub">Régime applicable par pays</span>
         </button>
-        <button class="tool-btn" onclick="openTool('iot')">
-          <span class="tool-badge" id="badge-iot">Actif</span>
-          <span class="tool-icon">🔌</span>
-          <span class="tool-label" id="tool-iot-label">IoT Box</span>
-          <span class="tool-sub" id="tool-iot-sub">Physical &amp; Virtual IoT</span>
+        <button class="tool-btn" onclick="openTool('quiz')">
+          <span class="tool-badge" id="badge-quiz">Actif</span>
+          <span class="tool-icon">🎓</span>
+          <span class="tool-label" id="tool-quiz-label">Quiz Pricing 2026</span>
+          <span class="tool-sub" id="tool-quiz-sub">Formation · Pricing Compensation</span>
         </button>
         <button class="tool-btn" onclick="openTool('hosting')">
           <span class="tool-badge" id="badge-hosting">Actif</span>
@@ -170,65 +170,13 @@
     </div>
   </div>
  
-  <!-- IOT VIEW -->
-  <div id="view-iot" style="display:none;">
-    <div style="max-width:1080px;width:100%;margin:24px auto 0;padding:0 24px;box-sizing:border-box;">
-      <div style="background:rgba(255,255,255,0.25);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.35);border-radius:14px;overflow:hidden;">
-        <button id="iot-explain-toggle-btn" onclick="toggleIotExplain()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;padding:15px 22px;cursor:pointer;font-family:inherit;color:#fff;font-size:13.5px;font-weight:600;text-align:left;">
-          <span id="iot-explain-toggle-label">💡 Qu'est-ce qu'une IoT Box ? — Cliquer pour déplier</span>
-          <span id="iot-explain-icon" style="font-size:15px;transition:transform 0.3s;color:rgba(255,255,255,0.5);">▼</span>
-        </button>
-        <div id="iot-explain-body" style="display:none;padding:14px 22px 18px;border-top:1px solid rgba(255,255,255,0.15);">
-          <div id="iot-explain-content"></div>
-          <div style="position:relative;width:100%;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;margin-top:14px;">
-            <iframe src="https://www.youtube.com/embed/xOEIh02oxzM" title="IoT Box" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="tool-main">
-      <div class="card">
-        <div class="card-header"><span style="font-size:18px;">🔌</span><span id="iot-card-header">Type d'IoT</span></div>
-        <div class="card-body">
-          <div class="section-label" id="iot-label-type">Quel type d'IoT ?</div>
-          <div class="type-grid">
-            <button class="type-btn" data-iot="physical" onclick="iotSelectType('physical')"><span class="t-icon">📦</span><span class="t-label" id="iot-physical-label">Physical IoT</span><span class="t-sub" id="iot-physical-sub">Boîtier physique</span></button>
-            <button class="type-btn" data-iot="virtual" onclick="iotSelectType('virtual')"><span class="t-icon">💻</span><span class="t-label" id="iot-virtual-label">Virtual IoT</span><span class="t-sub" id="iot-virtual-sub">Windows (logiciel)</span></button>
-          </div>
-          <div id="iot-physical-fields" class="conditional" style="display:none;">
-            <div class="iot-sub-notice"><div class="iot-sub-notice-icon">⚠️</div><div><div class="iot-sub-notice-title" id="iot-sub-title">Abonnement requis</div><div class="iot-sub-notice-text" id="iot-sub-text">Un <strong>Abonnement IoT</strong> est nécessaire par boîtier physique. Sans cet abonnement actif, la box ne peut pas fonctionner.</div></div></div>
-            <div class="section-label" id="iot-label-need" style="margin-top:18px;">Quel est le besoin ?</div>
-            <div class="iot-need-grid">
-              <button class="iot-need-btn" data-need="order" onclick="iotSelectNeed('order')"><span class="iot-need-icon">🚚</span><span class="iot-need-label" id="need-order">Commander une box</span></button>
-              <button class="iot-need-btn" data-need="connect" onclick="iotSelectNeed('connect')"><span class="iot-need-icon">🔗</span><span class="iot-need-label" id="need-connect">Connecter la box</span></button>
-              <button class="iot-need-btn" data-need="ports" onclick="iotSelectNeed('ports')"><span class="iot-need-icon">🔌</span><span class="iot-need-label" id="need-ports">Ports &amp; compatibilité</span></button>
-              <button class="iot-need-btn" data-need="client" onclick="iotSelectNeed('client')"><span class="iot-need-icon">👥</span><span class="iot-need-label" id="need-client">Ressources client</span></button>
-              <button class="iot-need-btn" data-need="videos-p" onclick="iotSelectNeed('videos-p')"><span class="iot-need-icon">🎬</span><span class="iot-need-label" id="need-videos-p">Vidéos</span></button>
-              <button class="iot-need-btn" data-need="contacts" onclick="iotSelectNeed('contacts')"><span class="iot-need-icon">👤</span><span class="iot-need-label" id="need-contacts">Référents</span></button>
-            </div>
-          </div>
-          <div id="iot-virtual-fields" class="conditional" style="display:none;">
-            <div class="section-label" id="iot-label-need-v" style="margin-top:18px;">Quel est le besoin ?</div>
-            <div class="iot-need-grid">
-              <button class="iot-need-btn" data-need="connect-v" onclick="iotSelectNeed('connect-v')"><span class="iot-need-icon">🔗</span><span class="iot-need-label" id="need-connect-v">Connecter (Windows)</span></button>
-              <button class="iot-need-btn" data-need="client-v" onclick="iotSelectNeed('client-v')"><span class="iot-need-icon">👥</span><span class="iot-need-label" id="need-client-v">Ressources client</span></button>
-              <button class="iot-need-btn" data-need="videos-v" onclick="iotSelectNeed('videos-v')"><span class="iot-need-icon">🎬</span><span class="iot-need-label" id="need-videos-v">Vidéos</span></button>
-              <button class="iot-need-btn" data-need="contacts-v" onclick="iotSelectNeed('contacts-v')"><span class="iot-need-icon">👤</span><span class="iot-need-label" id="need-contacts-v">Référents</span></button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="result-card" id="iot-result-card">
-        <div class="result-header"><span id="iot-result-icon">ℹ️</span><span id="iot-result-title">Ressources IoT</span></div>
-        <div class="result-body">
-          <div class="placeholder" id="iot-placeholder"><div class="ph-icon">🔌</div><p id="iot-placeholder-text">Sélectionnez le type d'IoT<br>pour afficher les ressources.</p></div>
-          <div class="result-content" id="iot-result-content" style="display:none;"></div>
-        </div>
-      </div>
-    </div>
+ 
+ 
+  <!-- QUIZ PRICING 2026 VIEW -->
+  <div id="view-quiz" style="display:none;">
+    <div id="quiz-content" style="max-width:920px;width:100%;margin:0 auto;padding:22px 20px 48px;box-sizing:border-box;"></div>
   </div>
- 
- 
+
   <!-- HOSTING VIEW -->
   <div id="view-hosting" style="display:none;">
     <div class="hosting-layout">
@@ -754,24 +702,24 @@
 
 
 
-<script src="js/data/translations.js?v=17"></script>
-<script src="js/data/constants.js?v=17"></script>
-<script src="js/utils/helpers.js?v=17"></script>
-<script src="js/components/globe.js?v=17"></script>
-<script src="js/components/vat.js?v=17"></script>
-<script src="js/components/iot.js?v=17"></script>
-<script src="js/components/hosting.js?v=17"></script>
-<script src="js/components/pricing.js?v=17"></script>
-<script src="js/components/recovery.js?v=17"></script>
-<script src="js/components/accountant.js?v=17"></script>
-<script src="js/components/upsell.js?v=17"></script>
-<script src="js/components/pitch.js?v=17"></script>
-<script src="js/components/hunting.js?v=17"></script>
-<script src="js/components/domain.js?v=17"></script>
-<script src="js/components/callfu.js?v=17"></script>
-<script src="js/components/triangle.js?v=17"></script>
-<script src="js/components/nav.js?v=17"></script>
-<script src="js/main.js?v=17"></script>
-<script src="js/components/halloween.js?v=17"></script>
+<script src="js/data/translations.js?v=18"></script>
+<script src="js/data/constants.js?v=18"></script>
+<script src="js/utils/helpers.js?v=18"></script>
+<script src="js/components/globe.js?v=18"></script>
+<script src="js/components/vat.js?v=18"></script>
+<script src="js/components/quiz.js?v=18"></script>
+<script src="js/components/hosting.js?v=18"></script>
+<script src="js/components/pricing.js?v=18"></script>
+<script src="js/components/recovery.js?v=18"></script>
+<script src="js/components/accountant.js?v=18"></script>
+<script src="js/components/upsell.js?v=18"></script>
+<script src="js/components/pitch.js?v=18"></script>
+<script src="js/components/hunting.js?v=18"></script>
+<script src="js/components/domain.js?v=18"></script>
+<script src="js/components/callfu.js?v=18"></script>
+<script src="js/components/triangle.js?v=18"></script>
+<script src="js/components/nav.js?v=18"></script>
+<script src="js/main.js?v=18"></script>
+<script src="js/components/halloween.js?v=18"></script>
 </body>
 </html>

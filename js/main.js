@@ -6,7 +6,7 @@ function setLang(l){
   el('lang-fr').classList.toggle('active',l==='fr'); el('lang-en').classList.toggle('active',l==='en');
   document.title=t('pageTitle');
   el('back-label').textContent=t('backLabel');
-  el('header-title').textContent=view==='vat'?t('vatHeaderTitle'):view==='iot'?t('iotHeaderTitle'):view==='hosting'?t('hostingHeaderTitle'):view==='pricing'?t('pricingHeaderTitle'):view==='recovery'?t('recoveryHeaderTitle'):view==='accountant'?t('accHeaderTitle'):view==='upsell'?t('upsellHeaderTitle'):view==='pitch'?t('pitchHeaderTitle'):view==='hunting'?t('huntingHeaderTitle'):view==='domain'?t('domainHeaderTitle'):view==='callfu'?t('callHeaderTitle'):view==='triangle'?t('triangleHeaderTitle'):t('headerTitle');
+  el('header-title').textContent=view==='vat'?t('vatHeaderTitle'):view==='quiz'?t('quizHeaderTitle'):view==='hosting'?t('hostingHeaderTitle'):view==='pricing'?t('pricingHeaderTitle'):view==='recovery'?t('recoveryHeaderTitle'):view==='accountant'?t('accHeaderTitle'):view==='upsell'?t('upsellHeaderTitle'):view==='pitch'?t('pitchHeaderTitle'):view==='hunting'?t('huntingHeaderTitle'):view==='domain'?t('domainHeaderTitle'):view==='callfu'?t('callHeaderTitle'):view==='triangle'?t('triangleHeaderTitle'):t('headerTitle');
   if(el('badge-accountant')) el('badge-accountant').textContent=t('badgeActive'); if(el('tool-accountant-label')) el('tool-accountant-label').textContent=t('toolAccountantLabel'); if(el('tool-accountant-sub')) el('tool-accountant-sub').textContent=t('toolAccountantSub');
   if(el('badge-upsell')) el('badge-upsell').textContent=t('badgeActive'); if(el('tool-upsell-label')) el('tool-upsell-label').textContent=t('toolUpsellLabel'); if(el('tool-upsell-sub')) el('tool-upsell-sub').textContent=t('toolUpsellSub');
   if(el('badge-pitch')) el('badge-pitch').textContent=t('badgeActive'); if(el('tool-pitch-label')) el('tool-pitch-label').textContent=t('toolPitchLabel'); if(el('tool-pitch-sub')) el('tool-pitch-sub').textContent=t('toolPitchSub');
@@ -14,8 +14,7 @@ function setLang(l){
   if(el('badge-domain')) el('badge-domain').textContent=t('badgeActive'); if(el('tool-domain-label')) el('tool-domain-label').textContent=t('toolDomainLabel'); if(el('tool-domain-sub')) el('tool-domain-sub').textContent=t('toolDomainSub');
   if(el('badge-callfu')) el('badge-callfu').textContent=t('badgeActive'); if(el('tool-callfu-label')) el('tool-callfu-label').textContent=t('toolCallLabel'); if(el('tool-callfu-sub')) el('tool-callfu-sub').textContent=t('toolCallSub');
   if(el('badge-triangle')) el('badge-triangle').textContent=t('badgeActive'); if(el('tool-triangle-label')) el('tool-triangle-label').textContent=t('toolTriangleLabel'); if(el('tool-triangle-sub')) el('tool-triangle-sub').textContent=t('toolTriangleSub');
-  if(el('iot-explain-toggle-label')) el('iot-explain-toggle-label').textContent=_iotExplainOpen?t('iotExplainToggleClose'):t('iotExplainToggle');
-  if(_iotExplainOpen && el('iot-explain-content')) el('iot-explain-content').innerHTML=IOT_EXPLAIN[lang];
+  if(view==='quiz') renderQuizView();
   if(view==='pitch') renderPitchView();
   if(view==='hunting') renderHuntingView();
   if(view==='domain') renderDomainView();
@@ -96,7 +95,7 @@ function setLang(l){
   if(pricingState.topic) renderPricingResult();
   if(el('home-title')) el('home-title').textContent=t('homeTitle'); if(el('home-sub')) el('home-sub').textContent=t('homeSub');
   if(el('badge-vat')) el('badge-vat').textContent=t('badgeActive'); if(el('tool-vat-label')) el('tool-vat-label').textContent=t('toolVatLabel'); if(el('tool-vat-sub')) el('tool-vat-sub').textContent=t('toolVatSub');
-  if(el('badge-iot')) el('badge-iot').textContent=t('badgeActive'); if(el('tool-iot-label')) el('tool-iot-label').textContent=t('toolIotLabel'); if(el('tool-iot-sub')) el('tool-iot-sub').textContent=t('toolIotSub');
+  if(el('badge-quiz')) el('badge-quiz').textContent=t('badgeActive'); if(el('tool-quiz-label')) el('tool-quiz-label').textContent=t('toolQuizLabel'); if(el('tool-quiz-sub')) el('tool-quiz-sub').textContent=t('toolQuizSub');
   if(el('badge-hosting')) el('badge-hosting').textContent=t('badgeActive'); if(el('tool-hosting-label')) el('tool-hosting-label').textContent=t('toolHostingLabel'); if(el('tool-hosting-sub')) el('tool-hosting-sub').textContent=t('toolHostingSub');
   if(el('badge-pricing')) el('badge-pricing').textContent=t('badgeActive'); if(el('tool-pricing-label')) el('tool-pricing-label').textContent=t('toolPricingLabel'); if(el('tool-pricing-sub')) el('tool-pricing-sub').textContent=t('toolPricingSub');
   for(var _i=5;_i<=6;_i++){if(el('bs'+_i))el('bs'+_i).textContent=t('badgeSoon');if(el('tl'+_i))el('tl'+_i).textContent=t('toolEmpty');}
@@ -113,16 +112,6 @@ function setLang(l){
   if(el('vat-verify-text')) el('vat-verify-text').innerHTML=t('vatVerifyText'); if(el('vies-link')) el('vies-link').textContent=t('viesLink');
   if(el('label-vat-check')) el('label-vat-check').textContent=t('labelVatCheck'); if(el('btn-vat-valid')) el('btn-vat-valid').textContent=t('btnVatValid'); if(el('btn-vat-invalid')) el('btn-vat-invalid').textContent=t('btnVatInvalid');
   if(el('vat-result-title')) el('vat-result-title').textContent=t('vatResultTitle'); if(el('vat-placeholder-text')) el('vat-placeholder-text').innerHTML=t('vatPlaceholder');
-  if(el('iot-card-header')) el('iot-card-header').textContent=t('iotCardHeader'); if(el('iot-label-type')) el('iot-label-type').textContent=t('iotLabelType');
-  if(el('iot-physical-label')) el('iot-physical-label').textContent=t('iotPhysicalLabel'); if(el('iot-physical-sub')) el('iot-physical-sub').textContent=t('iotPhysicalSub');
-  if(el('iot-virtual-label')) el('iot-virtual-label').textContent=t('iotVirtualLabel'); if(el('iot-virtual-sub')) el('iot-virtual-sub').textContent=t('iotVirtualSub');
-  if(el('iot-sub-title')) el('iot-sub-title').textContent=t('iotSubTitle'); if(el('iot-sub-text')) el('iot-sub-text').innerHTML=t('iotSubText');
-  if(el('iot-label-need')) el('iot-label-need').textContent=t('iotLabelNeed'); if(el('iot-label-need-v')) el('iot-label-need-v').textContent=t('iotLabelNeedV');
-  if(el('need-order')) el('need-order').textContent=t('needOrder'); if(el('need-connect')) el('need-connect').textContent=t('needConnect'); if(el('need-ports')) el('need-ports').textContent=t('needPorts');
-  if(el('need-client')) el('need-client').textContent=t('needClient'); if(el('need-videos-p')) el('need-videos-p').textContent=t('needVideosP'); if(el('need-contacts')) el('need-contacts').textContent=t('needContacts');
-  if(el('need-connect-v')) el('need-connect-v').textContent=t('needConnectV'); if(el('need-client-v')) el('need-client-v').textContent=t('needClientV');
-  if(el('need-videos-v')) el('need-videos-v').textContent=t('needVideosV'); if(el('need-contacts-v')) el('need-contacts-v').textContent=t('needContactsV');
-  if(el('iot-result-title')) el('iot-result-title').textContent=t('iotResultTitle'); if(el('iot-placeholder-text')) el('iot-placeholder-text').innerHTML=t('iotPlaceholder');
   if(el('hosting-card-header')) el('hosting-card-header').textContent=t('hostingCardHeader');
   if(el('hosting-label-type')) el('hosting-label-type').textContent=t('hostingLabelType');
   if(el('hosting-saas-label')) el('hosting-saas-label').textContent=t('hostingSaasLabel'); if(el('hosting-saas-sub')) el('hosting-saas-sub').textContent=t('hostingSaasSub');
@@ -146,7 +135,6 @@ function setLang(l){
   if(el('elig-email-toggle-label')) el('elig-email-toggle-label').textContent=t('eligEmailToggle');
   if(el('elig-copy-email-label')) el('elig-copy-email-label').textContent=t('eligCopyEmail');
   if(vatLast) showVatResult(vatLast);
-  if(iotState.need) iotShowResult(iotState.need);
   if(hostingState.type) hostingShowResult(hostingState.type);
   // upsell labels
   if(el('upsell-card-header'))el('upsell-card-header').textContent=t('upsellCardHeader');
