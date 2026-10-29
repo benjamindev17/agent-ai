@@ -11,27 +11,28 @@ function qzRand(min,max,step){ step=step||1; var k=Math.floor(Math.random()*((ma
 function qzShuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
 
 // ---------- Moteur de calcul ----------
-// extras = maintenance + Odoo.sh (prix inchangé) ; discount = remise fixe (€)
-function qzCompute(oldCat,newCat,users,extras,discount){
+// extras = maintenance + Odoo.sh (prix inchangé).
+// Au RENOUVELLEMENT la remise commerciale n'est pas reconduite :
+// nouveau total = nouveau catalogue − PC = PreTotal Rec+ × 1,07 (soit la remise, soit la PC).
+function qzCompute(oldCat,newCat,users,extras){
   var licOld=oldCat*users, licNew=newCat*users;
-  var increase=licNew-licOld;                 // uniquement les lignes qui changent
+  var increase=licNew-licOld;                 // uniquement les lignes qui changent (licences)
   var preTotal=licOld+extras;                 // ancien contrat au prix catalogue, SANS remise
   var hausse=0.07*preTotal;                    // hausse autorisée
   var pcMag=increase-hausse;                   // |PC| (ligne négative)
   var pcCap=0.93*increase;                      // plafond (à confirmer)
-  var ancienPaye=licOld+extras-discount;        // ancien total payé
-  var nouveauTotal=ancienPaye+hausse;           // raccourci : ancien payé + 7 % × PreTotal Rec+
-  var realPct= ancienPaye ? (hausse/ancienPaye*100) : 0;
+  var newCatTotal=licNew+extras;               // nouveau catalogue (plein)
+  var nouveauTotal=newCatTotal-pcMag;           // = PreTotal Rec+ × 1,07 (remise non reconduite)
   return {licOld:licOld,licNew:licNew,increase:increase,preTotal:preTotal,hausse:hausse,
-          pcMag:pcMag,pcCap:pcCap,ancienPaye:ancienPaye,nouveauTotal:nouveauTotal,realPct:realPct};
+          pcMag:pcMag,pcCap:pcCap,newCatTotal:newCatTotal,nouveauTotal:nouveauTotal};
 }
 
 // ---------- Libellés des erreurs types (pour le feedback) ----------
 var QZ_ERR = {
   paid:     {fr:"7 % appliqués sur le prix payé (remisé) au lieu du prix catalogue.", en:"7% applied to the (discounted) paid price instead of the catalog price."},
   increase: {fr:"7 % appliqués sur l'Increase au lieu du PreTotal Rec+.",             en:"7% applied to the Increase instead of PreTotal Rec+."},
-  discount: {fr:"Remise oubliée : calcul fait sur le catalogue plein.",               en:"Discount forgotten: computed on the full catalog."},
-  newcat:   {fr:"Nouveau catalogue × 1,07 (ignore le plafonnement réel).",            en:"New catalog × 1.07 (ignores the actual cap)."},
+  keptDisc: {fr:"Remise conservée EN PLUS de la PC. Au renouvellement, c'est soit la remise, soit la PC : la remise saute.", en:"Discount kept ON TOP of the PC. At renewal it's either the discount or the PC: the discount is dropped."},
+  newcat:   {fr:"Nouveau catalogue × 1,07 : on ajoute 7 % AU catalogue au lieu de plafonner l'augmentation.",            en:"New catalog × 1.07: 7% is added ON the catalog instead of capping the increase."},
   gaveAllow:{fr:"C'est la hausse autorisée (7 %), pas la Pricing Compensation.",      en:"That's the allowed increase (7%), not the Pricing Compensation."},
   noAllow:  {fr:"Increase non diminué de la hausse autorisée.",                       en:"Increase not reduced by the allowed increase."}
 };
@@ -117,15 +118,15 @@ var QUIZ_BANK = (function(){
              en:"MRR = total / number of contract months. It is a mere indicator, not part of the calculation. E.g. 37.40 → 40.02."} },
   // 8 — 7 % sur catalogue, pas payé (concept)
   { cat:'Concept',
-    q:{fr:"Un client remisé : la hausse réelle qu'il constate sur son prix payé est…",en:"A discounted client: the real rise on their paid price is…"},
+    q:{fr:"Les 7 % plafonnent la hausse de quel montant ?",en:"The 7% cap the rise of which amount?"},
     opts:[
-      {fr:"Supérieure à 7 % (les 7 % portent sur le catalogue, pas sur le prix remisé)",en:"Above 7% (the 7% apply to the catalog, not the discounted price)"},
-      {fr:"Exactement 7 %",en:"Exactly 7%"},
-      {fr:"Inférieure à 7 %",en:"Below 7%"},
-      {fr:"Toujours 20 %",en:"Always 20%"} ], a:0,
-    hint:{fr:"La remise reste en montant fixe pendant que l'assiette monte.",en:"The discount stays fixed while the base rises."},
-    explain:{fr:"Les 7 % sont calculés sur le prix catalogue. Comme la remise reste fixe, la hausse rapportée au prix payé dépasse 7 % (ex. Cas A : +7,80 %, Cas C : +8,75 %).",
-             en:"The 7% are computed on the catalog price. Since the discount stays fixed, the rise relative to the paid price exceeds 7% (e.g. Case A: +7.80%, Case C: +8.75%)."} },
+      {fr:"Du prix CATALOGUE (PreTotal Rec+)",en:"The CATALOG price (PreTotal Rec+)"},
+      {fr:"Du prix payé (remisé)",en:"The paid (discounted) price"},
+      {fr:"De l'Increase",en:"The Increase"},
+      {fr:"Du MRR",en:"The MRR"} ], a:0,
+    hint:{fr:"Regarde la formule de la hausse autorisée.",en:"Look at the allowed-increase formula."},
+    explain:{fr:"Les 7 % portent sur le prix catalogue (PreTotal Rec+), pas sur le prix payé. Et au renouvellement la remise commerciale saute : un client remisé repasse au catalogue × 1,07, donc constate une hausse bien supérieure à 7 % sur son prix payé.",
+             en:"The 7% apply to the catalog price (PreTotal Rec+), not the paid price. And at renewal the commercial discount is dropped: a discounted client goes back to catalog × 1.07, so sees a rise well above 7% on their paid price."} },
   // 9 — Odoo.sh / maintenance enlarge base
   { cat:'Concept',
     q:{fr:"Odoo.sh et la maintenance (prix inchangés) jouent quel rôle dans le calcul ?",en:"Odoo.sh and maintenance (unchanged prices): what role do they play?"},
@@ -137,25 +138,25 @@ var QUIZ_BANK = (function(){
     hint:{fr:"Leur prix ne change pas, mais ils comptent dans le PreTotal Rec+.",en:"Their price doesn't change, but they count in PreTotal Rec+."},
     explain:{fr:"Odoo.sh et la maintenance ne changent pas de prix (Increase inchangé) mais entrent dans le PreTotal Rec+, donc augmentent la hausse autorisée (7 % d'une assiette plus grande).",
              en:"Odoo.sh and maintenance don't change price (Increase unchanged) but are part of PreTotal Rec+, so they raise the allowed increase (7% of a bigger base)."} },
-  // 10 — remises fixes
+  // 10 — soit remise soit PC
   { cat:'Concept',
-    q:{fr:"Les remises (ex. Multi Year Discount) lors du renouvellement :",en:"Discounts (e.g. Multi Year Discount) at renewal:"},
+    q:{fr:"Au renouvellement, pour une remise COMMERCIALE, la règle est :",en:"At renewal, for a COMMERCIAL discount, the rule is:"},
     opts:[
-      {fr:"Restent en montant fixe",en:"Stay as a fixed amount"},
-      {fr:"Augmentent de 7 %",en:"Rise by 7%"},
-      {fr:"Augmentent de 20 %",en:"Rise by 20%"},
-      {fr:"Disparaissent automatiquement",en:"Disappear automatically"} ], a:0,
-    hint:{fr:"Montant fixe → le % remisé baisse quand l'assiette monte.",en:"Fixed amount → the discount % shrinks as the base rises."},
-    explain:{fr:"Les remises restent en montant fixe. C'est pourquoi le raccourci « nouveau total = ancien payé + 7 % × PreTotal Rec+ » reste valable tant que la remise est fixe et que le plafond 93 % ne joue pas.",
-             en:"Discounts stay as a fixed amount. That's why the shortcut “new total = old paid + 7% × PreTotal Rec+” holds as long as the discount is fixed and the 93% cap doesn't kick in."} },
+      {fr:"Soit la remise, soit la Pricing Compensation — la remise n'est pas reconduite",en:"Either the discount or the Pricing Compensation — the discount is not carried over"},
+      {fr:"On garde la remise ET on ajoute la PC",en:"Keep the discount AND add the PC"},
+      {fr:"La remise augmente de 7 %",en:"The discount rises by 7%"},
+      {fr:"La remise devient un pourcentage",en:"The discount becomes a percentage"} ], a:0,
+    hint:{fr:"On ne cumule jamais remise et PC sur le même écart de prix.",en:"Discount and PC are never stacked on the same price gap."},
+    explain:{fr:"Au renouvellement, c'est soit la remise, soit la PC : la remise commerciale saute, remplacée par la Pricing Compensation, et le client repart du catalogue × 1,07. (Le Multi Year Discount, rabais structurel, peut être reconduit avec le réengagement multi-annuel — cas particulier.)",
+             en:"At renewal it's either the discount or the PC: the commercial discount is dropped, replaced by the Pricing Compensation, and the client restarts from catalog × 1.07. (The Multi Year Discount, a structural rebate, may be carried over with the multi-year re-commitment — special case.)"} },
   // 11 — Cas A total
   { cat:'Cas A',
     q:{fr:"Cas A (5 ans, 40 users). Ancien total payé 94 492,80 €, PreTotal Rec+ 105 264 €. Quel est le NOUVEAU total ?",
        en:"Case A (5 yrs, 40 users). Old paid total 94,492.80 €, PreTotal Rec+ 105,264 €. What is the NEW total?"},
-    opts:[qzEUR(A.total), qzEUR(94492.80*1.07), qzEUR(112492.80), qzEUR(105264*1.07)], a:0,
-    hint:{fr:"Raccourci : nouveau total = ancien payé + 7 % × PreTotal Rec+.",en:"Shortcut: new total = old paid + 7% × PreTotal Rec+."},
-    explain:{fr:"7 % × 105 264 = 7 368,48. Nouveau total = 94 492,80 + 7 368,48 = 101 861,28 € (+7,80 % réel, à cause de la remise fixe).",
-             en:"7% × 105,264 = 7,368.48. New total = 94,492.80 + 7,368.48 = 101,861.28 € (+7.80% real, due to the fixed discount)."} },
+    opts:[qzEUR(A.total), qzEUR(105264*1.07), qzEUR(112492.80), qzEUR(94492.80*1.07)], a:0,
+    hint:{fr:"Ici le Multi Year Discount est reconduit → ancien payé + 7 % × PreTotal Rec+.",en:"Here the Multi Year Discount is carried over → old paid + 7% × PreTotal Rec+."},
+    explain:{fr:"Cas multi-annuel : le Multi Year Discount (rabais structurel) est reconduit. 7 % × 105 264 = 7 368,48. Nouveau total = 94 492,80 + 7 368,48 = 101 861,28 € (+7,80 % sur le payé). ⚠️ Pour une remise COMMERCIALE (non reconduite), on partirait du catalogue × 1,07 (112 632,48 €).",
+             en:"Multi-year case: the Multi Year Discount (structural rebate) is carried over. 7% × 105,264 = 7,368.48. New total = 94,492.80 + 7,368.48 = 101,861.28 € (+7.80% on paid). ⚠️ For a COMMERCIAL discount (not carried over), you'd start from catalog × 1.07 (112,632.48 €)."} },
   // 12 — Cas A PC
   { cat:'Cas A',
     q:{fr:"Cas A : Increase 18 000 €, hausse autorisée 7 368,48 €. Que vaut la ligne Pricing Compensation ?",
@@ -172,29 +173,29 @@ var QUIZ_BANK = (function(){
     hint:{fr:"Increase 90 ; hausse autorisée 7 % × 448,80.",en:"Increase 90; allowed increase 7% × 448.80."},
     explain:{fr:"Hausse autorisée = 7 % × 448,80 = 31,416. PC = 90 − 31,416 = 58,584 → ligne −58,584 € (arrondi −58,58 € sur le devis). Nouveau total 480,22 € (+7,00 %).",
              en:"Allowed increase = 7% × 448.80 = 31.416. PC = 90 − 31.416 = 58.584 → line −58.584 € (−58.58 € on the quote). New total 480.22 € (+7.00%)."} },
-  // 14 — Cas C with discount
+  // 14 — Cas C : remise commerciale non reconduite
   { cat:'Cas C',
-    q:{fr:"Cas C : catalogue 1 000 → 1 200 €, avec 200 € de remise fixe. Quelle hausse RÉELLE sur le prix payé ?",
-       en:"Case C: catalog 1,000 → 1,200 €, with a 200 € fixed discount. What REAL rise on the paid price?"},
+    q:{fr:"Cas C : catalogue 1 000 → 1 200 €. Le client a une remise fixe de 200 € (il paie 800 €). Au renouvellement, quel est le nouveau total ?",
+       en:"Case C: catalog 1,000 → 1,200 €. The client has a 200 € fixed discount (pays 800 €). At renewal, what is the new total?"},
     opts:[
-      {fr:"+8,75 % (800 → 870 €)",en:"+8.75% (800 → 870 €)"},
-      {fr:"+7,00 % (800 → 856 €)",en:"+7.00% (800 → 856 €)"},
-      {fr:"+20,00 %",en:"+20.00%"},
-      {fr:"+6,00 %",en:"+6.00%"} ], a:0,
-    hint:{fr:"7 % portent sur le catalogue (1 000), pas sur les 800 payés.",en:"7% apply to catalog (1,000), not the 800 paid."},
-    explain:{fr:"Hausse autorisée = 7 % × 1 000 = 70. Payé : 800 → 870 €, soit +8,75 %. Sans remise ce serait 1 000 → 1 070 € (+7,00 %).",
-             en:"Allowed increase = 7% × 1,000 = 70. Paid: 800 → 870 €, i.e. +8.75%. Without discount it would be 1,000 → 1,070 € (+7.00%)."} },
+      {fr:"1 070,00 € (= 1 000 × 1,07, la remise saute)",en:"1,070.00 € (= 1,000 × 1.07, discount dropped)"},
+      {fr:"870,00 € (on garde la remise : 800 + 70)",en:"870.00 € (keep the discount: 800 + 70)"},
+      {fr:"856,00 € (7 % sur le prix payé)",en:"856.00 € (7% on the paid price)"},
+      {fr:"1 284,00 € (1 200 × 1,07)",en:"1,284.00 € (1,200 × 1.07)"} ], a:0,
+    hint:{fr:"La remise commerciale n'est pas reconduite : soit la remise, soit la PC.",en:"The commercial discount is not carried over: either the discount or the PC."},
+    explain:{fr:"PC = Increase 200 − hausse autorisée 70 = 130 → ligne −130. Nouveau total = 1 200 − 130 = 1 070 € (= 1 000 × 1,07). La remise de 200 € saute : le client passe de 800 à 1 070 €. Garder la remise (870 €) serait l'erreur « remise + PC ».",
+             en:"PC = Increase 200 − allowed increase 70 = 130 → line −130. New total = 1,200 − 130 = 1,070 € (= 1,000 × 1.07). The 200 € discount is dropped: the client moves from 800 to 1,070 €. Keeping the discount (870 €) would be the “discount + PC” mistake."} },
   // 15 — raccourci
   { cat:'Raccourci',
-    q:{fr:"Quel est le raccourci de calcul du nouveau total ?",en:"What is the shortcut to compute the new total?"},
+    q:{fr:"Pour un client avec une remise COMMERCIALE, le raccourci du nouveau total au renouvellement est :",en:"For a client with a COMMERCIAL discount, the shortcut for the new total at renewal is:"},
     opts:[
-      {fr:"Ancien total payé + 7 % × PreTotal Rec+",en:"Old paid total + 7% × PreTotal Rec+"},
-      {fr:"Ancien total payé × 1,07",en:"Old paid total × 1.07"},
+      {fr:"Ancien catalogue × 1,07 (= nouveau catalogue − PC)",en:"Old catalog × 1.07 (= new catalog − PC)"},
+      {fr:"Ancien payé × 1,07",en:"Old paid × 1.07"},
       {fr:"Nouveau catalogue × 1,07",en:"New catalog × 1.07"},
-      {fr:"Ancien payé + 7 % × Increase",en:"Old paid + 7% × Increase"} ], a:0,
-    hint:{fr:"Valable tant que remises fixes et plafond 93 % non atteint.",en:"Valid while discounts are fixed and the 93% cap isn't reached."},
-    explain:{fr:"Nouveau total = ancien payé + 7 % × PreTotal Rec+. Attention : « ancien payé × 1,07 » est faux pour un client remisé (7 % portent sur le catalogue).",
-             en:"New total = old paid + 7% × PreTotal Rec+. Beware: “old paid × 1.07” is wrong for a discounted client (7% apply to the catalog)."} }
+      {fr:"Ancien payé + 7 % × PreTotal Rec+",en:"Old paid + 7% × PreTotal Rec+"} ], a:0,
+    hint:{fr:"La remise saute → on repart du catalogue.",en:"The discount is dropped → start from the catalog."},
+    explain:{fr:"Nouveau total = nouveau catalogue − PC = PreTotal Rec+ × 1,07 = ancien catalogue × 1,07 (la remise commerciale n'est pas reconduite). « Ancien payé + 7 % × PreTotal » ne vaut que si la remise est reconduite (ex. Multi Year Discount).",
+             en:"New total = new catalog − PC = PreTotal Rec+ × 1.07 = old catalog × 1.07 (the commercial discount is not carried over). “Old paid + 7% × PreTotal” only holds if the discount is carried over (e.g. Multi Year Discount)."} }
   ];
 })();
 
@@ -206,29 +207,29 @@ function qzGenExercise(){
   if(delta < oldCat*0.08) delta = Math.ceil(oldCat*0.08/10)*10;
   var newCat = oldCat + delta;
   var field = Math.random()<0.6 ? 'total' : 'pc';
-  var discount = 0;
-  if(field==='total'){ discount = Math.round(oldCat*users*qzRand(10,25,1)/100); } // >0 pour rendre les erreurs distinctes
-  else if(Math.random()<0.5){ discount = Math.round(oldCat*users*qzRand(10,20,1)/100); }
-  var m = qzCompute(oldCat,newCat,users,0,discount);
+  // remise actuelle du client (contexte / piège) : non reconduite au renouvellement
+  var discount = Math.round(oldCat*users*qzRand(10,25,1)/100);
+  var m = qzCompute(oldCat,newCat,users,0);
+  var ancienPaye = oldCat*users - discount; // ce que le client paie aujourd'hui, avec sa remise
 
-  var correct, cands, qTxt, explainCore;
-  var ctx = {fr:"Contrat annuel — "+users+" user"+(users>1?"s":"")+", ancien catalogue "+qzEUR(oldCat)+"/user, nouveau catalogue "+qzEUR(newCat)+"/user, remise fixe "+qzEUR(discount)+".",
-             en:"Annual contract — "+users+" user"+(users>1?"s":"")+", old catalog "+qzEUR(oldCat)+"/user, new catalog "+qzEUR(newCat)+"/user, fixed discount "+qzEUR(discount)+"."};
+  var correct, cands, qTxt;
+  var ctx = {fr:"Contrat annuel — "+users+" user"+(users>1?"s":"")+", ancien catalogue "+qzEUR(oldCat)+"/user, nouveau catalogue "+qzEUR(newCat)+"/user. Le client bénéficie aujourd'hui d'une remise fixe de "+qzEUR(discount)+" (prix payé "+qzEUR(ancienPaye)+").",
+             en:"Annual contract — "+users+" user"+(users>1?"s":"")+", old catalog "+qzEUR(oldCat)+"/user, new catalog "+qzEUR(newCat)+"/user. The client currently has a fixed discount of "+qzEUR(discount)+" (paid price "+qzEUR(ancienPaye)+")."};
   if(field==='total'){
-    correct = m.nouveauTotal;
+    correct = m.nouveauTotal; // = catalogue × 1,07, remise non reconduite
     cands = [
-      {v:m.ancienPaye*1.07, err:QZ_ERR.paid},
-      {v:m.ancienPaye+0.07*m.increase, err:QZ_ERR.increase},
-      {v:m.preTotal*1.07, err:QZ_ERR.discount},
-      {v:(newCat*users)*1.07, err:QZ_ERR.newcat}
+      {v:ancienPaye+m.hausse, err:QZ_ERR.keptDisc},         // a gardé la remise en plus de la PC
+      {v:ancienPaye*1.07, err:QZ_ERR.paid},                  // 7 % sur le prix payé
+      {v:m.preTotal+0.07*m.increase, err:QZ_ERR.increase},   // 7 % sur l'Increase
+      {v:m.newCatTotal*1.07, err:QZ_ERR.newcat}              // nouveau catalogue × 1,07
     ];
-    qTxt = {fr:ctx.fr+" Quel est le NOUVEAU total à facturer ?", en:ctx.en+" What is the NEW total to invoice?"};
+    qTxt = {fr:ctx.fr+" Au renouvellement, quel est le NOUVEAU total ?", en:ctx.en+" At renewal, what is the NEW total?"};
   } else {
     correct = m.pcMag;
     cands = [
       {v:0.07*m.preTotal, err:QZ_ERR.gaveAllow},
       {v:0.93*m.increase, err:QZ_ERR.increase},
-      {v:m.increase-0.07*m.ancienPaye, err:QZ_ERR.paid},
+      {v:m.increase-0.07*ancienPaye, err:QZ_ERR.paid},
       {v:m.increase, err:QZ_ERR.noAllow}
     ];
     qTxt = {fr:ctx.fr+" Quel est le montant (valeur absolue) de la ligne Pricing Compensation ?",
@@ -248,20 +249,20 @@ function qzGenExercise(){
     if(!seen[key]){ seen[key]=true; distract.push({v:v, err:{fr:"Valeur erronée.",en:"Wrong value."}}); }
   }
   var options = qzShuffle([{v:cr, err:null}].concat(distract)).map(function(o){
-    return { text:qzEUR(field==='pc'? o.v : o.v), correct:o.err===null, err:o.err };
+    return { text:qzEUR(o.v), correct:o.err===null, err:o.err };
   });
 
-  var ex = {
-    fr:"PreTotal Rec+ = "+qzEUR(m.preTotal)+" • Increase = "+qzEUR(m.increase)+" • Hausse autorisée (7 %) = "+qzEUR(m.hausse)
-      +" • PC = "+qzEUR(-m.pcMag)+" • Nouveau total = ancien payé "+qzEUR(m.ancienPaye)+" + "+qzEUR(m.hausse)+" = "+qzEUR(m.nouveauTotal)+" ("+qzPct(m.realPct)+" réel).",
-    en:"PreTotal Rec+ = "+qzEUR(m.preTotal)+" • Increase = "+qzEUR(m.increase)+" • Allowed increase (7%) = "+qzEUR(m.hausse)
-      +" • PC = "+qzEUR(-m.pcMag)+" • New total = old paid "+qzEUR(m.ancienPaye)+" + "+qzEUR(m.hausse)+" = "+qzEUR(m.nouveauTotal)+" ("+qzPct(m.realPct)+" real)."
+  var core = {
+    fr:"Au renouvellement, la remise commerciale saute (soit la remise, soit la PC). PreTotal Rec+ = "+qzEUR(m.preTotal)+" • Increase = "+qzEUR(m.increase)+" • Hausse autorisée (7 %) = "+qzEUR(m.hausse)
+      +" • PC = "+qzEUR(-m.pcMag)+" • Nouveau total = nouveau catalogue "+qzEUR(m.newCatTotal)+" − "+qzEUR(m.pcMag)+" = "+qzEUR(m.nouveauTotal)+" (= ancien catalogue × 1,07). Le client passe de "+qzEUR(ancienPaye)+" à "+qzEUR(m.nouveauTotal)+".",
+    en:"At renewal the commercial discount is dropped (either the discount or the PC). PreTotal Rec+ = "+qzEUR(m.preTotal)+" • Increase = "+qzEUR(m.increase)+" • Allowed increase (7%) = "+qzEUR(m.hausse)
+      +" • PC = "+qzEUR(-m.pcMag)+" • New total = new catalog "+qzEUR(m.newCatTotal)+" − "+qzEUR(m.pcMag)+" = "+qzEUR(m.nouveauTotal)+" (= old catalog × 1.07). The client moves from "+qzEUR(ancienPaye)+" to "+qzEUR(m.nouveauTotal)+"."
   };
   return {
     prompt:qTxt, options:options,
-    hint:{fr:"Les 7 % portent sur le PreTotal Rec+ (catalogue), jamais sur le prix payé ni sur l'Increase.",
-          en:"The 7% apply to PreTotal Rec+ (catalog), never to the paid price nor to the Increase."},
-    explain:ex, generated:true
+    hint:{fr:"La remise n'est pas reconduite : on part du nouveau catalogue et on applique la PC (7 % sur le PreTotal Rec+, pas sur le prix payé).",
+          en:"The discount is not carried over: start from the new catalog and apply the PC (7% on PreTotal Rec+, not on the paid price)."},
+    explain:core, generated:true
   };
 }
 
@@ -498,18 +499,20 @@ function renderQuizMemo(){
   h+='</tbody></table>';
   // Raccourci
   h+='<div style="margin-top:12px;background:rgba(0,160,157,0.1);border:1px solid rgba(0,200,150,0.3);border-radius:10px;padding:12px 15px;font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.6;">'
-    +'⚡ <strong>'+(isFR?'Raccourci :':'Shortcut:')+'</strong> '+(isFR?'nouveau total = ancien total payé + 7 % × PreTotal Rec+. Valable tant que les remises restent fixes et que le plafond de 93 % ne joue pas.':'new total = old paid total + 7% × PreTotal Rec+. Valid while discounts stay fixed and the 93% cap doesn’t apply.')+'</div>';
+    +'⚡ <strong>'+(isFR?'Raccourci :':'Shortcut:')+'</strong> '+(isFR?'nouveau total = nouveau catalogue − PC = PreTotal Rec+ × 1,07 (= ancien catalogue × 1,07). Au renouvellement, la remise commerciale n\'est pas reconduite : soit la remise, soit la PC.':'new total = new catalog − PC = PreTotal Rec+ × 1.07 (= old catalog × 1.07). At renewal the commercial discount is not carried over: either the discount or the PC.')+'</div>';
   // Points clés
   h+='<div class="qz-flip-tag" style="margin-top:18px;">'+(isFR?'Points clés':'Key points')+'</div>';
   var kp = isFR ? [
-    "Les 7 % portent sur le prix <strong>catalogue</strong>, pas sur le prix remisé. Un client remisé voit donc une hausse réelle <strong>supérieure à 7 %</strong>.",
+    "Les 7 % plafonnent la hausse du prix <strong>catalogue</strong> (PreTotal Rec+), pas du prix payé.",
+    "Au renouvellement, la remise commerciale <strong>saute</strong> : soit la remise, soit la Pricing Compensation (jamais les deux). Un client remisé repasse au <strong>catalogue × 1,07</strong>.",
     "Odoo.sh et la maintenance ne changent pas de prix : ils <strong>agrandissent l'assiette</strong> des 7 %.",
-    "Les remises (ex. Multi Year Discount) restent en <strong>montant fixe</strong>.",
+    "Le <strong>Multi Year Discount</strong> (rabais structurel) peut être reconduit avec le réengagement multi-annuel — distinct d'une remise commerciale.",
     "Le plafond 93 % et la Previous Compensation lors des renouvellements suivants sont <strong>à confirmer</strong>."
   ] : [
-    "The 7% apply to the <strong>catalog</strong> price, not the discounted one. A discounted client sees a real rise <strong>above 7%</strong>.",
+    "The 7% cap the rise of the <strong>catalog</strong> price (PreTotal Rec+), not the paid price.",
+    "At renewal the commercial discount is <strong>dropped</strong>: either the discount or the Pricing Compensation (never both). A discounted client goes back to <strong>catalog × 1.07</strong>.",
     "Odoo.sh and maintenance don’t change price: they <strong>enlarge the 7% base</strong>.",
-    "Discounts (e.g. Multi Year Discount) stay as a <strong>fixed amount</strong>.",
+    "The <strong>Multi Year Discount</strong> (structural rebate) may be carried over with the multi-year re-commitment — distinct from a commercial discount.",
     "The 93% cap and Previous Compensation on subsequent renewals are <strong>to confirm</strong>."
   ];
   h+='<ul class="qz-kpts" style="font-size:12.5px;color:rgba(255,255,255,0.82);padding-left:20px;margin:8px 0 0;">';
